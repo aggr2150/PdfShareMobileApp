@@ -1,41 +1,19 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
-import React, {type PropsWithChildren} from 'react';
+import React, {PropsWithChildren} from 'react';
 import {
   Dimensions,
   Linking,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   useColorScheme,
+  useWindowDimensions,
   View,
 } from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Pdf from 'react-native-pdf';
-import {useWindowDimensions} from 'react-native';
-
-import {NavigationContainer} from '@react-navigation/native';
-import RootNavigation from './src/navigations/RootNavigation';
-import {ThemeProvider} from '@rneui/themed';
-import theme from './src/components/theme';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {Button} from '@rneui/themed';
+import {useNavigation} from '@react-navigation/native';
 
 const Section: React.FC<
   PropsWithChildren<{
@@ -67,17 +45,46 @@ const Section: React.FC<
   );
 };
 
-const App = () => {
+// interface PdfViewerProps {
+// }
+
+const PdfViewer: React.FC = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
+  const backgroundStyle = {
+    flex: 1,
+    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  };
+  const source = {
+    uri: 'http://samples.leanpub.com/thereactnativebook-sample.pdf',
+    cache: true,
+  };
+  const {height, width} = useWindowDimensions();
+  const navigation = useNavigation();
+
   return (
-    <SafeAreaProvider>
-      <ThemeProvider theme={theme}>
-        <NavigationContainer>
-          <RootNavigation />
-        </NavigationContainer>
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <SafeAreaView style={backgroundStyle}>
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={backgroundStyle.backgroundColor}
+      />
+      <View style={styles.container}>
+        <Button
+          title={'navigate'}
+          onPress={() => navigation.reset({routes: [{name: 'Home'}]})}
+        />
+        <View
+          style={{
+            backgroundColor: 'red',
+            width: 100,
+            height: 100,
+            position: 'absolute',
+            bottom: 10,
+            right: 10,
+            alignSelf: 'flex-end',
+          }}></View>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -111,4 +118,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default PdfViewer;
