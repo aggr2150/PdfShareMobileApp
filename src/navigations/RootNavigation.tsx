@@ -10,7 +10,7 @@ const RootStack = createStackNavigator<RootStackParamList>();
 const RootStackNavigator = () => {
   return (
     <Provider store={ViewerStore}>
-      <RootStack.Navigator>
+      <RootStack.Navigator screenOptions={{cardStyle: {backgroundColor:'#000'}}}>
         <RootStack.Screen
           name="SignIn"
           component={SignIn}

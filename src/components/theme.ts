@@ -3,7 +3,7 @@ import {createTheme} from '@rneui/themed';
 export default createTheme({
   components: {
     Button: {
-      raised: true,
+      color: "secondary"
     },
     Text: {
       style: {
@@ -12,6 +12,10 @@ export default createTheme({
     },
   },
   lightColors: {
+    sheetsBackground: '#99c729',
     black: '#262626',
+    primary: '#99c729',
+    background: '#000',
+    secondary: '#1ba639'
   },
 });

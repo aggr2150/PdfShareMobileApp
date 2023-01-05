@@ -75,8 +75,9 @@ const PdfViewer: React.FC = () => {
       />
       <View style={[styles.container, {overflow: 'visible'}]}>
         <Pdf
+          trustAllCerts={false}
           source={source}
-          onPageSingleTap={() => dispatch(setUIVisible())}
+          // onPageSingleTap={() => dispatch(setUIVisible())}
           onLoadComplete={(numberOfPages, filePath) => {
             console.log(`Number of pages: ${numberOfPages}`);
           }}
@@ -87,6 +88,7 @@ const PdfViewer: React.FC = () => {
             console.log(error);
           }}
           onPressLink={uri => {
+            console.log(uri);
             Linking.canOpenURL(uri).then(value => {
               value && Linking.openURL(uri);
             });
@@ -103,7 +105,8 @@ const PdfViewer: React.FC = () => {
             bottom: 10,
             right: 10,
             alignSelf: 'flex-end',
-          }}></TouchableOpacity>
+          }}
+        />
       </View>
     </View>
   );

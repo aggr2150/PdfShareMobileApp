@@ -36,79 +36,22 @@ import RootNavigation from './src/navigations/RootNavigation';
 import {ThemeProvider} from '@rneui/themed';
 import theme from './src/components/theme';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-
-const Section: React.FC<
-  PropsWithChildren<{
-    title: string;
-  }>
-> = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
-
+import {SheetProvider} from 'react-native-actions-sheet';
+import '@src/components/sheets/register.ts';
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
-    <SafeAreaProvider>
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
+      <SafeAreaProvider>
         <NavigationContainer>
-          <RootNavigation />
+          <SheetProvider>
+            <RootNavigation />
+          </SheetProvider>
         </NavigationContainer>
-      </ThemeProvider>
-    </SafeAreaProvider>
+      </SafeAreaProvider>
+    </ThemeProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    marginTop: 25,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  pdf: {
-    flex: 1,
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  },
-});
 
 export default App;

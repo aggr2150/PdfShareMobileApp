@@ -6,49 +6,18 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   useColorScheme,
   useWindowDimensions,
   View,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Pdf from 'react-native-pdf';
-import {Button} from '@rneui/themed';
+import {Button, Input, makeStyles} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
+import {SheetManager} from 'react-native-actions-sheet';
 
-const Section: React.FC<
-  PropsWithChildren<{
-    title: string;
-  }>
-> = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
-
-// interface PdfViewerProps {
-// }
-
-const PdfViewer: React.FC = () => {
+const SignIn: React.FC = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
@@ -62,8 +31,9 @@ const PdfViewer: React.FC = () => {
   const {height, width} = useWindowDimensions();
   const navigation = useNavigation();
 
+  const styles = useStyles();
   return (
-    <SafeAreaView style={backgroundStyle}>
+    <SafeAreaView style={styles.wrapper}>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
@@ -72,6 +42,10 @@ const PdfViewer: React.FC = () => {
         <Button
           title={'navigate'}
           onPress={() => navigation.reset({routes: [{name: 'Home'}]})}
+        />
+        <Button
+          title={'open'}
+          onPress={() => SheetManager.show('loginSheet')}
         />
         <View
           style={{
@@ -82,22 +56,23 @@ const PdfViewer: React.FC = () => {
             bottom: 10,
             right: 10,
             alignSelf: 'flex-end',
-          }}></View>
+          }}
+        />
       </View>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(theme => ({
+  wrapper: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
     marginTop: 25,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
   },
   sectionTitle: {
     fontSize: 24,
@@ -111,11 +86,6 @@ const styles = StyleSheet.create({
   highlight: {
     fontWeight: '700',
   },
-  pdf: {
-    flex: 1,
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  },
-});
+}));
 
-export default PdfViewer;
+export default SignIn;
