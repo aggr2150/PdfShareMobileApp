@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">EveryPDF</string>
+    <string moduleConfig="true" name="CodePushDeploymentKey">IY5qefVf4_T1rQrz9uEdDdUYVDzEM4J_vH6V_</string>
 </resources>
