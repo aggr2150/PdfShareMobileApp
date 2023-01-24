@@ -20,3 +20,10 @@ declare interface TPlace {
   createdAt: Date;
   updatedAt?: Date;
 }
+
+declare interface ISession {
+  userId?: string;
+  id?: string;
+  nickname?: string;
+  email?: string;
+}

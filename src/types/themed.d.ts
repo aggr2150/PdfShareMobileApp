@@ -6,5 +6,6 @@ declare module '@rneui/themed' {
     accent: string;
     surface: string;
     sheetsBackground: string;
+    separator: string;
   }
 }

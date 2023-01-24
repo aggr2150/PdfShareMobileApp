@@ -11,7 +11,7 @@ interface ThrottleFlatListProps<T> extends FlatListProps<T> {}
 
 const ThrottleFlatList = <T extends object>(
   props: ThrottleFlatListProps<T>,
-): React.ReactElement => {
+): JSX.Element => {
   return <FlatList<T> {...props} />;
 };
 

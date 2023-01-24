@@ -8,28 +8,8 @@
  * @format
  */
 
-import React, {type PropsWithChildren} from 'react';
-import {
-  Dimensions,
-  Linking,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-import Pdf from 'react-native-pdf';
-import {useWindowDimensions} from 'react-native';
+import React from 'react';
+import {useColorScheme} from 'react-native';
 
 import {NavigationContainer} from '@react-navigation/native';
 import RootNavigation from './src/navigations/RootNavigation';
@@ -38,20 +18,33 @@ import theme from './src/components/theme';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {SheetProvider} from 'react-native-actions-sheet';
 import '@src/components/sheets/register.ts';
+import codePush from 'react-native-code-push';
+import Toast from 'react-native-toast-message';
+import {RootStore} from '@redux/store/RootStore';
+import {Provider} from 'react-redux';
+
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
-    <ThemeProvider theme={theme}>
-      <SafeAreaProvider>
-        <NavigationContainer>
-          <SheetProvider>
-            <RootNavigation />
-          </SheetProvider>
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </ThemeProvider>
+    <>
+      <ThemeProvider theme={theme}>
+        <SafeAreaProvider>
+          <Provider store={RootStore}>
+            <NavigationContainer>
+              <SheetProvider>
+                <RootNavigation />
+              </SheetProvider>
+            </NavigationContainer>
+          </Provider>
+        </SafeAreaProvider>
+      </ThemeProvider>
+      <Toast />
+    </>
   );
 };
 
-export default App;
+export default codePush({
+  checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
+  installMode: codePush.InstallMode.ON_NEXT_RESUME,
+})(App);

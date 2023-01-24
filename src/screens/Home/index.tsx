@@ -1,16 +1,39 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
-import {Button, Text} from '@rneui/themed';
+import {makeStyles} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
-import ThrottleFlatList from '@components/ThrottleFlatlist';
 import ToggleBtn from '@components/ToggleBtn';
+import Pages from '@components/Pages';
+import FirstScene from '@screens/Home/FirstScene';
+import SecondScene from '@screens/Home/SecondScene';
+import BookCard from '@components/BookCard';
+import Avatar from '@components/Avatar';
+import {withTiming} from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+
+enum EnumSelectedIndex {
+  '전체',
+  '구독중',
+}
 
 const Home = () => {
+  const styles = useStyles();
   const navigation = useNavigation();
+  const [selectedIndex, setSelectedIndex] = useState<EnumSelectedIndex>(
+    EnumSelectedIndex.전체,
+  );
+  const insets = useSafeAreaInsets();
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <View style={{position: 'absolute', top: 24, zIndex: 1}}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#000',
+      }}>
+      <View style={{position: 'absolute', top: insets.top || 24, zIndex: 1}}>
         <ToggleBtn
+          labelText={['전체', '구독중']}
           textStyle={{fontSize: 10}}
           switchStyle={{borderRadius: 23, backgroundColor: '#161616'}}
           containerStyle={{
@@ -19,28 +42,34 @@ const Home = () => {
             borderRadius: 23,
             backgroundColor: '#000',
           }}
+          onPress={setSelectedIndex}
           splitCenter={true}
+          selectedIndex={selectedIndex}
         />
       </View>
-      <ThrottleFlatList<TPlace>
-        data={[1, 2, 3, 4]}
-        contentContainerStyle={{width: '100%'}}
-        renderItem={({item, index}) => (
-          <View
-            style={{
-              aspectRatio: 16 / 9,
-              backgroundColor: index % 2 === 0 ? '#1a3692' : '#e73f90',
-              width: '100%',
-            }}>
-            <Text>{item._id}</Text>
-          </View>
-        )}
-      />
-      {/*<Button*/}
-      {/*  title={'navigate'}*/}
-      {/*  onPress={() => navigation.navigate('Viewer')}*/}
-      {/*/>*/}
+      <View
+        style={{
+          width: '100%',
+          height: '100%',
+          flex: 1,
+        }}>
+        <Pages
+          setSelectedIndex={setSelectedIndex}
+          selectedIndex={selectedIndex}
+          SceneMap={[FirstScene, SecondScene]}
+        />
+      </View>
     </View>
   );
 };
+
+const useStyles = makeStyles(theme => ({
+  container: {
+    backgroundColor: theme.colors.background,
+    paddingHorizontal: 25,
+    // justifyContent: 'center',
+    borderTopRightRadius: 45,
+    borderTopLeftRadius: 45,
+  },
+}));
 export default Home;

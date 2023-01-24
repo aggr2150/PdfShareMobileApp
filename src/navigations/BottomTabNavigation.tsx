@@ -4,6 +4,13 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Button, makeStyles, Text} from '@rneui/themed';
 import Home from '@screens/Home';
 import {SheetManager} from 'react-native-actions-sheet';
+import Profile from '@screens/Profile';
+import History from '@screens/History';
+import HomeIcon from '@assets/icon/home.svg';
+import SearchIcon from '@assets/icon/search.svg';
+import HistoryIcon from '@assets/icon/history.svg';
+import ProfileIcon from '@assets/icon/person.svg';
+import HistoryStackNavigator from '@navigations/HistoryStackNavigation';
 
 function SettingsScreen() {
   return (
@@ -28,17 +35,71 @@ export default () => {
         tabBarStyle: styles.tabBarContainer,
         tabBarShowLabel: false,
         headerShown: false,
+        tabBarActiveTintColor: '#99c729',
       }}>
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Search" component={SettingsScreen} />
-      <Tab.Screen name="Profile" component={SettingsScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarIcon: ({size, color}) => (
+            <HomeIcon
+              style={{width: size, height: size}}
+              width={size}
+              height={size}
+              fill={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Search"
+        component={SettingsScreen}
+        options={{
+          tabBarIcon: ({size, color}) => (
+            <SearchIcon
+              style={{width: size, height: size}}
+              width={size}
+              height={size}
+              fill={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="HistoryTab"
+        component={HistoryStackNavigator}
+        options={{
+          tabBarIcon: ({size, color}) => (
+            <HistoryIcon
+              style={{width: size, height: size}}
+              width={size}
+              height={size}
+              fill={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          tabBarIcon: ({size, color}) => (
+            <ProfileIcon
+              style={{width: size, height: size}}
+              width={size}
+              height={size}
+              fill={color}
+            />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 };
 
 const useStyles = makeStyles(theme => ({
   tabBarContainer: {
+    borderTopWidth: 0,
     backgroundColor: theme.colors.background,
   },
 }));
