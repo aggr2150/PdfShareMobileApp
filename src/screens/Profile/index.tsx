@@ -14,10 +14,14 @@ import Animated, {
   SlideInRight,
   SlideOutLeft,
 } from 'react-native-reanimated';
+import {useAppSelector} from '@redux/store/RootStore';
 
-const Profile = () => {
+const Profile = (p: IUser) => {
+  // p.
   const navigation = useNavigation();
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const user = useAppSelector(state => state.auth.session);
+  console.log(user);
   let data;
   const renderItem = useMemo<React.FC<{item: TPlace; index: number}>>(() => {
     switch (selectedIndex) {

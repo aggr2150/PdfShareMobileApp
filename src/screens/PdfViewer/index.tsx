@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   Dimensions,
   Linking,
@@ -13,10 +13,10 @@ import {
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Pdf, {Source} from 'react-native-pdf';
-import {useAppDispatch, useAppSelector} from '@redux/store/ViewerStore';
+// import {useAppDispatch, useAppSelector} from '@redux/store/ViewerStore';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import {setUIVisible} from '@redux/reducer/viewerReducer';
+// import {setUIVisible} from '@redux/reducer/viewerReducer';
 import Animated, {
   SlideInDown,
   SlideInLeft,
@@ -49,8 +49,9 @@ const PdfViewer: React.FC = () => {
     // require("../../assets/테스트.pdf")
   };
   const {height, width} = useWindowDimensions();
-  const dispatch = useAppDispatch();
-  const UIVisible = useAppSelector(state => state.viewer.UIVisible);
+  // const dispatch = useAppDispatch();
+  // const UIVisible = useAppSelector(state => state.viewer.UIVisible);
+  const [UIVisible, setUIVisible] = useState(true);
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const actionSheetRef = useRef<ActionSheetRef>(null);
@@ -67,7 +68,7 @@ const PdfViewer: React.FC = () => {
           trustAllCerts={false}
           // source={source}
           source={require('../../assets/test_3.pdf')}
-          onPageSingleTap={() => dispatch(setUIVisible())}
+          onPageSingleTap={() => setUIVisible(prevState => !prevState)}
           onLoadComplete={(numberOfPages, filePath) => {
             console.log(`Number of pages: ${numberOfPages}`);
           }}
@@ -264,7 +265,13 @@ const PdfViewer: React.FC = () => {
                   },
                 ]}
                 onPress={() => detailsActionSheetRef.current?.show()}>
-                <Avatar style={{width: 20, height: 20, marginRight: 5}} />
+                <Pressable
+                  onPress={() => {
+                    navigation.navigate('ProfileTab');
+                    navigation.push('Profile');
+                  }}>
+                  <Avatar style={{width: 20, height: 20, marginRight: 5}} />
+                </Pressable>
                 <Text>123123 님의 무슨무슨 pdf</Text>
               </Pressable>
             </Animated.View>

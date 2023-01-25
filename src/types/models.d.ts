@@ -25,5 +25,13 @@ declare interface ISession {
   userId?: string;
   id?: string;
   nickname?: string;
+  email: string;
+}
+
+declare interface IUser extends ISession {
+  _id?: string;
+  id?: string;
+  nickname?: string;
+  avatar?: string;
   email?: string;
 }

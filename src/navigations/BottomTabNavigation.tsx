@@ -10,7 +10,8 @@ import HomeIcon from '@assets/icon/home.svg';
 import SearchIcon from '@assets/icon/search.svg';
 import HistoryIcon from '@assets/icon/history.svg';
 import ProfileIcon from '@assets/icon/person.svg';
-import HistoryStackNavigator from '@navigations/HistoryStackNavigation';
+import HistoryStackNavigation from '@navigations/HistoryStackNavigation';
+import ProfileStackNavigation from '@navigations/ProfileStackNavigation';
 
 function SettingsScreen() {
   return (
@@ -67,7 +68,7 @@ export default () => {
       />
       <Tab.Screen
         name="HistoryTab"
-        component={HistoryStackNavigator}
+        component={HistoryStackNavigation}
         options={{
           tabBarIcon: ({size, color}) => (
             <HistoryIcon
@@ -80,8 +81,8 @@ export default () => {
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={Profile}
+        name="ProfileTab"
+        component={ProfileStackNavigation}
         options={{
           tabBarIcon: ({size, color}) => (
             <ProfileIcon

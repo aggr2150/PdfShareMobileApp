@@ -12,8 +12,10 @@ import {makeStyles} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
 import {SheetManager} from 'react-native-actions-sheet';
 import AppLogo from '@assets/logo/appLogoWithText.svg';
-import {apiInstance} from '@utils/Networking';
+import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {initialized} from '@redux/reducer/authReducer';
+import Keychain from 'react-native-keychain';
+import {useAppDispatch} from '@redux/store/RootStore';
 
 const SignIn: React.FC = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -24,6 +26,7 @@ const SignIn: React.FC = () => {
   };
   const {height, width} = useWindowDimensions();
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
   const showSheet = useCallback(async () => {
     console.log('showsheet');
     await SheetManager.show('loginSheet', {payload: {closable: false}});
@@ -37,18 +40,32 @@ const SignIn: React.FC = () => {
     //   console.log(config);
     //   return config;
     // });
-    apiInstance
-      .post<response<ISession>>('/api/auth/signIn')
-      .then(response => {
-        if (response.data.code !== 200) {
-          initialized(null);
-          showSheet().then(r => console.log(r));
-        } else {
-          initialized(response.data.data);
-        }
-        // aa().then(() => {});
-      })
-      .catch(error => console.log(error));
+    // Retrieve the credentials
+    Keychain.getGenericPassword().then(credentials => {
+      if (credentials) {
+        console.log('cred');
+        getCsrfToken.then(token =>
+          apiInstance
+            .post<response<ISession>>('/api/auth/signIn', {
+              _csrf: token,
+              id: credentials.username,
+              password: credentials.password,
+            })
+            .then(response => {
+              if (response.data.code !== 200) {
+                dispatch(initialized(null));
+                showSheet().then(r => console.log(r));
+              } else {
+                console.log(response.data.data);
+                dispatch(initialized(response.data.data));
+                navigation.reset({routes: [{name: 'Tabs'}]});
+              }
+              // aa().then(() => {});
+            })
+            .catch(error => console.log(error)),
+        );
+      }
+    });
   }, [showSheet]);
 
   const styles = useStyles();

@@ -30,74 +30,71 @@ function SettingsScreen({navigation}) {
 
 const RootStackNavigator = () => {
   return (
-    <Provider store={ViewerStore}>
-      <RootStack.Navigator
-        screenOptions={{cardStyle: {backgroundColor: '#000'}}}>
-        <RootStack.Screen
-          name="SignIn"
-          component={SignIn}
-          options={{headerShown: false}}
-        />
-        <RootStack.Screen
-          name="Viewer"
-          component={PdfViewer}
-          options={{
-            headerShown: false,
-            // header: ViewerHeader,
-            header: ViewerHeader,
-          }}
-        />
-        <RootStack.Screen
-          name="Comments"
-          component={Comments}
-          options={{
-            headerTintColor: 'white',
-            headerStyle: {
-              backgroundColor: '#000',
-            },
-            headerTitleStyle: {
-              color: '#fff',
-            },
-            // headerShown: false,
-            // header: ViewerHeader,
-            // header: ViewerHeader,
-          }}
-        />
-        <RootStack.Screen
-          name={'Tabs'}
-          component={BottomTabNavigation}
-          options={{headerShown: false}}
-        />
-        <RootStack.Screen
-          name="EditProfile"
-          component={EditProfile}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <RootStack.Screen
-          name="Upload"
-          component={Upload}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <RootStack.Screen
-          name="Settings"
-          component={SettingsScreen}
-          options={{
-            headerTintColor: 'white',
-            headerStyle: {
-              backgroundColor: '#000',
-            },
-            headerTitleStyle: {
-              color: '#fff',
-            },
-            // headerShown: false,
-          }}
-        />
-      </RootStack.Navigator>
-    </Provider>
+    <RootStack.Navigator screenOptions={{cardStyle: {backgroundColor: '#000'}}}>
+      <RootStack.Screen
+        name="SignIn"
+        component={SignIn}
+        options={{headerShown: false}}
+      />
+      <RootStack.Screen
+        name="Viewer"
+        component={PdfViewer}
+        options={{
+          headerShown: false,
+          // header: ViewerHeader,
+          header: ViewerHeader,
+        }}
+      />
+      <RootStack.Screen
+        name="Comments"
+        component={Comments}
+        options={{
+          headerTintColor: 'white',
+          headerStyle: {
+            backgroundColor: '#000',
+          },
+          headerTitleStyle: {
+            color: '#fff',
+          },
+          // headerShown: false,
+          // header: ViewerHeader,
+          // header: ViewerHeader,
+        }}
+      />
+      <RootStack.Screen
+        name={'Tabs'}
+        component={BottomTabNavigation}
+        options={{headerShown: false}}
+      />
+      <RootStack.Screen
+        name="EditProfile"
+        component={EditProfile}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <RootStack.Screen
+        name="Upload"
+        component={Upload}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <RootStack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          headerTintColor: 'white',
+          headerStyle: {
+            backgroundColor: '#000',
+          },
+          headerTitleStyle: {
+            color: '#fff',
+          },
+          // headerShown: false,
+        }}
+      />
+    </RootStack.Navigator>
   );
 };
 export default RootStackNavigator;

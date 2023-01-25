@@ -3,7 +3,7 @@ import {RootState} from '@src/redux/store/RootStore';
 
 interface authState {
   authState: EAuthState;
-  session: ISession;
+  session: Nullable<ISession>;
 }
 enum EAuthState {
   INIT = 'INIT',
@@ -13,7 +13,7 @@ enum EAuthState {
 
 const initialState: authState = {
   authState: EAuthState.INIT,
-  session: {},
+  session: null,
 };
 
 export const authSlice = createSlice({

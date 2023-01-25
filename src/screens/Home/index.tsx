@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import {StatusBar, View} from 'react-native';
 import {makeStyles} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
 import ToggleBtn from '@components/ToggleBtn';
@@ -31,6 +31,7 @@ const Home = () => {
         alignItems: 'center',
         backgroundColor: '#000',
       }}>
+      <StatusBar backgroundColor={'black'} barStyle={'light-content'} />
       <View style={{position: 'absolute', top: insets.top || 24, zIndex: 1}}>
         <ToggleBtn
           labelText={['전체', '구독중']}

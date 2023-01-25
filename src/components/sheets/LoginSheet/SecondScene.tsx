@@ -34,7 +34,6 @@ const SecondScene = props => {
       })
       .then(result => {
         console.log(result);
-        Keychain.setGenericPassword(email, password).then(r => console.log(r));
       })
       .catch(error => console.log(error));
   }, [csrfToken, email]);
@@ -61,6 +60,9 @@ const SecondScene = props => {
         switch (response.data.code) {
           case 200:
             dispatch(signIn(response.data.data));
+            Keychain.setGenericPassword(email, password).then(r =>
+              console.log(r),
+            );
             props.setClosable(true);
             SheetManager.hide('loginSheet').then(() => {
               console.log('loginSheetHide');
@@ -78,14 +80,6 @@ const SecondScene = props => {
             });
             break;
           case 422:
-            /* TODO
-          param
-          */
-            console.log(
-              response.data,
-              response.data.errors[0],
-              verificationCode,
-            );
             switch (response.data.errors[0].param) {
               case 'passwordConfirm':
                 Toast.show({
@@ -122,6 +116,20 @@ const SecondScene = props => {
             /* TODO
           too many requests
           */
+            break;
+          case 409:
+            Toast.show({
+              type: 'error',
+              text1: '중복된 이메일 입니다.',
+              position: 'bottom',
+            });
+            break;
+          case 500:
+            Toast.show({
+              type: 'error',
+              text1: 'Unknown Error Occurred!',
+              position: 'bottom',
+            });
             break;
         }
       })
@@ -182,9 +190,8 @@ const SecondScene = props => {
             style={styles.textInput}
             contentStyle={styles.textInputContent}
             activeUnderlineColor={'#99c729'}
-            keyboardType={'url'}
             textColor={'#fff'}
-            underlineColor={'#60b630'}
+            underlineColor={'#99c729'}
             secureTextEntry={true}
             autoCorrect={false}
           />

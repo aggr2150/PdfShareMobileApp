@@ -1,11 +1,11 @@
 import React from 'react';
-import {ScrollView, View} from 'react-native';
+import {ScrollView, TextInput, View} from 'react-native';
 import {Button, Input, makeStyles, Text} from '@rneui/themed';
 import {StackScreenProps} from '@react-navigation/stack';
 import {HeaderBackButton} from '@react-navigation/elements';
 import Avatar from '@components/Avatar';
-import {TextInput} from 'react-native-paper';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import Book from '@components/Book';
 
 type UploadProps = StackScreenProps<RootStackParamList, 'Upload'>;
 
@@ -14,12 +14,31 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.container}>
+      {/*<View*/}
+      {/*  style={{*/}
+      {/*    zIndex: 0,*/}
+      {/*    position: 'absolute',*/}
+      {/*    top: 0,*/}
+      {/*    bottom: 0,*/}
+      {/*    left: 0,*/}
+      {/*    right: 0,*/}
+      {/*  }}>*/}
+      {/*  <View style={{backgroundColor: '#99c729', aspectRatio: 16 / 9}} />*/}
+      {/*  /!*<View style={{backgroundColor: 'red', height: '100%'}} />*!/*/}
+      {/*</View>*/}
       <ScrollView>
-        <View>
+        <View
+          style={{
+            zIndex: 0,
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+          }}>
           <View style={{backgroundColor: '#99c729', aspectRatio: 16 / 9}} />
-          <View style={{backgroundColor: 'red', height: '100%'}} />
         </View>
-        <View style={{position: 'absolute'}}>
+        <View>
           <View
             style={[
               styles.backButton,
@@ -34,40 +53,41 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
             />
           </View>
           <View style={styles.inputContainer}>
+            <View style={{width: '50%', marginBottom: 20}}>
+              <Book />
+            </View>
             <Button
               buttonStyle={{
                 borderRadius: 24,
-                paddingVertical: 14,
-                paddingHorizontal: 40,
+                paddingVertical: 5,
+                paddingHorizontal: 45,
                 marginBottom: 24,
+                backgroundColor: '#99c729',
               }}
-              title={'프로필 수정'}
+              title={
+                <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                  <Text style={{fontSize: 8}} />
+                  <Text style={{fontSize: 13}}>내 PDF 업로드</Text>
+                  <Text style={{fontSize: 8}}>(최대 20MB)</Text>
+                </View>
+              }
             />
             <View style={styles.inputField}>
               <TextInput
-                dense={true}
-                style={styles.textInput}
-                contentStyle={styles.textInputContent}
-                activeUnderlineColor={'#99c729'}
+                style={styles.titleInput}
                 keyboardType={'url'}
                 multiline={true}
-                textColor={'#fff'}
+                placeholderTextColor={'#1ba639'}
                 placeholder={'컨텐츠의 제목을 넣어주세요'}
-                underlineColor={'#99c729'}
               />
               <TextInput
-                dense={true}
-                style={styles.textInput}
-                contentStyle={styles.textInputContent}
-                activeUnderlineColor={'#99c729'}
-                keyboardType={'url'}
+                style={styles.contentInput}
+                placeholderTextColor={'white'}
                 multiline={true}
-                textColor={'#fff'}
                 placeholder={
                   '자신의 아이디어, 문서, 프로젝트들을 이곳에 간단\n' +
                   '히 설명해 주세요. 해시 태그를 달아도 좋아요.'
                 }
-                underlineColor={'#99c729'}
               />
             </View>
           </View>
@@ -86,8 +106,8 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
   },
   inputContainer: {
-    flex: 1,
-    backgroundColor: theme.colors.primary,
+    // flex: 1,
+    // backgroundColor: theme.colors.primary,
     paddingHorizontal: 35,
     alignItems: 'center',
   },
@@ -116,27 +136,22 @@ const useStyles = makeStyles(theme => ({
     paddingTop: 3,
     paddingBottom: 15,
     paddingHorizontal: 20,
-    backgroundColor: theme.colors.black,
+    backgroundColor: 'black',
     borderRadius: 20,
   },
-  textInput: {
-    backgroundColor: '#fff',
+  contentInput: {
+    // backgroundColor: '#fff',
+    color: 'white',
     paddingHorizontal: 0,
     fontSize: 13,
-  },
-  textInputContent: {
-    // flex: 1,
-    // width: '100%',
-    // paddingHorizontal: 0,
-    backgroundColor: theme.colors.black,
-    color: theme.colors.secondary,
     fontFamily: 'Apple SD Gothic Neo',
-    // alignSelf: 'stretch',
-    textAlign: 'left',
-    fontSize: 13,
-    paddingLeft: 0,
-    margin: 0,
-    paddingBottom: 0,
+  },
+  titleInput: {
+    color: '#1ba639',
+    textAlign: 'center',
+    paddingHorizontal: 0,
+    fontSize: 22,
+    fontFamily: 'Apple SD Gothic Neo',
   },
   label: {
     marginTop: 3,

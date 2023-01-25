@@ -8,6 +8,8 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import {Input as BaseInput} from '@rneui/base/dist/Input/Input';
 import {SheetManager} from 'react-native-actions-sheet';
+import {useAppDispatch} from '@redux/store/RootStore';
+import {signIn} from '@redux/reducer/authReducer';
 
 const FirstScene = props => {
   const styles = useStyles(props);
@@ -17,10 +19,14 @@ const FirstScene = props => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [csrfToken, setCsrfToken] = useState<string>();
+  const dispatch = useAppDispatch();
   useEffect(() => {
     apiInstance.post<CsrfTokenResponse>('/api/csrfToken').then(response => {
       if (response.status === 200) {
         setCsrfToken(response.data.data._csrf);
+        apiInstance.defaults.data = {
+          _csrf: response.data.data._csrf,
+        };
       }
     });
   }, []);
@@ -29,15 +35,21 @@ const FirstScene = props => {
       console.log('loginSheetHide');
     });
     navigation.reset({routes: [{name: 'Tabs'}]});
-    // apiInstance.post<response<ISession>>('/api/signIn').then(response => {
-    //   if (response.data.code === 200) {
-    //     SheetManager.hide('loginSheet').then(() => {
-    //       console.log('loginSheetHide');
-    //       navigation.reset({routes: [{name: 'Tabs'}]});
-    //     });
-    //   }
-    // });
-  }, [email, password]);
+    apiInstance
+      .post<response<ISession>>('/api/auth/signIn', {
+        _csrf: csrfToken,
+        email: email,
+        password: password,
+      })
+      .then(response => {
+        if (response.data.code === 200) {
+          dispatch(signIn(response.data.data));
+          SheetManager.hide('loginSheet').then(() => {
+            navigation.reset({routes: [{name: 'Tabs'}]});
+          });
+        }
+      });
+  }, [csrfToken, dispatch, email, navigation, password]);
 
   return (
     <View>
