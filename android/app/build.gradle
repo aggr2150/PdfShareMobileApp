@@ -161,6 +161,7 @@ android {
                 }
             }
         }
+        vectorDrawables.useSupportLibrary = true
     }
 
     if (isNewArchitectureEnabled()) {

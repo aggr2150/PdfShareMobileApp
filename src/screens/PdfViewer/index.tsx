@@ -34,18 +34,22 @@ import CommentIcon from '@assets/icon/comment.svg';
 import DotIcon from '@assets/icon/dot.svg';
 import ActionSheet, {ActionSheetRef} from 'react-native-actions-sheet';
 import Separator from '@components/Seperator';
+import {StackScreenProps} from '@react-navigation/stack';
 
-const PdfViewer: React.FC = () => {
+type ViewerProps = StackScreenProps<RootStackParamList, 'Viewer'>;
+const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     flex: 1,
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+  // route.params.document.filepath
   const source: Source = {
+    uri: route?.params?.document.filepath,
     // uri: 'http://samples.leanpub.com/thereactnativebook-sample.pdf',
     // uri: 'ile://src/assets/테스트.pdf',
-    // cache: true,
+    cache: true,
     // require("../../assets/테스트.pdf")
   };
   const {height, width} = useWindowDimensions();
@@ -53,7 +57,6 @@ const PdfViewer: React.FC = () => {
   // const UIVisible = useAppSelector(state => state.viewer.UIVisible);
   const [UIVisible, setUIVisible] = useState(true);
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
   const actionSheetRef = useRef<ActionSheetRef>(null);
   const detailsActionSheetRef = useRef<ActionSheetRef>(null);
   const styles = useStyles();
@@ -66,8 +69,8 @@ const PdfViewer: React.FC = () => {
       <View style={[styles.container, {overflow: 'visible'}]}>
         <Pdf
           trustAllCerts={false}
-          // source={source}
-          source={require('../../assets/test_3.pdf')}
+          source={source}
+          // source={require('../../assets/test_3.pdf')}
           onPageSingleTap={() => setUIVisible(prevState => !prevState)}
           onLoadComplete={(numberOfPages, filePath) => {
             console.log(`Number of pages: ${numberOfPages}`);

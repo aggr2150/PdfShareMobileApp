@@ -1,6 +1,6 @@
 declare type RootStackParamList = {
   Tabs: undefined;
-  Viewer: undefined;
+  Viewer: undefined | IPost;
   SignIn: undefined;
   Comments: undefined;
   History: undefined;

@@ -1,24 +1,30 @@
-declare interface TPlace {
+declare interface IAuthor {
   _id: string;
-  author: {
-    userId: string;
-    maskedPhone: string;
-  };
-  category: string;
+  id: string;
+  nickname: string;
+}
+declare interface IFile {
+  _id: string;
+  originalFilename?: string;
+  filepath: string;
+  blurFilepath?: string;
+}
+declare interface IPost {
+  _id: string;
+  author: IAuthor;
   title: string;
   content: string;
-  images: TImage[];
-  location: {
-    longitude: number;
-    latitude: number;
-  };
-  link?: string;
-  postcode: any;
-  parkingInformation?: string;
-  phoneNumber: string;
-  likeStatus: boolean;
+  tag: string[];
+  thumbnail?: IFile;
+  documentThumbnail: IFile;
+  document: IFile;
+  viewCounter: number;
+  likeCounter: number;
+  commentCounter: number;
+  isDeleted: boolean;
   createdAt: Date;
   updatedAt?: Date;
+  likeStatus: boolean;
 }
 
 declare interface ISession {

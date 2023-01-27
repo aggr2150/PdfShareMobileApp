@@ -2,7 +2,20 @@ import {Text} from '@rneui/themed';
 import {View} from 'react-native';
 import React, {useState} from 'react';
 
-const Book = () => {
+interface BookProps {
+  title: string;
+  author: IAuthor;
+  thumbnail?: IFile;
+  documentThumbnail: IFile;
+  document: IFile;
+}
+const Book: React.FC<BookProps> = ({
+  title,
+  author,
+  thumbnail,
+  documentThumbnail,
+  document,
+}) => {
   const [dimension, setDimension] = useState<{width: number; height: number}>({
     width: 0,
     height: 0,
@@ -23,10 +36,11 @@ const Book = () => {
       <Text
         style={{fontSize: dimension?.width / 9, textAlign: 'center'}}
         numberOfLines={2}>
-        크리스마스가 어쩌고저쩌고
+        {title}
       </Text>
       <Text style={{fontSize: dimension?.width / 10}} numberOfLines={2}>
-        작가가 누구
+        {/*작가가 누구*/}
+        {author?.nickname}
       </Text>
     </View>
   );

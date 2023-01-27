@@ -5,15 +5,16 @@ import {useNavigation} from '@react-navigation/native';
 import Book from '@src/components/Book';
 
 interface BookCardProps {
-  item: TPlace;
+  item: IPost;
   index: number;
 }
 const BookCard: React.FC<BookCardProps> = ({item, index}) => {
   const styles = useStyles();
   const navigation = useNavigation();
+  console.log('author', item, index);
   return (
     <Pressable
-      onPress={() => navigation.navigate('Viewer')}
+      onPress={() => navigation.navigate('Viewer', item)}
       style={{
         aspectRatio: 16 / 9,
         backgroundColor: index % 2 === 0 ? '#1a3692' : '#e73f90',
@@ -27,15 +28,16 @@ const BookCard: React.FC<BookCardProps> = ({item, index}) => {
         }}>
         <View style={{flex: 1, margin: 8, justifyContent: 'space-between'}}>
           <Text style={{fontSize: 22, fontWeight: 'bold'}} numberOfLines={2}>
-            크리스마스어쩌고 저쩌고
+            {item?.title}
           </Text>
           <View>
             <Text style={{fontSize: 12}} numberOfLines={3}>
               올린이는 크리스마스 에세이에 대한 정보를 피드에 간단히 보여줄 수
               있 습니다.
+              {item?.content}
             </Text>
             <Text style={{marginTop: 5, fontSize: 12, alignSelf: 'flex-end'}}>
-              작가가 누구
+              {item?.author?.nickname}
             </Text>
           </View>
         </View>
@@ -91,7 +93,13 @@ const BookCard: React.FC<BookCardProps> = ({item, index}) => {
               height: '70%',
               aspectRatio: 1 / Math.sqrt(2),
             }}>
-            <Book />
+            <Book
+              author={item?.author}
+              document={item?.document}
+              documentThumbnail={item?.documentThumbnail}
+              thumbnail={item?.thumbnail}
+              title={item?.title}
+            />
           </View>
         </View>
         {/*<Text>{item._id}</Text>*/}
