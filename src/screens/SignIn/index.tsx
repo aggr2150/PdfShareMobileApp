@@ -43,7 +43,7 @@ const SignIn: React.FC = () => {
     // Retrieve the credentials
     Keychain.getGenericPassword().then(credentials => {
       if (credentials) {
-        console.log('cred');
+        console.log('cred', credentials.username);
         getCsrfToken.then(token =>
           apiInstance
             .post<response<ISession>>('/api/auth/signIn', {
@@ -52,6 +52,7 @@ const SignIn: React.FC = () => {
               password: credentials.password,
             })
             .then(response => {
+              console.log(response, token);
               if (response.data.code !== 200) {
                 dispatch(initialized(null));
                 showSheet().then(r => console.log(r));
@@ -66,7 +67,7 @@ const SignIn: React.FC = () => {
         );
       }
     });
-  }, [showSheet]);
+  }, [dispatch, navigation, showSheet]);
 
   const styles = useStyles();
   return (

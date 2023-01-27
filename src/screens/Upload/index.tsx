@@ -17,6 +17,8 @@ import DocumentPicker, {
   DocumentPickerResponse,
 } from 'react-native-document-picker';
 import ImagePicker, {Image} from 'react-native-image-crop-picker';
+import BackButton from '@components/BackButton';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 type UploadProps = StackScreenProps<RootStackParamList, 'Upload'>;
 const Upload: React.FC<UploadProps> = ({navigation, route}) => {
@@ -75,27 +77,18 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
   }, [submitDisabled, title, content, pdf]);
   return (
     <View style={styles.container}>
-      {/*<View*/}
-      {/*  style={{*/}
-      {/*    zIndex: 0,*/}
-      {/*    position: 'absolute',*/}
-      {/*    top: 0,*/}
-      {/*    bottom: 0,*/}
-      {/*    left: 0,*/}
-      {/*    right: 0,*/}
-      {/*  }}>*/}
-      {/*  <View style={{backgroundColor: '#99c729', aspectRatio: 16 / 9}} />*/}
-      {/*  /!*<View style={{backgroundColor: 'red', height: '100%'}} />*!/*/}
-      {/*</View>*/}
-      <ScrollView>
+      <KeyboardAwareScrollView
+        style={{flex: 1, minHeight: '100%'}}
+        bounces={false}>
         <View
           style={{
-            zIndex: 0,
+            // zIndex: 0,
             position: 'absolute',
             top: 0,
             bottom: 0,
             left: 0,
             right: 0,
+            backgroundColor: 'black',
           }}>
           <View
             style={{backgroundColor: '#99c729', height: dimensions.height / 3}}
@@ -109,12 +102,16 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
                 justifyContent: 'space-between',
                 paddingTop: insets.top || 11,
                 paddingBottom: 11,
+                alignItems: 'center',
               },
             ]}>
-            <HeaderBackButton
-              tintColor={'white'}
-              onPress={() => navigation.goBack()}
-            />
+            {/*<HeaderBackButton*/}
+            {/*  tintColor={'white'}*/}
+            {/*  onPress={() => navigation.goBack()}*/}
+            {/*/>*/}
+            <View style={{padding: 5}}>
+              <BackButton onPress={() => navigation.goBack()} color={'white'} />
+            </View>
             <HeaderBackButton tintColor={'white'} onPress={submit} />
           </View>
           <View style={styles.inputContainer}>
@@ -155,6 +152,7 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
               />
               <TextInput
                 style={styles.contentInput}
+                scrollEnabled={false}
                 placeholderTextColor={'white'}
                 multiline={true}
                 onChangeText={setContent}
@@ -165,7 +163,7 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
             </View>
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
       <ProgressModal
         progressModalVisible={progressModalVisible}
         setProgressModalVisible={setProgressModalVisible}
@@ -176,6 +174,7 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
 const useStyles = makeStyles(theme => ({
   container: {
     flex: 1,
+    position: 'relative',
   },
   inputContainer: {
     // flex: 1,

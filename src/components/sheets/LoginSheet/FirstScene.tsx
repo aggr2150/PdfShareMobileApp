@@ -31,19 +31,28 @@ const FirstScene = props => {
     });
   }, []);
   const submit = useCallback(() => {
-    SheetManager.hide('loginSheet').then(() => {
-      console.log('loginSheetHide');
-    });
-    navigation.reset({routes: [{name: 'Tabs'}]});
+    // SheetManager.hide('loginSheet').then(() => {
+    //   console.log('loginSheetHide');
+    // });
+    // navigation.reset({routes: [{name: 'Tabs'}]});
     apiInstance
       .post<response<ISession>>('/api/auth/signIn', {
         _csrf: csrfToken,
-        email: email,
+        id: email,
         password: password,
       })
       .then(response => {
+        console.log(
+          'response',
+          csrfToken,
+          response.data.code,
+          response.data.status,
+        );
         if (response.data.code === 200) {
           dispatch(signIn(response.data.data));
+          Keychain.setGenericPassword(email, password).then(r =>
+            console.log(r),
+          );
           SheetManager.hide('loginSheet').then(() => {
             navigation.reset({routes: [{name: 'Tabs'}]});
           });
@@ -65,6 +74,7 @@ const FirstScene = props => {
           inputStyle={{margin: 0}}
           keyboardType={'email-address'}
           autoCorrect={false}
+          autoCapitalize={'none'}
           returnKeyType={'next'}
           onSubmitEditing={() => passwordRef.current?.focus()}
         />
