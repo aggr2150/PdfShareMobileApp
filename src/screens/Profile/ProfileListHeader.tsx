@@ -8,6 +8,7 @@ import {Button, Divider, Menu} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import PlusIcon from '@assets/icon/plus1.svg';
 import BackButton from '@components/BackButton';
+import Keychain from 'react-native-keychain';
 
 interface ProfileListHeaderProps {
   selectedIndex: number;
@@ -100,6 +101,14 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
                 closeMenu();
               }}
               title={<Text style={styles.menuText}>설정</Text>}
+            />
+            <Menu.Item
+              dense={true}
+              onPress={() => {
+                Keychain.resetGenericPassword().then();
+                closeMenu();
+              }}
+              title={<Text style={styles.menuText}>로그아웃</Text>}
             />
           </Menu>
         </View>
