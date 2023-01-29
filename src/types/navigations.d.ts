@@ -9,7 +9,7 @@ declare type RootStackParamList = {
     nickname: string;
     description?: string;
   };
-  Profile: undefined;
+  Profile: undefined | IUser;
   Settings: undefined;
   CollectionList: undefined;
   Upload: undefined;

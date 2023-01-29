@@ -5,10 +5,11 @@ import React from 'react';
 interface BackButtonProps {
   onPress: () => void;
   color?: ColorValue;
+  disabled?: boolean;
 }
-const BackButton: React.FC<BackButtonProps> = ({onPress, color}) => {
+const BackButton: React.FC<BackButtonProps> = ({onPress, color, disabled}) => {
   return (
-    <Pressable onPress={onPress}>
+    <Pressable onPress={onPress} disabled={disabled}>
       <Ionicons
         color={color}
         name={Platform.select({
@@ -16,11 +17,7 @@ const BackButton: React.FC<BackButtonProps> = ({onPress, color}) => {
           ios: 'ios-chevron-back',
           default: 'ios-chevron-back',
         })}
-        size={Platform.select({
-          android: 24,
-          ios: 30,
-          default: 30,
-        })}
+        size={30}
       />
     </Pressable>
   );

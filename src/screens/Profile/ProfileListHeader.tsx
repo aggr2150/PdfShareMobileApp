@@ -11,10 +11,12 @@ import PlusIcon from '@assets/icon/plus1.svg';
 interface ProfileListHeaderProps {
   selectedIndex: number;
   setSelectedIndex: Dispatch<number>;
+  user?: IUser;
 }
 const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
   selectedIndex,
   setSelectedIndex,
+  user,
 }) => {
   const styles = useStyles();
   const navigation = useNavigation();
@@ -64,9 +66,11 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
               dense={true}
               onPress={() => {
                 navigation.navigate('EditProfile', {
-                  id: '123',
-                  nickname: '123',
+                  // id: '123',
+                  // nickname: '123',
                   description: '123',
+                  id: user?.id,
+                  nickname: user?.nickname,
                 });
                 closeMenu();
               }}
@@ -98,17 +102,19 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
             flexDirection: 'row',
             justifyContent: 'center',
           }}>
-          <Avatar />
+          <Avatar avatar={user?.avatar} />
         </View>
         <View style={{marginBottom: 4}}>
-          <Text style={styles.nicknameText}>닉네임명</Text>
+          <Text style={styles.nicknameText}>{user?.nickname}</Text>
         </View>
         <View style={{flexDirection: 'row'}}>
           <View style={{marginHorizontal: 20}}>
-            <Text style={styles.counterText}>구독자 102명</Text>
+            <Text style={styles.counterText}>
+              구독자 {user?.subscriberCounter}명
+            </Text>
           </View>
           <View style={{marginHorizontal: 20}}>
-            <Text style={styles.counterText}>내 PDF 20개</Text>
+            <Text style={styles.counterText}>내 PDF {user?.postCounter}개</Text>
           </View>
         </View>
       </View>

@@ -3,6 +3,7 @@ import UserAgent from 'react-native-user-agent';
 
 export const apiInstance: AxiosInstance = axios.create({
   baseURL: 'https://everypdf.cc',
+  // baseURL: 'http://10.0.2.2:3000',
   timeout: 5000,
   withCredentials: true,
   headers: {

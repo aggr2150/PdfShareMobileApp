@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Pressable,
   ScrollView,
@@ -12,13 +12,15 @@ import {HeaderBackButton} from '@react-navigation/elements';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Book from '@components/Book';
 import ProgressModal from '@screens/Upload/ProgressModal';
-import {apiInstance} from '@utils/Networking';
+import {apiInstance, getCsrfToken} from '@utils/Networking';
 import DocumentPicker, {
   DocumentPickerResponse,
 } from 'react-native-document-picker';
 import ImagePicker, {Image} from 'react-native-image-crop-picker';
 import BackButton from '@components/BackButton';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {err} from 'react-native-svg/lib/typescript/xml';
+import BookCover from '@components/BookCover';
 
 type UploadProps = StackScreenProps<RootStackParamList, 'Upload'>;
 const Upload: React.FC<UploadProps> = ({navigation, route}) => {
@@ -32,6 +34,7 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
   const [submitDisabled, setSubmitDisabled] = useState(true);
   const [thumbnail, setThumbnail] = useState<Image>();
   const [pdf, setPdf] = useState<DocumentPickerResponse>();
+  const [csrfToken, setCsrfToken] = useState<string>();
   const openPdfPicker = useCallback(() => {
     DocumentPicker.pickSingle({
       type: DocumentPicker.types.pdf,
@@ -47,34 +50,57 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
   const openImagePicker = useCallback(() => {
     ImagePicker.openPicker({
       mediaType: 'photo',
-      cropping: true,
+      // cropping: true,
       multiple: false,
+      writeTempFile: true,
+      includeExif: true,
     }).then(setThumbnail);
+  }, []);
+  useEffect(() => {
+    getCsrfToken.then(token => setCsrfToken(token));
   }, []);
 
   const submit = useCallback(() => {
-    if (!submitDisabled) {
-      setSubmitDisabled(true);
-      setProgressModalVisible(true);
-      let form = new FormData();
-      form.append('title', title);
-      form.append('content', content);
-      form.append('thumbnail', thumbnail);
-      form.append('pdf', pdf);
-      setProgressModalVisible(true);
-      apiInstance
-        .post('/api/post/upload', form, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-        .then(() => {
-          setProgressModalVisible(false);
-          setSubmitDisabled(false);
-          navigation.navigate('Home');
-        });
+    // if (pdf) {
+    // setSubmitDisabled(true);
+    setProgressModalVisible(true);
+    let form = new FormData();
+    form.append('title', title);
+    form.append('content', content);
+    if (thumbnail) {
+      form.append('thumbnail', {
+        uri: thumbnail.path,
+        type: thumbnail.mime,
+        name:
+          thumbnail.filename ||
+          thumbnail.path.substring(
+            thumbnail.path.lastIndexOf('/') + 1,
+            thumbnail.path.length,
+          ),
+      });
     }
-  }, [submitDisabled, title, content, pdf]);
+    // form.append('pdf', pdf);
+    form.append('pdf', {uri: pdf?.uri, type: pdf?.type, name: pdf?.name});
+    form.append('_csrf', csrfToken);
+    apiInstance
+      .post('/api/post/upload', form, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true,
+      })
+      .then(response => {
+        console.log(response.data);
+        setProgressModalVisible(false);
+        setSubmitDisabled(false);
+        navigation.navigate('Home');
+      })
+      .catch(error => {
+        console.log('error', error);
+        setProgressModalVisible(false);
+      });
+    // }
+  }, [csrfToken, pdf, title, content, thumbnail, navigation]);
   return (
     <View style={styles.container}>
       <KeyboardAwareScrollView
@@ -112,7 +138,13 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
             <View style={{padding: 5}}>
               <BackButton onPress={() => navigation.goBack()} color={'white'} />
             </View>
-            <HeaderBackButton tintColor={'white'} onPress={submit} />
+            <View>
+              <BackButton
+                onPress={submit}
+                color={'white'}
+                disabled={title.length === 0 && !thumbnail && !pdf}
+              />
+            </View>
           </View>
           <View style={styles.inputContainer}>
             <View
@@ -122,7 +154,7 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
                 height: dimensions.height / 3,
               }}>
               <Pressable onPress={openImagePicker}>
-                <Book />
+                <BookCover source={thumbnail} />
               </Pressable>
             </View>
             <Button

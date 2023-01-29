@@ -69,6 +69,13 @@ const BookCard: React.FC<BookCardProps> = ({item, index}) => {
               // width: '100%',
               aspectRatio: 1 / Math.sqrt(2),
             }}>
+            <Book
+              author={item?.author}
+              document={item?.document}
+              documentThumbnail={item?.documentThumbnail}
+              thumbnail={item?.documentThumbnail}
+              title={item?.title}
+            />
             {/*<View*/}
             {/*  style={{*/}
             {/*    width: '100%',*/}

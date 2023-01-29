@@ -24,11 +24,11 @@ const Book: React.FC<BookProps> = ({
     width: 0,
     height: 0,
   });
-  return thumbnail || documentThumbnail ? (
+  return source ? (
     <FastImage
       resizeMode={'cover'}
       style={{width: '100%', height: '100%', aspectRatio: 1 / Math.sqrt(2)}}
-      source={{uri: thumbnail.filepath}}
+      source={{uri: source.path}}
     />
   ) : (
     <View
@@ -38,18 +38,21 @@ const Book: React.FC<BookProps> = ({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: 'brown',
+        backgroundColor: 'white',
         padding: dimension.width * 0.1,
         paddingTop: dimension.height * 0.15,
         paddingBottom: dimension.height * 0.2,
       }}>
       <Text
-        style={{fontSize: dimension?.width / 9, textAlign: 'center'}}
+        style={{
+          fontSize: dimension?.width / 9,
+          textAlign: 'center',
+          color: '#99c729',
+        }}
         numberOfLines={2}>
-        {title}
+        표지 이미지를 선택해 주세요
       </Text>
       <Text style={{fontSize: dimension?.width / 10}} numberOfLines={2}>
-        {/*작가가 누구*/}
         {author?.nickname}
       </Text>
     </View>

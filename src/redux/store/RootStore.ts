@@ -1,10 +1,14 @@
 import {configureStore} from '@reduxjs/toolkit';
 import {TypedUseSelectorHook, useDispatch, useSelector} from 'react-redux';
 import authReducer from '@redux/reducer/authReducer';
+import postsReducer from '@redux/reducer/postsReducer';
+import UsersReducer from '@redux/reducer/usersReducer';
 
 export const RootStore = configureStore({
   reducer: {
     auth: authReducer,
+    posts: postsReducer,
+    users: UsersReducer,
   },
 });
 

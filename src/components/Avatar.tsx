@@ -7,6 +7,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import {makeStyles, Text} from '@rneui/themed';
+import FastImage from 'react-native-fast-image';
 
 // function ThrottleFlatList<T>({
 //   data,
@@ -15,8 +16,9 @@ import {makeStyles, Text} from '@rneui/themed';
 // }
 interface AvatarProps {
   style?: ViewStyle;
+  avatar?: IFile;
 }
-const Avatar: React.FC<AvatarProps> = ({style}) => {
+const Avatar: React.FC<AvatarProps> = ({style, avatar}) => {
   return (
     <View
       style={[
@@ -24,10 +26,21 @@ const Avatar: React.FC<AvatarProps> = ({style}) => {
           width: 90,
           height: 90,
           borderRadius: 90,
-          backgroundColor: '#60b630',
+          overflow: 'hidden',
+          // backgroundColor: '#60b630',
         },
         style,
       ]}>
+      <FastImage
+        source={{
+          uri: avatar?.filepath || 'https://cdn.everypdf.cc/static/every2.png',
+        }}
+        style={{
+          width: 90,
+          height: 90,
+          borderRadius: 90,
+        }}
+      />
       <View></View>
     </View>
   );
