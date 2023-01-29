@@ -8,23 +8,13 @@ interface BookProps {
   title: string;
   author: IAuthor;
   thumbnail?: IFile;
-  documentThumbnail: IFile;
-  document: IFile;
-  source?: Image;
 }
-const Book: React.FC<BookProps> = ({
-  title,
-  author,
-  thumbnail,
-  documentThumbnail,
-  document,
-  source,
-}) => {
+const Book: React.FC<BookProps> = ({title, author, thumbnail}) => {
   const [dimension, setDimension] = useState<{width: number; height: number}>({
     width: 0,
     height: 0,
   });
-  return thumbnail || documentThumbnail ? (
+  return thumbnail ? (
     <FastImage
       resizeMode={'cover'}
       style={{width: '100%', height: '100%', aspectRatio: 1 / Math.sqrt(2)}}
@@ -49,7 +39,6 @@ const Book: React.FC<BookProps> = ({
         {title}
       </Text>
       <Text style={{fontSize: dimension?.width / 10}} numberOfLines={2}>
-        {/*작가가 누구*/}
         {author?.nickname}
       </Text>
     </View>

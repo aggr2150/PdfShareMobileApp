@@ -1,5 +1,5 @@
 import React from 'react';
-import {ListRenderItem, Pressable, View} from 'react-native';
+import {Pressable, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
 import Book from '@src/components/Book';

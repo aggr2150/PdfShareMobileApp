@@ -58,17 +58,19 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   const dispatch = useAppDispatch();
   useEffect(() => {
     apiInstance
-      .post<response<{user?: IUser; feeds: IPost[]}>>('/api/user', {
-        id: route.params?.id,
-      })
+      .post<response<{user?: IUser; feeds: IPost[]; likes: IPost[]}>>(
+        '/api/user',
+        {
+          id: route.params?.id,
+        },
+      )
       .then(response => {
         if (response.data.code === 200 && response.data.data.user) {
-          console.log('eff', response.data);
           dispatch(userAdded(response.data.data.user));
           if (response.data.data.feeds.length !== 0) {
             setTabData(prevState => [
               response.data.data.feeds,
-              prevState[1],
+              response.data.data.likes,
               prevState[2],
             ]);
             dispatch(postAddedMany(response.data.data.feeds));
@@ -122,12 +124,6 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
           backgroundColor: '#000',
         }}>
         <Animated.FlatList<IPost>
-          renderScrollComponent={props => (
-            <Animated.ScrollView
-              exiting={SlideOutLeft}
-              entering={SlideInRight}
-              {...props}></Animated.ScrollView>
-          )}
           data={data}
           extraData={data}
           // exiting={SlideOutLeft}
