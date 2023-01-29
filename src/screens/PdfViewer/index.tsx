@@ -271,7 +271,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                 <Pressable
                   onPress={() => {
                     navigation.navigate('ProfileTab');
-                    navigation.push('Profile');
+                    navigation.push('Profile', {id: route.params.author.id});
                   }}>
                   <Avatar style={{width: 20, height: 20, marginRight: 5}} />
                 </Pressable>

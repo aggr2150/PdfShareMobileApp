@@ -15,7 +15,10 @@ export const apiInstance: AxiosInstance = axios.create({
 });
 export const getCsrfToken = apiInstance
   .post<CsrfTokenResponse>('/api/csrfToken')
-  .then(response => response.data.data._csrf);
+  .then(response => {
+    console.log(response.data);
+    return response.data.data._csrf;
+  });
 // .catch(() => void);
 // export const confirmIdToken = async (user: FirebaseAuthTypes.User) => {
 //   return apiInstance

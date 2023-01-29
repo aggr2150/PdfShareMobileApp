@@ -41,32 +41,41 @@ const SignIn: React.FC = () => {
     //   return config;
     // });
     // Retrieve the credentials
-    Keychain.getGenericPassword().then(credentials => {
-      if (credentials) {
-        console.log('cred', credentials.username);
-        getCsrfToken.then(token =>
-          apiInstance
-            .post<response<ISession>>('/api/auth/signIn', {
-              _csrf: token,
-              id: credentials.username,
-              password: credentials.password,
-            })
-            .then(response => {
-              console.log(response, token);
-              if (response.data.code !== 200) {
-                dispatch(initialized(null));
-                showSheet().then(r => console.log(r));
-              } else {
-                console.log(response.data.data);
-                dispatch(initialized(response.data.data));
-                navigation.reset({routes: [{name: 'Tabs'}]});
-              }
-              // aa().then(() => {});
-            })
-            .catch(error => console.log(error)),
-        );
-      }
-    });
+    console.log('eff');
+    Keychain.getGenericPassword()
+      .then(credentials => {
+        if (credentials) {
+          console.log('cred', credentials.username);
+          getCsrfToken.then(token => {
+            console.log('111', token);
+            apiInstance
+              .post<response<ISession>>('/api/auth/signIn', {
+                _csrf: token,
+                id: credentials.username,
+                password: credentials.password,
+              })
+              .then(response => {
+                console.log(response, token);
+                if (response.data.code !== 200) {
+                  dispatch(initialized(null));
+                  showSheet().then(r => console.log(r));
+                } else {
+                  console.log(response.data.data);
+                  dispatch(initialized(response.data.data));
+                  navigation.reset({routes: [{name: 'Tabs'}]});
+                }
+                // aa().then(() => {});
+              })
+              .catch(error => console.log(error));
+          });
+        } else {
+          dispatch(initialized(null));
+          showSheet().then(r => console.log(r));
+        }
+      })
+      .finally(() => {
+        console.log('fine');
+      });
   }, [dispatch, navigation, showSheet]);
 
   const styles = useStyles();

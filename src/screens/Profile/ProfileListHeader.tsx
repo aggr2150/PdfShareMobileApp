@@ -1,12 +1,13 @@
 import React, {Dispatch, useState} from 'react';
 import {Pressable, TouchableOpacity, View} from 'react-native';
 import {ButtonGroup, makeStyles, Text} from '@rneui/themed';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import Avatar from '@components/Avatar';
 import DotIcon from '@assets/icon/dot.svg';
 import {Button, Divider, Menu} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import PlusIcon from '@assets/icon/plus1.svg';
+import BackButton from '@components/BackButton';
 
 interface ProfileListHeaderProps {
   selectedIndex: number;
@@ -20,6 +21,7 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
 }) => {
   const styles = useStyles();
   const navigation = useNavigation();
+  const route = useRoute();
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
 
@@ -47,12 +49,17 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
             paddingRight: insets.right || 15,
             paddingLeft: insets.left || 15,
           }}>
-          <Pressable
-            onPress={() => {
-              navigation.navigate('Upload');
-            }}>
-            <PlusIcon fill={'white'} width={32} height={32} />
-          </Pressable>
+          {route.params?.id !== undefined ? (
+            <BackButton onPress={() => navigation.goBack()} color={'white'} />
+          ) : (
+            <Pressable
+              onPress={() => {
+                navigation.navigate('Upload');
+              }}>
+              <PlusIcon fill={'white'} width={32} height={32} />
+            </Pressable>
+          )}
+
           <Menu
             visible={visible}
             onDismiss={closeMenu}

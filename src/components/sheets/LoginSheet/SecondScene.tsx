@@ -27,15 +27,17 @@ const SecondScene = props => {
     getCsrfToken.then(token => setCsrfToken(token));
   }, []);
   const sendVerificationCode = useCallback(() => {
-    apiInstance
-      .post('/api/auth/signUp/sendVerificationCode', {
-        _csrf: csrfToken,
-        email: email,
-      })
-      .then(result => {
-        console.log(result);
-      })
-      .catch(error => console.log(error));
+    if (csrfToken) {
+      apiInstance
+        .post('/api/auth/signUp/sendVerificationCode', {
+          _csrf: csrfToken,
+          email: email,
+        })
+        .then(result => {
+          console.log(result);
+        })
+        .catch(error => console.log(error, csrfToken, email));
+    }
   }, [csrfToken, email]);
   const submit = useCallback(() => {
     // Toast.show({
