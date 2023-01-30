@@ -4,7 +4,7 @@ import {makeStyles, Text} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
 import ToggleBtn from '@components/ToggleBtn';
 import Pages from '@components/Pages';
-import FirstScene from '@screens/History/FirstScene';
+import FirstSceneBk from '@screens/History/FirstScene.bk';
 import SecondScene from '@screens/History/SecondScene';
 import Separator from '@components/Seperator';
 import ActionSheet, {
@@ -27,7 +27,7 @@ const CollectionList = ({navigation, route}) => {
   const renameSheetRef = useRef<ActionSheetRef>(null);
   return (
     <View style={styles.container}>
-      <ThrottleFlatList<TPlace>
+      <ThrottleFlatList<IPost>
         data={new Array(3)}
         // style={{width: '100%'}}
         ListHeaderComponent={() => {

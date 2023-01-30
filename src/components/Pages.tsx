@@ -33,7 +33,7 @@ const Pages: React.FC<PagesProps> = ({
       initialPage={0}
       onPageSelected={event => setSelectedIndex(event.nativeEvent.position)}>
       {/*<View key="1">*/}
-      {/*  <FirstScene />*/}
+      {/*  <FirstSceneBk />*/}
       {/*</View>*/}
       {/*<View key="2">*/}
       {/*  <SecondScene />*/}

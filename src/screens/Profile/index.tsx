@@ -26,7 +26,7 @@ enum ETabIndex {
   'Follow',
 }
 
-type ProfileProps = StackScreenProps<RootStackParamList, 'Profile'>;
+type ProfileProps = StackScreenProps<RootStackParamList, 'Profile' | 'My'>;
 const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   // const navigation = useNavigation();
   // const route = useRoute();

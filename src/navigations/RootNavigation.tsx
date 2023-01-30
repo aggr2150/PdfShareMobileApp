@@ -13,6 +13,7 @@ import {Button, Text} from '@rneui/themed';
 import {SheetManager} from 'react-native-actions-sheet';
 import SearchIcon from '@assets/icon/search.svg';
 import Upload from '@screens/Upload';
+import Profile from '@screens/Profile';
 const RootStack = createStackNavigator<RootStackParamList>();
 
 function SettingsScreen({navigation}) {

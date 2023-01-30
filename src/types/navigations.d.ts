@@ -1,5 +1,11 @@
+import {NavigatorScreenParams} from '@react-navigation/native';
+
+declare type BottomTabParamList = {
+  HomeTab: undefined;
+  ProfileTab: undefined;
+};
 declare type RootStackParamList = {
-  Tabs: undefined;
+  Tabs: NavigatorScreenParams<BottomTabParamList>;
   Viewer: undefined | IPost;
   SignIn: undefined;
   Comments: undefined;
@@ -9,8 +15,11 @@ declare type RootStackParamList = {
     nickname: string;
     description?: string;
   };
-  Profile: undefined | IUser;
+  My: undefined;
+  Profile: IUser | {id: string};
   Settings: undefined;
   CollectionList: undefined;
   Upload: undefined;
+
+  Home: undefined;
 };

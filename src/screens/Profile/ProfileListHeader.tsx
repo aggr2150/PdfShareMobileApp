@@ -25,6 +25,11 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
   const route = useRoute();
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
+  console.log(
+    navigation.getState().routes.length,
+    navigation.getState().key,
+    route.key,
+  );
 
   const closeMenu = () => setVisible(false);
   const insets = useSafeAreaInsets();

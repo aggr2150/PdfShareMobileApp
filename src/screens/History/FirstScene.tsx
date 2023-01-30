@@ -1,64 +1,75 @@
-import React, {useState} from 'react';
-import {makeStyles, Text} from '@rneui/themed';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import {makeStyles} from '@rneui/themed';
 import ThrottleFlatList from '@components/ThrottleFlatlist';
 import BookCard from '@components/BookCard';
-import {FlatList, Pressable, useWindowDimensions, View} from 'react-native';
-import Book from '@components/Book';
-import {useNavigation} from '@react-navigation/native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {FlatList, TouchableOpacity, useWindowDimensions} from 'react-native';
+import {apiInstance} from '@utils/Networking';
+import _ from 'lodash';
+import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
+import {postAddedMany} from '@redux/reducer/postsReducer';
+import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 
 const FirstScene = () => {
   const styles = useStyles();
-  const {height, width} = useWindowDimensions();
-  const [data, setData] = useState(Array(50));
-  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+  const [initialized, setInitialized] = useState(false);
+  const [data, setData] = useState<IPost[]>([]);
+  const [fetching, setFetching] = useState(true);
+  const dimensions = useWindowDimensions();
+  const tabBarHeight = useBottomTabBarHeight();
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    apiInstance.post<response<IPost[]>>('/api/feeds/recent').then(response => {
+      if (response.data.data.length !== 0) {
+        setData(prevState => [...prevState, ...response.data.data]);
+        dispatch(postAddedMany(response.data.data));
+      }
+    });
+  }, [dispatch]);
+  const throttleEventCallback = useMemo(
+    () =>
+      _.throttle(() => {
+        apiInstance
+          .post<response<IPost[]>>('/api/feeds/recent')
+          .then(response => {
+            if (response.data.data.length !== 0) {
+              setData(prevState => [...prevState, ...response.data.data]);
+              dispatch(postAddedMany(response.data.data));
+            }
+          })
+          .finally(() => setFetching(false));
+      }),
+    [dispatch],
+  );
+  const onEndReached = useCallback(() => {
+    if (!fetching) {
+      throttleEventCallback();
+    }
+  }, [fetching, throttleEventCallback]);
+
+  const posts = useAppSelector(state => {
+    return data.map(item => state.posts.entities[item._id] || item);
+  });
   return (
-    <View style={{flex: 1}}>
-      <View style={{flex: 1}}>
-        <View
-          style={{
-            marginBottom: 30,
-            marginHorizontal: 30,
-          }}>
-          <Text style={{fontSize: 17}}>히스토리</Text>
-          {data.length === 0 && (
-            <Text style={{fontSize: 12, marginTop: 3, color: '#ccc'}}>
-              기록이 없습니다.
-            </Text>
-          )}
-        </View>
-        {data.length !== 0 && (
-          <FlatList<TPlace>
-            data={Array(50)}
-            horizontal
-            contentContainerStyle={{
-              // aspectRatio: 16 / 9,
-              // flex: 1,
-              height: (width / 21) * 9,
-              // width: width,
-            }}
-            ItemSeparatorComponent={() => (
-              <View
-                style={{
-                  width: 3,
-                }}
-              />
-            )}
-            showsHorizontalScrollIndicator={true}
-            renderItem={({item, index}) => (
-              <Pressable
-                onPress={() => navigation.navigate('Viewer')}
-                style={{
-                  // paddingRight: '5%',
-                  flex: 1,
-                  // backgroundColor: 'red',
-                }}>
-                <Book item={item} index={index} />
-              </Pressable>
-            )}
-          />
-        )}
-      </View>
-    </View>
+    <FlatList<IPost>
+      data={posts}
+      contentContainerStyle={{
+        width: '100%',
+        marginTop: insets.top + 46 + 24,
+        minHeight: dimensions.height - tabBarHeight + 46 + 24,
+      }}
+      contentOffset={{y: insets.top + 46 + 24, x: 0}}
+      onEndReached={onEndReached}
+      renderItem={({item, index}) => <BookCard item={item} index={index} />}
+    />
   );
 };
 

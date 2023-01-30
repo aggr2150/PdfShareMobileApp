@@ -22,7 +22,7 @@ const Pages: React.FC<PagesProps> = ({selectedIndex}) => {
   return (
     <PagerView ref={pagerRef} style={styles.pagerView} initialPage={0}>
       <View key="1">
-        <ThrottleFlatList<TPlace>
+        <ThrottleFlatList<IPost>
           data={[1, 2, 3, 4]}
           contentContainerStyle={{width: '100%'}}
           renderItem={({item, index}) => (
@@ -123,7 +123,7 @@ const Pages: React.FC<PagesProps> = ({selectedIndex}) => {
         />
       </View>
       <View key="2">
-        <ThrottleFlatList<TPlace>
+        <ThrottleFlatList<IPost>
           data={new Array(10)}
           // style={{width: '100%'}}
           renderItem={({item, index}) => (

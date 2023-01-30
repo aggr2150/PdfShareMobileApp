@@ -9,6 +9,11 @@ const ProfileStackNavigation = () => {
     <ProfileStack.Navigator
       screenOptions={{cardStyle: {backgroundColor: '#000'}}}>
       <ProfileStack.Screen
+        name="My"
+        component={Profile}
+        options={{headerShown: false}}
+      />
+      <ProfileStack.Screen
         name="Profile"
         component={Profile}
         options={{headerShown: false}}

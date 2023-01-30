@@ -12,6 +12,7 @@ import HistoryIcon from '@assets/icon/history.svg';
 import ProfileIcon from '@assets/icon/person.svg';
 import HistoryStackNavigation from '@navigations/HistoryStackNavigation';
 import ProfileStackNavigation from '@navigations/ProfileStackNavigation';
+import HomeStackNavigation from '@navigations/tabs/HomeStackNavigation';
 
 function SettingsScreen() {
   return (
@@ -39,8 +40,8 @@ export default () => {
         tabBarActiveTintColor: '#99c729',
       }}>
       <Tab.Screen
-        name="Home"
-        component={Home}
+        name="HomeTab"
+        component={HomeStackNavigation}
         options={{
           tabBarIcon: ({size, color}) => (
             <HomeIcon

@@ -11,7 +11,6 @@ interface BookCardProps {
 const BookCard: React.FC<BookCardProps> = ({item, index}) => {
   const styles = useStyles();
   const navigation = useNavigation();
-  console.log('author', item, index);
   return (
     <Pressable
       onPress={() => navigation.navigate('Viewer', item)}

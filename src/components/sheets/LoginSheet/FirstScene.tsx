@@ -5,7 +5,7 @@ import {apiInstance} from '@utils/Networking';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import {Input as BaseInput} from '@rneui/base/dist/Input/Input';
 import {SheetManager} from 'react-native-actions-sheet';
 import {useAppDispatch} from '@redux/store/RootStore';
@@ -54,7 +54,19 @@ const FirstScene = props => {
             console.log(r),
           );
           SheetManager.hide('loginSheet').then(() => {
-            navigation.reset({routes: [{name: 'Tabs'}]});
+            navigation.dispatch(
+              CommonActions.reset({
+                // stale: true,
+                // stale: false,
+                // index: 0,
+                routes: [{name: 'Tabs'}],
+              }),
+            );
+            // navigation.reset({
+            //   stale: false,
+            //   index: 0,
+            //   routes: [{name: 'Tabs'}],
+            // });
           });
         }
       });

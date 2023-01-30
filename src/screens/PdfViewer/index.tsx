@@ -28,7 +28,11 @@ import Animated, {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {makeStyles, Text} from '@rneui/themed';
 import Avatar from '@components/Avatar';
-import {useNavigation} from '@react-navigation/native';
+import {
+  StackActions,
+  TabActions,
+  useNavigation,
+} from '@react-navigation/native';
 import HeartIcon from '@assets/icon/heart.svg';
 import CommentIcon from '@assets/icon/comment.svg';
 import DotIcon from '@assets/icon/dot.svg';
@@ -270,8 +274,28 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                 onPress={() => detailsActionSheetRef.current?.show()}>
                 <Pressable
                   onPress={() => {
-                    navigation.navigate('ProfileTab');
-                    navigation.push('Profile', {id: route.params.author.id});
+                    if (route.params?.author.id) {
+                      console.log(navigation.getState().routes[0].state);
+                      if (!navigation.getState().routes[0].state) {
+                        navigation.navigate('Tabs', {
+                          screen: 'ProfileTab',
+                          params: {
+                            screen: 'Profile',
+                            initial: false,
+                            params: {
+                              id: route.params.author.id,
+                            },
+                          },
+                        });
+                      } else {
+                        navigation.navigate('ProfileTab');
+                        navigation.dispatch(
+                          StackActions.push('Profile', {
+                            id: route.params.author.id,
+                          }),
+                        );
+                      }
+                    }
                   }}>
                   <Avatar style={{width: 20, height: 20, marginRight: 5}} />
                 </Pressable>

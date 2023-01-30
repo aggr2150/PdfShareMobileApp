@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {makeStyles} from '@rneui/themed';
-import {useNavigation} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import {SheetManager} from 'react-native-actions-sheet';
 import AppLogo from '@assets/logo/appLogoWithText.svg';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
@@ -62,7 +62,14 @@ const SignIn: React.FC = () => {
                 } else {
                   console.log(response.data.data);
                   dispatch(initialized(response.data.data));
-                  navigation.reset({routes: [{name: 'Tabs'}]});
+                  navigation.dispatch(
+                    CommonActions.reset({
+                      // stale: false,
+                      // stale: false,
+                      routes: [{name: 'Tabs'}],
+                    }),
+                  );
+                  // navigation.reset({stale: false, routes: [{name: 'Tabs'}]});
                 }
                 // aa().then(() => {});
               })
