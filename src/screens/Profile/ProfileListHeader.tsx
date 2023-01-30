@@ -71,7 +71,14 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
             onDismiss={closeMenu}
             contentStyle={{backgroundColor: 'black'}}
             anchor={
-              <TouchableOpacity onPress={openMenu}>
+              <TouchableOpacity
+                onPress={openMenu}
+                style={{
+                  width: 32,
+                  height: 32,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
                 <DotIcon fill={'white'} width={24} height={24} />
               </TouchableOpacity>
             }>

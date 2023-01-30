@@ -55,7 +55,7 @@ export default () => {
       />
       <Tab.Screen
         name="Search"
-        component={SettingsScreen}
+        component={HomeStackNavigation}
         options={{
           tabBarIcon: ({size, color}) => (
             <SearchIcon
