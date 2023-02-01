@@ -2,7 +2,7 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import Profile from '@screens/Profile';
 
-const ProfileStack = createStackNavigator<RootStackParamList>();
+const ProfileStack = createStackNavigator<ProfileStackScreenParams>();
 
 const ProfileStackNavigation = () => {
   return (

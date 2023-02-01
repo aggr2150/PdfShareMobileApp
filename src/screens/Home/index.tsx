@@ -20,19 +20,9 @@ enum EnumSelectedIndex {
 const Home = () => {
   const styles = useStyles();
   const navigation = useNavigation();
-  const [data, setData] = useState<IPost[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<EnumSelectedIndex>(
     EnumSelectedIndex['전체'],
   );
-  useEffect(() => {
-    apiInstance.post<response<IPost[]>>('/api/feeds/recent').then(response => {
-      console.log(response);
-      if (response.data.data.length !== 0) {
-        setData(prevState => [...prevState, ...response.data.data]);
-      }
-    });
-  }, []);
-
   const insets = useSafeAreaInsets();
   return (
     <View

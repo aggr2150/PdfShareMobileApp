@@ -20,6 +20,7 @@ import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 const FirstScene = () => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
+  const [refreshing, setRefreshing] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [data, setData] = useState<IPost[]>([]);
   const [fetching, setFetching] = useState(true);
@@ -29,32 +30,52 @@ const FirstScene = () => {
   useEffect(() => {
     apiInstance.post<response<IPost[]>>('/api/feeds/recent').then(response => {
       if (response.data.data.length !== 0) {
-        setData(prevState => [...prevState, ...response.data.data]);
+        setData(response.data.data.slice(0, 3));
         dispatch(postAddedMany(response.data.data));
+        setFetching(false);
       }
     });
   }, [dispatch]);
   const throttleEventCallback = useMemo(
     () =>
-      _.throttle(() => {
+      _.throttle((pagingKey, initial?) => {
         apiInstance
-          .post<response<IPost[]>>('/api/feeds/recent')
+          .post<response<IPost[]>>('/api/feeds/recent', {pagingKey})
           .then(response => {
+            console.log(response.data, response.data.data.slice(0, 3));
             if (response.data.data.length !== 0) {
-              setData(prevState => [...prevState, ...response.data.data]);
+              if (initial) {
+                setData(response.data.data);
+              } else {
+                setData(prevState => [
+                  ...prevState,
+                  ...response.data.data.slice(0, 3),
+                ]);
+              }
               dispatch(postAddedMany(response.data.data));
             }
           })
-          .finally(() => setFetching(false));
+          .catch(error => console.log(error))
+          .finally(() => {
+            console.log('fin');
+            setFetching(false);
+            setRefreshing(false);
+          });
       }),
     [dispatch],
   );
   const onEndReached = useCallback(() => {
+    console.log(data, fetching);
     if (!fetching) {
-      throttleEventCallback();
+      throttleEventCallback(data[data.length - 1]?._id);
     }
-  }, [fetching, throttleEventCallback]);
+  }, [data, fetching, throttleEventCallback]);
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    throttleEventCallback.cancel();
+    throttleEventCallback(undefined, true);
+  }, [throttleEventCallback]);
   const posts = useAppSelector(state => {
     return data.map(item => state.posts.entities[item._id] || item);
   });
@@ -68,6 +89,8 @@ const FirstScene = () => {
       }}
       contentOffset={{y: insets.top + 46 + 24, x: 0}}
       onEndReached={onEndReached}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
       renderItem={({item, index}) => <BookCard item={item} index={index} />}
     />
   );

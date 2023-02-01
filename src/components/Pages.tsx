@@ -1,11 +1,7 @@
-import React, {Dispatch, useEffect, useRef, useState} from 'react';
-import {Pressable, View} from 'react-native';
-import {makeStyles, Text} from '@rneui/themed';
-import {useNavigation} from '@react-navigation/native';
+import React, {Dispatch, useEffect, useRef} from 'react';
+import {View} from 'react-native';
+import {makeStyles} from '@rneui/themed';
 import PagerView from 'react-native-pager-view';
-import ThrottleFlatList from '@components/ThrottleFlatlist';
-import {SheetManager} from 'react-native-actions-sheet';
-import Book from '@components/Book';
 
 interface PagesProps {
   selectedIndex: number;

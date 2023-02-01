@@ -27,35 +27,37 @@ const FirstScene = () => {
   const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
   const [initialized, setInitialized] = useState(false);
-  const [data, setData] = useState<IPost[]>([]);
+  const [data, setData] = useState<IHistoryPost[]>([]);
   const [fetching, setFetching] = useState(true);
   const dimensions = useWindowDimensions();
   const tabBarHeight = useBottomTabBarHeight();
   const dispatch = useAppDispatch();
+  // const pagingKey =
   useEffect(() => {
-    apiInstance.post<response<IPost[]>>('/api/feeds/history').then(response => {
-      if (response.data.data.length !== 0) {
-        setData(prevState => [...prevState, ...response.data.data]);
-        dispatch(postAddedMany(response.data.data));
-      }
-    });
+    apiInstance
+      .post<response<IHistoryPost[]>>('/api/feeds/history')
+      .then(response => {
+        if (response.data.data.length !== 0) {
+          setData(response.data.data);
+          dispatch(postAddedMany(response.data.data));
+          setFetching(false);
+        }
+      });
   }, [dispatch]);
   const throttleEventCallback = useMemo(
     () =>
-      _.throttle((initial?) => {
+      _.throttle((pagingKey, initial?) => {
         apiInstance
-          .post<response<IPost[]>>('/api/feeds/history')
+          .post<response<IHistoryPost[]>>('/api/feeds/history', {pagingKey})
           .then(response => {
             if (response.data.data.length !== 0) {
               if (initial) {
-                setData(prevState => [...prevState, ...response.data.data]);
-              } else {
                 setData(response.data.data);
+              } else {
+                setData(prevState => [...prevState, ...response.data.data]);
               }
               dispatch(postAddedMany(response.data.data));
             }
-            console.log('history');
-            setRefreshing(false);
           })
           .catch(error => {
             console.log(error, 'his');
@@ -63,21 +65,20 @@ const FirstScene = () => {
           .finally(() => {
             setFetching(false);
             setRefreshing(false);
-            console.log('ref');
           });
       }),
     [dispatch],
   );
   const onEndReached = useCallback(() => {
     if (!fetching) {
-      throttleEventCallback();
+      throttleEventCallback(data[data.length - 1].timestamp);
     }
-  }, [fetching, throttleEventCallback]);
+  }, [data, fetching, throttleEventCallback]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     throttleEventCallback.cancel();
-    throttleEventCallback(true);
+    throttleEventCallback(undefined, true);
   }, [throttleEventCallback]);
 
   const posts = useAppSelector(state => {
@@ -89,29 +90,27 @@ const FirstScene = () => {
       data={posts}
       contentContainerStyle={{
         width: '100%',
-        // paddingTop: insets.top + 46 + 24,
-        // minHeight: dimensions.height - tabBarHeight + 46 + 24,
-      }}
-      style={{
         paddingTop: insets.top + 46 + 24,
+        minHeight: dimensions.height - tabBarHeight + 46 + 24,
       }}
+      // style={{
+      //   paddingTop: insets.top + 46 + 24,
+      // }}
       // contentOffset={{y: insets.top + 46 + 24, x: 0}}
       onEndReached={onEndReached}
-      contentInset={{top: insets.top + 46 + 24}}
-      contentOffset={{y: -(insets.top + 46 + 24)}}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      // refreshControl={
-      //   <RefreshControl
-      //     // style={{top: insets.top + 46 + 24}}
-      //     style={{zIndex: 9}}
-      //     refreshing={refreshing}
-      //     onRefresh={onRefresh}
-      //     // title="Pull to refresh"
-      //     tintColor="#fff"
-      //     titleColor="#fff"
-      //   />
-      // }
+      refreshControl={
+        <RefreshControl
+          // style={{top: insets.top + 46 + 24}}
+          style={{display: 'none'}}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          // title="Pull to refresh"
+          tintColor="#fff"
+          titleColor="#fff"
+        />
+      }
       renderItem={({item, index}) => <BookCard item={item} index={index} />}
     />
     // </SafeAreaView>

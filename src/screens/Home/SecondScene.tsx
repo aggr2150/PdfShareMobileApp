@@ -13,6 +13,7 @@ import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 const SecondScene: React.FC = () => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
+  const [refreshing, setRefreshing] = useState(false);
   const [data, setData] = useState<IPost[]>([]);
   const [fetching, setFetching] = useState(true);
   const dimensions = useWindowDimensions();
@@ -33,12 +34,16 @@ const SecondScene: React.FC = () => {
   }, [dispatch]);
   const throttleEventCallback = useMemo(
     () =>
-      _.throttle(() => {
+      _.throttle((pagingKey, initial?) => {
         apiInstance
           .post<response<IPost[]>>('/api/feeds/subscribe')
           .then(response => {
             if (response.data.data.length !== 0) {
-              setData(prevState => [...prevState, ...response.data.data]);
+              if (initial) {
+                setData(response.data.data);
+              } else {
+                setData(prevState => [...prevState, ...response.data.data]);
+              }
               dispatch(postAddedMany(response.data.data));
             }
           })

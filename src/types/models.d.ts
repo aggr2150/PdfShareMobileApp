@@ -14,6 +14,10 @@ declare interface ILike {
   _id: string;
   likeAt: string;
 }
+
+declare interface IHistoryPost extends IPost {
+  timestamp: string;
+}
 declare interface IPost {
   _id: string;
   author: IAuthor;
@@ -30,6 +34,16 @@ declare interface IPost {
   createdAt: Date;
   updatedAt?: Date;
   likeStatus: boolean;
+}
+
+declare interface ICollection {
+  _id: string;
+  title: string;
+  user: IAuthor;
+  posts: string[];
+  isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 declare interface ISession {

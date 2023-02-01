@@ -1,10 +1,16 @@
-import {Platform, useWindowDimensions, View} from 'react-native';
+import {
+  Platform,
+  Pressable,
+  TextInput,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import {Button, Input, makeStyles, Text} from '@rneui/themed';
 import ActionSheet, {
   SheetManager,
   SheetProps,
 } from 'react-native-actions-sheet';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ButtonGroup} from '@rneui/themed';
@@ -13,21 +19,40 @@ import {useNavigation} from '@react-navigation/native';
 import Separator from '@components/Seperator';
 import Avatar from '@components/Avatar';
 import BoxIcon from '@assets/icon/box.svg';
+import {apiInstance, getCsrfToken} from '@utils/Networking';
+import {postAdded} from '@redux/reducer/postsReducer';
+import Toast from 'react-native-toast-message';
 
 const CollectionSheet: React.FC<SheetProps> = props => {
   const styles = useStyles(props);
-  const [orientation, setOrientation] = useState<string>();
-  useEffect(() => {
-    return Orientation.addOrientationListener(setOrientation);
-  }, []);
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
 
   const {height, width} = useWindowDimensions();
-  console.log(orientation);
+  const [csrfToken, setCsrfToken] = useState<string>();
+  const [title, setTitle] = useState<string>('');
+
+  useEffect(() => {
+    getCsrfToken.then(token => setCsrfToken(token));
+  }, []);
+  const submit = useCallback(() => {
+    apiInstance
+      .post('/api/collection/create', {title, _csrf: csrfToken})
+      .then(response => {
+        if (response.data.code === 200) {
+          SheetManager.hide('collectionSheet').then();
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: 'Unknown Error Occurred!',
+            position: 'bottom',
+          });
+        }
+      });
+  }, [csrfToken, title]);
+
   return (
     <ActionSheet
-      // closable={false}
       id={props.sheetId}
       // headerAlwaysVisible={false}
       gestureEnabled={true}
@@ -46,24 +71,44 @@ const CollectionSheet: React.FC<SheetProps> = props => {
         <Separator style={{marginVertical: 10}} />
         <View
           style={{
-            flexDirection: 'row',
-            marginHorizontal: 15,
-          }}>
-          <Avatar style={{width: 20, height: 20, marginRight: 5}} />
-          <Text>콜렉션 추가</Text>
-        </View>
-        <Separator style={{marginVertical: 10}} />
-        <View
-          style={{
-            marginHorizontal: 15,
-            marginVertical: 5,
+            marginHorizontal: 32,
+            marginVertical: 35,
             flexDirection: 'row',
             alignItems: 'center',
+            backgroundColor: '#4c4c4c',
+            borderRadius: 100,
+            overflow: 'hidden',
           }}>
-          <BoxIcon fill={'white'} width={30} height={30} />
-          <View style={{marginHorizontal: 10}}>
-            <Text>저장된 PDF 보기</Text>
+          <View
+            style={{
+              padding: 20,
+              paddingHorizontal: 32,
+              flex: 1,
+              backgroundColor: '#4c4c4c',
+            }}>
+            <TextInput
+              style={{
+                fontSize: 13,
+                padding: 0,
+                color: '#fff',
+              }}
+              onChangeText={setTitle}
+              onSubmitEditing={submit}
+              placeholderTextColor={'#fff'}
+              placeholder={'콜렉션 이름을 입력하세요.'}
+            />
           </View>
+          <Pressable
+            onPress={submit}
+            style={{
+              paddingHorizontal: 28,
+              backgroundColor: '#99c729',
+              // flex: 1,
+            }}>
+            <View style={{flex: 1, justifyContent: 'center'}}>
+              <Text>완료</Text>
+            </View>
+          </Pressable>
         </View>
       </View>
     </ActionSheet>

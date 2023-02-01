@@ -34,7 +34,10 @@ enum ETabIndex {
   'Follow',
 }
 
-type ProfileProps = StackScreenProps<RootStackParamList, 'Profile' | 'My'>;
+type ProfileProps = StackScreenProps<
+  ProfileStackScreenParams,
+  'Profile' | 'My'
+>;
 const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   // const navigation = useNavigation();
   // const route = useRoute();
@@ -144,6 +147,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
         paddingRight: insets.right,
         paddingLeft: insets.left,
         overflow: 'visible',
+        flex: 1,
       }}>
       {!user ? (
         <Spinner />
@@ -155,7 +159,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
           scrollIndicatorInsets={{right: 0}}
           // style={{width: '100%'}}
           // exiting={SlideOutLeft}
-          style={{overflow: 'visible'}}
+          // style={{overflow: 'visible'}}
           // contentContainerStyle={{width: '100%'}}
           ListHeaderComponent={() => (
             <ProfileListHeader

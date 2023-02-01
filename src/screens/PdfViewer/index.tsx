@@ -31,7 +31,7 @@ import Separator from '@components/Seperator';
 import {StackScreenProps} from '@react-navigation/stack';
 import {RootStackParamList} from '@src/types/navigations';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
-import {selectById, updatePost} from '@redux/reducer/postsReducer';
+import {postAdded, selectById, updatePost} from '@redux/reducer/postsReducer';
 import Spinner from '@components/Spinner';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {likeAdded, likeRemoved} from '@redux/reducer/likesReducer';
@@ -48,10 +48,6 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
 
   const [csrfToken, setCsrfToken] = useState<string>();
 
-  console.log('post', post.likeStatus);
-  useEffect(() => {
-    getCsrfToken.then(token => setCsrfToken(token));
-  }, []);
   // route.params.document.filepath
   const source: Source = {
     uri: route?.params?.document.filepath,
@@ -69,6 +65,16 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   const detailsActionSheetRef = useRef<ActionSheetRef>(null);
   const styles = useStyles();
   const dispatch = useAppDispatch();
+  useEffect(() => {
+    getCsrfToken.then(token => setCsrfToken(token));
+    apiInstance
+      .post<response<IPost>>('/api/post/' + route.params._id)
+      .then(response => {
+        if (response.data.data) {
+          dispatch(postAdded(response.data.data));
+        }
+      });
+  }, [dispatch, route.params._id]);
   const likeCallback = useCallback(() => {
     if (post) {
       console.log(post.likeStatus);

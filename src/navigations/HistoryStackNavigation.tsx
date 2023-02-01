@@ -2,9 +2,9 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import ViewerHeader from '@components/ViewerHeader';
 import History from '@screens/History';
-import CollectionList from '@screens/History/CollectionList';
+import Collection from '@screens/History/CollectionList';
 
-const HistoryStack = createStackNavigator<RootStackParamList>();
+const HistoryStack = createStackNavigator<HistoryStackScreenParams>();
 
 const HistoryStackNavigation = () => {
   return (
@@ -16,8 +16,8 @@ const HistoryStackNavigation = () => {
         options={{headerShown: false}}
       />
       <HistoryStack.Screen
-        name="CollectionList"
-        component={CollectionList}
+        name="Collection"
+        component={Collection}
         options={{
           headerShown: false,
           // header: ViewerHeader,

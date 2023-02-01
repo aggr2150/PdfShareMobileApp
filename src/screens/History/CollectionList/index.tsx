@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Pressable, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import Separator from '@components/Seperator';
@@ -8,19 +8,45 @@ import PencilIcon from '@assets/icon/pencil2.svg';
 import Book from '@components/Book';
 import Avatar from '@components/Avatar';
 import BoxIcon from '@assets/icon/box.svg';
+import {apiInstance} from '@utils/Networking';
+import {StackScreenProps} from '@react-navigation/stack';
+import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
+import {postAddedMany} from '@redux/reducer/postsReducer';
 
 enum EnumSelectedIndex {
   '히스토리',
   '콜렉션',
 }
 
-const CollectionList = ({navigation, route}) => {
+type CollectionProps = StackScreenProps<HistoryStackScreenParams, 'Collection'>;
+const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
   const styles = useStyles();
   const renameSheetRef = useRef<ActionSheetRef>(null);
+  const [collection, setCollection] = useState<ICollection>();
+  const [fetching, setFetching] = useState(true);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    apiInstance
+      .post('/api/feeds/collection', {collectionId: route.params._id})
+      .then(response => {
+        if (response.data.data.length !== 0) {
+          setCollection(response.data.data.collection);
+          // setData(response.data.data.feeds);
+          dispatch(postAddedMany(response.data.data.feeds));
+          setFetching(false);
+        }
+      });
+  }, [dispatch, route.params._id]);
+
+  const data = useAppSelector(state => {
+    return collection?.posts.map<IPost>(
+      item => state.posts.entities[item] as IPost,
+    );
+  });
   return (
     <View style={styles.container}>
       <ThrottleFlatList<IPost>
-        data={new Array(3)}
+        data={data}
         // style={{width: '100%'}}
         ListHeaderComponent={() => {
           return (
@@ -43,7 +69,7 @@ const CollectionList = ({navigation, route}) => {
         renderItem={({item, index}) => (
           <Pressable
             onPress={() => {
-              navigation.navigate('Viewer');
+              navigation.navigate('Viewer', item);
             }}
             style={{
               backgroundColor: '#282828',
@@ -55,15 +81,19 @@ const CollectionList = ({navigation, route}) => {
               flex: 1,
             }}>
             <View style={{flex: 1}}>
-              <Book />
+              <Book
+                author={item.author}
+                title={item.title}
+                thumbnail={item.thumbnail}
+              />
             </View>
             <View style={{justifyContent: 'space-between'}}>
               <Text
                 style={{fontSize: 22, textAlign: 'right', marginBottom: 37}}>
-                크리스마스어쩌고 저쩌고
+                {item.title}
               </Text>
               <Text style={{fontSize: 16, textAlign: 'right'}}>
-                누가어쩌고저쩌고
+                {item.author.nickname}
               </Text>
             </View>
           </Pressable>
@@ -152,4 +182,4 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default CollectionList;
+export default Collection;
