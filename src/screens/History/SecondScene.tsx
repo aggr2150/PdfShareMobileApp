@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Pressable, View} from 'react-native';
+import {FlatList, Pressable, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import ThrottleFlatList from '@components/ThrottleFlatlist';
 import {SheetManager} from 'react-native-actions-sheet';
@@ -10,8 +10,12 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
 import {apiInstance} from '@utils/Networking';
 import {postAddedMany} from '@redux/reducer/postsReducer';
-import {useAppDispatch} from '@redux/store/RootStore';
+import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {useNavigation} from '@react-navigation/native';
+import {
+  collectionAddedMany,
+  selectAll,
+} from '@redux/reducer/collectionsReducer';
 
 const SecondScene: React.FC = () => {
   const styles = useStyles();
@@ -19,7 +23,7 @@ const SecondScene: React.FC = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
-  const [data, setData] = useState<ICollection[]>([]);
+  // const [data, setData] = useState<ICollection[]>([]);
   const [fetching, setFetching] = useState(true);
 
   const navigation = useNavigation();
@@ -29,16 +33,17 @@ const SecondScene: React.FC = () => {
       .post<response<ICollection[]>>('/api/collection/list')
       .then(response => {
         if (response.data.data.length !== 0) {
-          setData(response.data.data);
-          // dispatch(postAddedMany(response.data.data));
+          // setData(response.data.data);
+          dispatch(collectionAddedMany(response.data.data));
           setFetching(false);
         }
       });
   }, [dispatch]);
+  const collections = useAppSelector(state => selectAll(state.collections));
   return (
-    <View>
-      <ThrottleFlatList<ICollection>
-        data={data}
+    <View style={{flex: 1}}>
+      <FlatList<ICollection>
+        data={collections}
         // style={{width: '100%'}}
         contentContainerStyle={{
           paddingTop: insets.top + 46 + 24,

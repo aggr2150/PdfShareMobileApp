@@ -4,6 +4,7 @@ import authReducer from '@redux/reducer/authReducer';
 import postsReducer from '@redux/reducer/postsReducer';
 import UsersReducer from '@redux/reducer/usersReducer';
 import likesReducer from '@redux/reducer/likesReducer';
+import collectionsReducer from '@redux/reducer/collectionsReducer';
 
 export const RootStore = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const RootStore = configureStore({
     posts: postsReducer,
     users: UsersReducer,
     likes: likesReducer,
+    collections: collectionsReducer,
   },
 });
 

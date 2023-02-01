@@ -1,6 +1,5 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import ViewerHeader from '@components/ViewerHeader';
 import History from '@screens/History';
 import Collection from '@screens/History/CollectionList';
 
@@ -20,8 +19,6 @@ const HistoryStackNavigation = () => {
         component={Collection}
         options={{
           headerShown: false,
-          // header: ViewerHeader,
-          header: ViewerHeader,
         }}
       />
     </HistoryStack.Navigator>

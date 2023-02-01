@@ -3,17 +3,12 @@ import {createStackNavigator} from '@react-navigation/stack';
 import PdfViewer from '../screens/PdfViewer';
 import BottomTabNavigation from '@navigations/BottomTabNavigation';
 import SignIn from '@screens/SignIn';
-import ViewerHeader from '@components/ViewerHeader';
-import {Provider} from 'react-redux';
-import {ViewerStore} from '@redux/store/ViewerStore';
 import Comments from '@screens/Comments';
 import EditProfile from '@screens/Profile/EditProfile';
 import {View} from 'react-native';
 import {Button, Text} from '@rneui/themed';
-import {SheetManager} from 'react-native-actions-sheet';
-import SearchIcon from '@assets/icon/search.svg';
 import Upload from '@screens/Upload';
-import Profile from '@screens/Profile';
+
 const RootStack = createStackNavigator<RootStackParamList>();
 
 function SettingsScreen({navigation}) {
@@ -43,7 +38,6 @@ const RootStackNavigator = () => {
         options={{
           headerShown: false,
           // header: ViewerHeader,
-          header: ViewerHeader,
         }}
       />
       <RootStack.Screen
