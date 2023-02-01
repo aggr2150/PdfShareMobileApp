@@ -30,7 +30,7 @@ const History = () => {
         <ToggleBtn
           labelText={['히스토리', '콜렉션']}
           textStyle={{fontSize: 10}}
-          switchStyle={{borderRadius: 23, backgroundColor: '#161616'}}
+          switchStyle={{borderRadius: 23, backgroundColor: '#262626'}}
           containerStyle={{
             height: 46,
             minWidth: 200,

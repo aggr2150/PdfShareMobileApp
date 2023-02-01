@@ -47,7 +47,7 @@ const Home = () => {
         <ToggleBtn
           labelText={['전체', '구독중']}
           textStyle={{fontSize: 10}}
-          switchStyle={{borderRadius: 23, backgroundColor: '#161616'}}
+          switchStyle={{borderRadius: 23, backgroundColor: '#262626'}}
           containerStyle={{
             height: 46,
             minWidth: 200,

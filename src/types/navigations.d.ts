@@ -1,12 +1,14 @@
-import {NavigatorScreenParams} from '@react-navigation/native';
-
 declare type BottomTabParamList = {
   HomeTab: undefined;
-  ProfileTab: undefined;
+  ProfileTab: import('@react-navigation/native').NavigatorScreenParams<ProfileStackScreenParams>;
 };
+declare type ProfileStackScreenParams = {
+  Profile: IUser | {id: string};
+};
+
 declare type RootStackParamList = {
-  Tabs: NavigatorScreenParams<BottomTabParamList>;
-  Viewer: undefined | IPost;
+  Tabs: import('@react-navigation/native').NavigatorScreenParams<BottomTabParamList>;
+  Viewer: IPost;
   SignIn: undefined;
   Comments: undefined;
   History: undefined;

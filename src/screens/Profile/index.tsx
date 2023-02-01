@@ -7,6 +7,7 @@ import ToggleBtn from '@components/ToggleBtn';
 import Avatar from '@components/Avatar';
 import ProfileListHeader from '@screens/Profile/ProfileListHeader';
 import BookCard from '@components/BookCard';
+import Spinner from '@components/Spinner';
 import {Provider} from 'react-native-paper';
 import Animated, {
   FadeIn,
@@ -19,6 +20,13 @@ import {StackScreenProps} from '@react-navigation/stack';
 import {selectById, userAdded} from '@redux/reducer/usersReducer';
 import {apiInstance} from '@utils/Networking';
 import {postAddedMany} from '@redux/reducer/postsReducer';
+import {
+  likeAddedMany,
+  selectAll,
+  setAllLike,
+} from '@redux/reducer/likesReducer';
+import {getSession} from '@redux/reducer/authReducer';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
 enum ETabIndex {
   'PDF',
@@ -31,11 +39,13 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   // const navigation = useNavigation();
   // const route = useRoute();
   // route.params.id
+  const insets = useSafeAreaInsets();
   const [selectedIndex, setSelectedIndex] = useState<ETabIndex>(ETabIndex.PDF);
+  const session = useAppSelector(state => getSession(state));
   const user = useAppSelector(state =>
     selectById(state.users, route.params?.id || state.auth.session?.id || ''),
   );
-  const [tabData, setTabData] = useState<[IPost[], IPost[], IPost[]]>([
+  const [tabData, setTabData] = useState<[IPost[], ILikePost[], IPost[]]>([
     [],
     [],
     [],
@@ -45,9 +55,15 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
       item => state.posts.entities[item._id] || item,
     );
   });
+  // const LikesData = useAppSelector(state => {
+  //   // state.likes
+  //   return tabData[selectedIndex].map(
+  //     item => state.posts.entities[item._id] || item,
+  //   );
+  // });
   const LikesData = useAppSelector(state => {
-    return tabData[selectedIndex].map(
-      item => state.posts.entities[item._id] || item,
+    return selectAll(state.likes).map(
+      item => state.posts.entities[item._id] as ILikePost,
     );
   });
   const FollowData = useAppSelector(state => {
@@ -58,7 +74,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   const dispatch = useAppDispatch();
   useEffect(() => {
     apiInstance
-      .post<response<{user?: IUser; feeds: IPost[]; likes: IPost[]}>>(
+      .post<response<{user?: IUser; feeds: IPost[]; likes: ILikePost[]}>>(
         '/api/user',
         {
           id: route.params?.id,
@@ -74,6 +90,12 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
               prevState[2],
             ]);
             dispatch(postAddedMany(response.data.data.feeds));
+          }
+          if (
+            response.data.data.likes &&
+            response.data.data.likes.length !== 0
+          ) {
+            dispatch(setAllLike(response.data.data.likes));
           }
         }
       });
@@ -115,36 +137,43 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
       break;
   }
   return (
-    <Provider>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          // alignItems: 'center',
-          backgroundColor: '#000',
-        }}>
-        <Animated.FlatList<IPost>
+    <View
+      style={{
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingRight: insets.right,
+        paddingLeft: insets.left,
+        overflow: 'visible',
+      }}>
+      {!user ? (
+        <Spinner />
+      ) : (
+        <FlatList<IPost>
           data={data}
-          extraData={data}
+          // extraData={data}
+          // showsVerticalScrollIndicator={false}
+          scrollIndicatorInsets={{right: 0}}
+          // style={{width: '100%'}}
           // exiting={SlideOutLeft}
-          contentContainerStyle={{width: '100%'}}
+          style={{overflow: 'visible'}}
+          // contentContainerStyle={{width: '100%'}}
           ListHeaderComponent={() => (
             <ProfileListHeader
               user={user}
+              isMine={session?._id === user._id}
               selectedIndex={selectedIndex}
               setSelectedIndex={setSelectedIndex}
             />
           )}
           renderItem={renderItem}
-          keyExtractor={(item, index) => `${selectedIndex}${index}`}
+          keyExtractor={item => `${selectedIndex}${item._id}`}
         />
-        {/*<Button*/}
-        {/*  title={'navigate'}*/}
-        {/*  onPress={() => navigation.navigate('Viewer')}*/}
-        {/*/>*/}
-      </View>
-    </Provider>
+      )}
+    </View>
   );
+  // ) : (
+  //   <Spinner />
+  // );
 };
 
 export default Profile;

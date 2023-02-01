@@ -63,7 +63,7 @@ const FirstScene = () => {
       data={posts}
       contentContainerStyle={{
         width: '100%',
-        marginTop: insets.top + 46 + 24,
+        paddingTop: insets.top + 46 + 24,
         minHeight: dimensions.height - tabBarHeight + 46 + 24,
       }}
       contentOffset={{y: insets.top + 46 + 24, x: 0}}

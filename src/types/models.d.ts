@@ -9,6 +9,11 @@ declare interface IFile {
   filepath: string;
   blurFilepath?: string;
 }
+declare interface ILikePost extends ILike, IPost {}
+declare interface ILike {
+  _id: string;
+  likeAt: string;
+}
 declare interface IPost {
   _id: string;
   author: IAuthor;
@@ -28,7 +33,7 @@ declare interface IPost {
 }
 
 declare interface ISession {
-  userId?: string;
+  _id?: string;
   id?: string;
   nickname?: string;
   email: string;

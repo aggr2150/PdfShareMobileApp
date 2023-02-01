@@ -1,16 +1,8 @@
-import React, {useRef, useState} from 'react';
-import {Pressable, ScrollView, View} from 'react-native';
+import React, {useRef} from 'react';
+import {Pressable, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
-import {useNavigation} from '@react-navigation/native';
-import ToggleBtn from '@components/ToggleBtn';
-import Pages from '@components/Pages';
-import FirstSceneBk from '@screens/History/FirstScene.bk';
-import SecondScene from '@screens/History/SecondScene';
 import Separator from '@components/Seperator';
-import ActionSheet, {
-  ActionSheetRef,
-  SheetManager,
-} from 'react-native-actions-sheet';
+import ActionSheet, {ActionSheetRef} from 'react-native-actions-sheet';
 import ThrottleFlatList from '@components/ThrottleFlatlist';
 import PencilIcon from '@assets/icon/pencil2.svg';
 import Book from '@components/Book';

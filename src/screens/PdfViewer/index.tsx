@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Dimensions,
   Linking,
@@ -17,37 +17,41 @@ import Pdf, {Source} from 'react-native-pdf';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // import {setUIVisible} from '@redux/reducer/viewerReducer';
-import Animated, {
-  SlideInDown,
-  SlideInLeft,
-  SlideInRight,
-  SlideOutDown,
-  SlideOutLeft,
-  SlideOutRight,
-} from 'react-native-reanimated';
+import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {makeStyles, Text} from '@rneui/themed';
 import Avatar from '@components/Avatar';
-import {
-  StackActions,
-  TabActions,
-  useNavigation,
-} from '@react-navigation/native';
+import {StackActions} from '@react-navigation/native';
 import HeartIcon from '@assets/icon/heart.svg';
+import HeartOutLineIcon from '@assets/icon/heart-outline.svg';
 import CommentIcon from '@assets/icon/comment.svg';
 import DotIcon from '@assets/icon/dot.svg';
 import ActionSheet, {ActionSheetRef} from 'react-native-actions-sheet';
 import Separator from '@components/Seperator';
 import {StackScreenProps} from '@react-navigation/stack';
-
+import {RootStackParamList} from '@src/types/navigations';
+import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
+import {selectById, updatePost} from '@redux/reducer/postsReducer';
+import Spinner from '@components/Spinner';
+import {apiInstance, getCsrfToken} from '@utils/Networking';
+import {likeAdded, likeRemoved} from '@redux/reducer/likesReducer';
 type ViewerProps = StackScreenProps<RootStackParamList, 'Viewer'>;
 const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   const isDarkMode = useColorScheme() === 'dark';
-
+  const post = useAppSelector(state =>
+    selectById(state.posts, route.params._id),
+  );
   const backgroundStyle = {
     flex: 1,
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+  const [csrfToken, setCsrfToken] = useState<string>();
+
+  console.log('post', post.likeStatus);
+  useEffect(() => {
+    getCsrfToken.then(token => setCsrfToken(token));
+  }, []);
   // route.params.document.filepath
   const source: Source = {
     uri: route?.params?.document.filepath,
@@ -64,7 +68,42 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   const actionSheetRef = useRef<ActionSheetRef>(null);
   const detailsActionSheetRef = useRef<ActionSheetRef>(null);
   const styles = useStyles();
-  return (
+  const dispatch = useAppDispatch();
+  const likeCallback = useCallback(() => {
+    if (post) {
+      console.log(post.likeStatus);
+      dispatch(
+        updatePost({
+          id: post._id,
+          changes: {
+            likeStatus: !post.likeStatus,
+            likeCounter: !post.likeStatus
+              ? post.likeCounter + 1
+              : post.likeCounter - 1,
+          },
+        }),
+      );
+      apiInstance
+        .post('/api/like/post/' + post._id, {
+          likeStatus: !post.likeStatus,
+          _csrf: csrfToken,
+        })
+        .then(response => {
+          if (response.data.data.likeStatus) {
+            dispatch(
+              likeAdded({likeAt: response.data.data.likeAt, _id: post._id}),
+            );
+          } else {
+            dispatch(likeRemoved(post._id));
+          }
+          console.log('response', response.data);
+        });
+    }
+  }, [csrfToken, dispatch, post]);
+
+  return !post ? (
+    <Spinner />
+  ) : (
     <View style={backgroundStyle}>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
@@ -95,8 +134,8 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
         />
         {UIVisible && (
           <Animated.View
-            entering={SlideInLeft}
-            exiting={SlideOutLeft}
+            entering={FadeIn.duration(100)}
+            exiting={FadeOut.duration(100)}
             style={{
               position: 'absolute',
               // backgroundColor: 'red',
@@ -153,38 +192,17 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
             pointerEvents={'box-none'}
             style={{position: 'absolute', bottom: 0, right: 0, left: 0}}>
             <Animated.View
-              entering={SlideInRight}
-              exiting={SlideOutRight}
+              entering={FadeIn.duration(100)}
+              exiting={FadeOut.duration(100)}
               style={{
                 marginRight: insets.right || 15,
                 alignSelf: 'flex-end',
               }}>
               <TouchableOpacity
                 onPress={
-                  () => navigation.navigate('Comments')
-                  // () => SheetManager.show('commentSheet')
-                }
-                style={{
-                  width: 34,
-                  height: 34,
-                  marginBottom: 15,
-                  backgroundColor: 'white',
-                  borderRadius: 34,
-                  shadowColor: '#000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.22,
-                  shadowRadius: 2.22,
-
-                  elevation: 3,
-                }}>
-                <HeartIcon fill={'black'} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={
-                  () => navigation.navigate('Comments')
+                  likeCallback
+                  // () => {}
+                  // () => navigation.navigate('Comments')
                   // () => SheetManager.show('commentSheet')
                 }
                 style={{
@@ -205,7 +223,11 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                <HeartIcon fill={'#99c729'} width={32} height={32} />
+                {post.likeStatus ? (
+                  <HeartIcon fill={'#99c729'} width={32} height={32} />
+                ) : (
+                  <HeartOutLineIcon fill={'#99c729'} width={32} height={32} />
+                )}
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => navigation.navigate('Comments')}
@@ -253,8 +275,8 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
               </TouchableOpacity>
             </Animated.View>
             <Animated.View
-              entering={SlideInDown}
-              exiting={SlideOutDown}
+              entering={FadeIn.duration(100)}
+              exiting={FadeOut.duration(100)}
               style={{
                 // position: 'absolute',
                 left: 0,
@@ -283,7 +305,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                             screen: 'Profile',
                             initial: false,
                             params: {
-                              id: route.params.author.id,
+                              id: post.author.id,
                             },
                           },
                         });
@@ -291,7 +313,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                         navigation.navigate('ProfileTab');
                         navigation.dispatch(
                           StackActions.push('Profile', {
-                            id: route.params.author.id,
+                            id: post.author.id,
                           }),
                         );
                       }
@@ -299,7 +321,9 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                   }}>
                   <Avatar style={{width: 20, height: 20, marginRight: 5}} />
                 </Pressable>
-                <Text>123123 님의 무슨무슨 pdf</Text>
+                <Text>
+                  {post.author.nickname} 님의 {post.title}
+                </Text>
               </Pressable>
             </Animated.View>
           </Animated.View>
@@ -327,15 +351,10 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
             </View>
             <Separator style={{marginVertical: 15}} />
             <View style={{alignSelf: 'flex-start'}}>
-              <Text style={styles.contentText}>
-                제목 : 므나읨느음나이ㅡ마ㅣ
-              </Text>
+              <Text style={styles.contentText}>제목 : {post.title}</Text>
               <Text style={styles.contentText}>날짜 : 219023912380</Text>
               <Text style={styles.contentText}>
-                설명 :
-                으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으
-                아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느
-                ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ
+                설명 : {post.content}
                 {/*능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ*/}
                 {/*나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으*/}
                 {/*아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으*/}
@@ -382,6 +401,8 @@ const useStyles = makeStyles(theme => ({
     fontSize: 13,
   },
   container: {
+    width: '100%',
+    height: '100%',
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',

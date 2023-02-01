@@ -6,16 +6,24 @@ import {SheetManager} from 'react-native-actions-sheet';
 import Separator from '@components/Seperator';
 import ToggleBtn from '@components/ToggleBtn';
 import PlusButton from '@components/buttons/PlusButton';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
 
 const SecondScene: React.FC = () => {
   const styles = useStyles();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   return (
     <View>
       <ThrottleFlatList<IPost>
         data={new Array(10)}
         // style={{width: '100%'}}
+        contentContainerStyle={{
+          paddingTop: insets.top + 46 + 24,
+        }}
+        contentOffset={{y: insets.top + 46 + 24, x: 0}}
         ItemSeparatorComponent={Separator}
         renderItem={({item, index}) => (
           <Pressable
