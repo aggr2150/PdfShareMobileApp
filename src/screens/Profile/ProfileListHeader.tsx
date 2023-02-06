@@ -11,6 +11,8 @@ import BackButton from '@components/BackButton';
 import Keychain from 'react-native-keychain';
 import Toast from 'react-native-toast-message';
 import {apiInstance} from '@utils/Networking';
+import {useAppDispatch} from '@redux/store/RootStore';
+import {signOut} from '@redux/reducer/authReducer';
 
 interface ProfileListHeaderProps {
   selectedIndex: number;
@@ -37,6 +39,7 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
 
   const closeMenu = () => setVisible(false);
   const insets = useSafeAreaInsets();
+  const dispatch = useAppDispatch();
   return (
     // <Provider>
     <View>
@@ -125,6 +128,7 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
                 onPress={() => {
                   apiInstance.post('/api/auth/signOut').then();
                   Keychain.resetGenericPassword().then();
+                  dispatch(signOut());
                   closeMenu();
                   navigation.dispatch(
                     CommonActions.reset({
