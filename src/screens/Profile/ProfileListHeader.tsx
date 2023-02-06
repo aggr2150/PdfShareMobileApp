@@ -1,7 +1,7 @@
 import React, {Dispatch, useState} from 'react';
 import {Pressable, TouchableOpacity, View} from 'react-native';
 import {Button, ButtonGroup, makeStyles, Text} from '@rneui/themed';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {CommonActions, useNavigation, useRoute} from '@react-navigation/native';
 import Avatar from '@components/Avatar';
 import DotIcon from '@assets/icon/dot.svg';
 import {Divider, Menu, Provider} from 'react-native-paper';
@@ -126,6 +126,14 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
                   apiInstance.post('/api/auth/signOut').then();
                   Keychain.resetGenericPassword().then();
                   closeMenu();
+                  navigation.dispatch(
+                    CommonActions.reset({
+                      // stale: true,
+                      // stale: false,
+                      // index: 0,
+                      routes: [{name: 'SignIn'}],
+                    }),
+                  );
                 }}
                 title={<Text style={styles.menuText}>로그아웃</Text>}
               />

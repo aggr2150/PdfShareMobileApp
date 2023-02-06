@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {FlatList, ScrollView, View} from 'react-native';
 import {Button, Text} from '@rneui/themed';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -47,6 +47,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   const user = useAppSelector(state =>
     selectById(state.users, route.params?.id || session?.id || ''),
   );
+  const [refreshing, setRefreshing] = useState(false);
   const [tabData, setTabData] = useState<[IPost[], ILikePost[], IPost[]]>([
     [],
     [],
@@ -102,6 +103,41 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
         }
       });
   }, [dispatch, route.params?.id]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    apiInstance
+      .post<response<{user?: IUser; feeds: IPost[]; likes: ILikePost[]}>>(
+        '/api/user',
+        {
+          id: route.params?.id,
+        },
+      )
+      .then(response => {
+        if (response.data.code === 200 && response.data.data.user) {
+          dispatch(userAdded(response.data.data.user));
+          console.log(response.data.data.user);
+          if (response.data.data.feeds.length !== 0) {
+            setTabData(prevState => [
+              response.data.data.feeds,
+              response.data.data.likes,
+              prevState[2],
+            ]);
+            dispatch(postAddedMany(response.data.data.feeds));
+          }
+          if (
+            response.data.data.likes &&
+            response.data.data.likes.length !== 0
+          ) {
+            dispatch(setAllLike(response.data.data.likes));
+          }
+        }
+      })
+      .finally(() => {
+        setRefreshing(false);
+      });
+  }, [dispatch, route.params?.id]);
+
   let data;
   const renderItem = useMemo<
     React.FC<{item: IPost; index: number}>
@@ -148,11 +184,13 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
         overflow: 'visible',
         flex: 1,
       }}>
-      {!user ? (
+      {!user || refreshing ? (
         <Spinner />
       ) : (
         <FlatList<IPost>
           data={data}
+          onRefresh={onRefresh}
+          refreshing={refreshing}
           // extraData={data}
           // showsVerticalScrollIndicator={false}
           scrollIndicatorInsets={{right: 0}}
@@ -163,7 +201,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
           ListHeaderComponent={() => (
             <ProfileListHeader
               user={user}
-              isMine={session?._id === user._id}
+              isMine={session?._id === user?._id}
               selectedIndex={selectedIndex}
               setSelectedIndex={setSelectedIndex}
             />

@@ -164,13 +164,13 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({navigation}) => {
         </View>
         <Button
           containerStyle={styles.submitButton}
-          // onPress={submitVerificationCode}
-          onPress={() => {
-            navigation.navigate('ResetPasswordConfirm', {
-              email: email,
-              verificationCode: verificationCode,
-            });
-          }}
+          onPress={submitVerificationCode}
+          // onPress={() => {
+          //   navigation.navigate('ResetPasswordConfirm', {
+          //     email: email,
+          //     verificationCode: verificationCode,
+          //   });
+          // }}
           titleStyle={styles.buttonLabel}>
           확인
         </Button>
