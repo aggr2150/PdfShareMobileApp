@@ -29,9 +29,10 @@ const usersSlice = createSlice({
   reducers: {
     userAdded: userAdapter.addOne,
     userAddedMany: userAdapter.addMany,
-    setOneUser: (state, action) => {
-      userAdapter.setOne(state, action.payload.user);
-    },
+    // setOneUser: (state, action) => {
+    //   userAdapter.setOne(state, action.payload.user);
+    // },
+    setOneUser: userAdapter.setOne,
     setAll: userAdapter.setAll,
     updateUser: userAdapter.updateOne,
   },

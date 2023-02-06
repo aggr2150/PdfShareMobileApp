@@ -16,7 +16,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {StackScreenProps} from '@react-navigation/stack';
-import {selectById, userAdded} from '@redux/reducer/usersReducer';
+import {selectById, setOneUser, userAdded} from '@redux/reducer/usersReducer';
 import {apiInstance} from '@utils/Networking';
 import {postAddedMany} from '@redux/reducer/postsReducer';
 import {
@@ -45,7 +45,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   const [selectedIndex, setSelectedIndex] = useState<ETabIndex>(ETabIndex.PDF);
   const session = useAppSelector(state => getSession(state));
   const user = useAppSelector(state =>
-    selectById(state.users, route.params?.id || state.auth.session?.id || ''),
+    selectById(state.users, route.params?.id || session?.id || ''),
   );
   const [tabData, setTabData] = useState<[IPost[], ILikePost[], IPost[]]>([
     [],
@@ -84,8 +84,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
       )
       .then(response => {
         if (response.data.code === 200 && response.data.data.user) {
-          dispatch(userAdded(response.data.data.user));
-          console.log(response.data.data.user);
+          dispatch(setOneUser(response.data.data.user));
           if (response.data.data.feeds.length !== 0) {
             setTabData(prevState => [
               response.data.data.feeds,

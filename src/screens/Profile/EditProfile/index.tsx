@@ -1,16 +1,17 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Pressable, ScrollView, View} from 'react-native';
-import {Button, Input, makeStyles, Text} from '@rneui/themed';
+import {Button, makeStyles, Text} from '@rneui/themed';
 import {StackScreenProps} from '@react-navigation/stack';
 import {HeaderBackButton} from '@react-navigation/elements';
 import Avatar from '@components/Avatar';
 import {TextInput} from 'react-native-paper';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import ImagePicker, {Image} from 'react-native-image-crop-picker';
 import Toast from 'react-native-toast-message';
 import {useAppDispatch} from '@redux/store/RootStore';
 import {editAccount} from '@redux/reducer/authReducer';
+import {StackActions} from '@react-navigation/native';
 
 type EditProfileProps = StackScreenProps<RootStackParamList, 'EditProfile'>;
 
@@ -44,6 +45,8 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
     let form = new FormData();
     form.append('id', id);
     form.append('nickname', nickname);
+    form.append('link', link);
+    form.append('description', description);
     if (avatar) {
       form.append('avatar', {
         uri: avatar.path,
@@ -68,7 +71,14 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
         switch (response.data.code) {
           case 200:
             dispatch(editAccount(response.data.data));
-            navigation.navigate('My');
+            navigation.dispatch(
+              StackActions.replace(
+                // stale: false,
+                // stale: false,
+                'My',
+              ),
+            );
+            navigation.navigate('ProfileTab');
             break;
           case 409:
             Toast.show({
@@ -83,7 +93,16 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
         console.log('error', error);
       });
     // }
-  }, [id, nickname, avatar, csrfToken, navigation]);
+  }, [
+    id,
+    nickname,
+    link,
+    description,
+    avatar,
+    csrfToken,
+    dispatch,
+    navigation,
+  ]);
   return (
     <View style={styles.container}>
       <ScrollView>
