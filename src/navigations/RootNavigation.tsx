@@ -6,8 +6,10 @@ import SignIn from '@screens/SignIn';
 import Comments from '@screens/Comments';
 import EditProfile from '@screens/Profile/EditProfile';
 import {View} from 'react-native';
-import {Button, Text} from '@rneui/themed';
+import {Button, makeStyles, Text} from '@rneui/themed';
 import Upload from '@screens/Upload';
+import ResetPassword from '@screens/ResetPassword';
+import ResetPasswordConfirm from '@screens/ResetPassword/ResetPasswordConfirm';
 
 const RootStack = createStackNavigator<RootStackParamList>();
 
@@ -25,6 +27,7 @@ function SettingsScreen({navigation}) {
 }
 
 const RootStackNavigator = () => {
+  const styles = useStyles();
   return (
     <RootStack.Navigator screenOptions={{cardStyle: {backgroundColor: '#000'}}}>
       <RootStack.Screen
@@ -89,7 +92,21 @@ const RootStackNavigator = () => {
           // headerShown: false,
         }}
       />
+      <RootStack.Group
+        screenOptions={{headerShown: false, cardStyle: styles.primaryCard}}>
+        <RootStack.Screen name="ResetPassword" component={ResetPassword} />
+        <RootStack.Screen
+          name="ResetPasswordConfirm"
+          component={ResetPasswordConfirm}
+        />
+      </RootStack.Group>
     </RootStack.Navigator>
   );
 };
+
+const useStyles = makeStyles(theme => ({
+  primaryCard: {
+    backgroundColor: theme.colors.primary,
+  },
+}));
 export default RootStackNavigator;

@@ -10,6 +10,7 @@ import PlusIcon from '@assets/icon/plus1.svg';
 import BackButton from '@components/BackButton';
 import Keychain from 'react-native-keychain';
 import Toast from 'react-native-toast-message';
+import {apiInstance} from '@utils/Networking';
 
 interface ProfileListHeaderProps {
   selectedIndex: number;
@@ -90,7 +91,9 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
                 navigation.navigate('EditProfile', {
                   // id: '123',
                   // nickname: '123',
-                  description: '123',
+                  avatar: user?.avatar,
+                  link: user?.link,
+                  description: user?.description,
                   id: user?.id,
                   nickname: user?.nickname,
                 });
@@ -120,6 +123,7 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
               <Menu.Item
                 dense={true}
                 onPress={() => {
+                  apiInstance.post('/api/auth/signOut').then();
                   Keychain.resetGenericPassword().then();
                   closeMenu();
                 }}

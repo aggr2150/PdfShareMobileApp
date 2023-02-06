@@ -1,9 +1,8 @@
-import {TextInput, useWindowDimensions, View} from 'react-native';
-import {Button, Input, makeStyles} from '@rneui/themed';
+import {TextInput, TouchableOpacity, View} from 'react-native';
+import {Button, Input, makeStyles, Text} from '@rneui/themed';
 import Keychain from 'react-native-keychain';
 import {apiInstance} from '@utils/Networking';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import Orientation from 'react-native-orientation-locker';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {CommonActions, useNavigation} from '@react-navigation/native';
 import {Input as BaseInput} from '@rneui/base/dist/Input/Input';
@@ -107,60 +106,39 @@ const FirstScene = props => {
         />
       </View>
       <View>
-        <Button
-          containerStyle={styles.submitButton}
-          onPress={submit}
-          // onPress={async () => {
-          //   const credentials = await Keychain.getGenericPassword();
-          //   console.log(credentials);
-          //   if (credentials) {
-          //     console.log(
-          //       'Credentials successfully loaded for user ' + credentials,
-          //     );
-          //     apiInstance.defaults.auth = {
-          //       username: credentials.username,
-          //       password: credentials.password,
-          //     };
-          //     apiInstance
-          //       .post<{
-          //         code: number;
-          //         status: string;
-          //         data: {
-          //           deviceToken: string;
-          //         };
-          //       }>(
-          //         'https://everypdf.cc/api/signIn',
-          //         {},
-          //         {
-          //           xsrfCookieName: '',
-          //           auth: {
-          //             username: credentials.username,
-          //             password: credentials.password,
-          //           },
-          //         },
-          //       )
-          //       .then(result => {
-          //         console.log(
-          //           'result',
-          //           result,
-          //           result.data,
-          //           apiInstance.defaults.headers,
-          //         );
-          //       });
-          //   } else {
-          //     Keychain.setGenericPassword('aaa', 'aa').then(r =>
-          //       console.log(r),
-          //     );
-          //   }
-          //
-          //   // setClosable(true);
-          //   // // SheetManager.hideAll();
-          //   // sheetRef.current.hide();
-          //   // navigation.reset({routes: [{name: 'Tabs'}]});
-          // }}
-        >
+        <Button containerStyle={styles.submitButton} onPress={submit}>
           aaa
         </Button>
+      </View>
+      <View
+        style={{
+          margin: 12,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            props.setClosable(true);
+            navigation.navigate('ResetPassword');
+          }}>
+          <Text>비밀번호 찾기</Text>
+        </TouchableOpacity>
+        <Text> / </Text>
+        <TouchableOpacity
+          onPress={() => {
+            props.setClosable(true);
+            navigation.dispatch(
+              CommonActions.reset({
+                // stale: true,
+                // stale: false,
+                // index: 0,
+                routes: [{name: 'Tabs'}],
+              }),
+            );
+          }}>
+          <Text>홈으로 가기</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

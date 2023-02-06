@@ -58,7 +58,6 @@ const SecondScene = props => {
         },
       )
       .then(response => {
-        console.log(response);
         switch (response.data.code) {
           case 200:
             dispatch(signIn(response.data.data));
@@ -72,9 +71,6 @@ const SecondScene = props => {
             });
             break;
           case 410:
-            /* TODO
-            expired
-            */
             Toast.show({
               type: 'error',
               text1: '만료된 인증번호 입니다.',

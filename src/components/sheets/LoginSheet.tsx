@@ -39,7 +39,6 @@ const LoginSheet: React.FC<SheetProps<loginSheetPayload>> = props => {
   const [closable, setClosable] = useState(!!props.payload?.closable);
 
   useEffect(() => {
-    console.log('pppp', closable, props.payload?.closable === false);
     if (props.payload?.closable === false && closable) {
       sheetRef.current?.hide();
     }
@@ -55,7 +54,7 @@ const LoginSheet: React.FC<SheetProps<loginSheetPayload>> = props => {
       gestureEnabled={true}
       CustomHeaderComponent={<></>}
       statusBarTranslucent
-      // closable={closable}
+      closable={closable}
       // overdrawSize={0}
       // isModal={false}
       backgroundInteractionEnabled={!closable}

@@ -32,7 +32,6 @@ import ActionSheet, {
 } from 'react-native-actions-sheet';
 import Separator from '@components/Seperator';
 import {StackScreenProps} from '@react-navigation/stack';
-import {RootStackParamList} from '@src/types/navigations';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {postAdded, selectById, updatePost} from '@redux/reducer/postsReducer';
 import Spinner from '@components/Spinner';

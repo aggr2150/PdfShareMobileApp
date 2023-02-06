@@ -4,7 +4,7 @@ declare interface IAuthor {
   nickname: string;
 }
 declare interface IFile {
-  _id: string;
+  _id?: string;
   originalFilename?: string;
   filepath: string;
   blurFilepath?: string;
@@ -58,7 +58,8 @@ declare interface IUser extends ISession {
   id: string;
   nickname: string;
   avatar?: IFile;
-
+  link: string;
+  description: string;
   postCounter: number;
   subscriberCounter: number;
   subscribingCounter?: number;

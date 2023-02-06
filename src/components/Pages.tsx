@@ -3,9 +3,12 @@ import {View} from 'react-native';
 import {makeStyles} from '@rneui/themed';
 import PagerView from 'react-native-pager-view';
 
+export interface SceneProps {
+  setSelectedIndex: Dispatch<number>;
+}
 interface PagesProps {
   selectedIndex: number;
-  SceneMap: React.ComponentType[];
+  SceneMap: React.ComponentType<SceneProps>[];
   setSelectedIndex: Dispatch<number>;
   gesture?: boolean;
 }
@@ -36,7 +39,7 @@ const Pages: React.FC<PagesProps> = ({
       {/*</View>*/}
       {SceneMap.map((Scene, index) => (
         <View key={index + 1}>
-          <Scene />
+          <Scene setSelectedIndex={setSelectedIndex} />
         </View>
       ))}
     </PagerView>

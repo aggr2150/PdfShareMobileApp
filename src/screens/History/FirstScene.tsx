@@ -96,7 +96,7 @@ const FirstScene = () => {
       // style={{
       //   paddingTop: insets.top + 46 + 24,
       // }}
-      contentOffset={{y: (insets.top ? insets.top + 6 : 24) + 12, x: 0}}
+      contentOffset={{y: (insets.top ? insets.top + 6 : 46 + 24) + 12, x: 0}}
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}

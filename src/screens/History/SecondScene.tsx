@@ -66,7 +66,6 @@ const SecondScene: React.FC = () => {
           paddingTop: (insets.top || 24) + 46 + 12,
           minHeight: dimensions.height - tabBarHeight + 46 + 24,
         }}
-        // contentOffset={{y: insets.top + 46 + 24 + tabBarHeight, x: 0}}
         ItemSeparatorComponent={Separator}
         renderItem={({item, index}) => (
           <Pressable

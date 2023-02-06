@@ -19,7 +19,6 @@ import DocumentPicker, {
 import ImagePicker, {Image} from 'react-native-image-crop-picker';
 import BackButton from '@components/BackButton';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {err} from 'react-native-svg/lib/typescript/xml';
 import BookCover from '@components/BookCover';
 
 type UploadProps = StackScreenProps<RootStackParamList, 'Upload'>;

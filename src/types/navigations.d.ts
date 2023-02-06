@@ -23,6 +23,8 @@ declare type RootStackParamList = {
     id: string;
     nickname: string;
     description?: string;
+    link?: string;
+    avatar?: IFile;
   };
   My: undefined;
   // Profile: IUser | {id: string};
@@ -30,5 +32,11 @@ declare type RootStackParamList = {
   // CollectionList: undefined;
   Upload: undefined;
 
+  ResetPassword: undefined;
+
+  ResetPasswordConfirm: {
+    email: string;
+    verificationCode: string;
+  };
   Home: undefined;
 };

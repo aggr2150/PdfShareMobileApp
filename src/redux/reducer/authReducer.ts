@@ -37,9 +37,12 @@ export const authSlice = createSlice({
       state.authState = EAuthState.AUTHORIZED;
       state.session = action.payload;
     },
+    editAccount: (state, action: PayloadAction<ISession>) => {
+      state.session = action.payload;
+    },
   },
 });
-export const {signOut, signIn, initialized} = authSlice.actions;
+export const {signOut, signIn, initialized, editAccount} = authSlice.actions;
 export const authState = (state: RootState) => state.auth.authState;
 export const getSession = (state: RootState) => state.auth.session;
 export default authSlice.reducer;

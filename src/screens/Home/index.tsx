@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {StatusBar, View} from 'react-native';
 import {makeStyles} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
@@ -6,11 +6,7 @@ import ToggleBtn from '@components/ToggleBtn';
 import Pages from '@components/Pages';
 import FirstScene from '@screens/Home/FirstScene';
 import SecondScene from '@screens/Home/SecondScene';
-import BookCard from '@components/BookCard';
-import Avatar from '@components/Avatar';
-import {withTiming} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {apiInstance} from '@utils/Networking';
 
 enum EnumSelectedIndex {
   '전체',
