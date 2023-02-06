@@ -8,7 +8,6 @@ import Avatar from '@components/Avatar';
 import ProfileListHeader from '@screens/Profile/ProfileListHeader';
 import BookCard from '@components/BookCard';
 import Spinner from '@components/Spinner';
-import {Provider} from 'react-native-paper';
 import Animated, {
   FadeIn,
   FadeOut,

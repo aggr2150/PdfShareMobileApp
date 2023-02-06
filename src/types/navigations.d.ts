@@ -16,7 +16,8 @@ declare type RootStackParamList = {
   Tabs: import('@react-navigation/native').NavigatorScreenParams<BottomTabParamList>;
   Viewer: IPost;
   SignIn: undefined;
-  Comments: undefined;
+  Comments: {postId: string};
+  Replies: IComment;
   History: undefined;
   EditProfile: {
     id: string;

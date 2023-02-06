@@ -37,164 +37,164 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
   const closeMenu = () => setVisible(false);
   const insets = useSafeAreaInsets();
   return (
-    <Provider>
-      <View>
+    // <Provider>
+    <View>
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginBottom: 24,
+        }}>
         <View
           style={{
-            justifyContent: 'center',
+            height: 32,
+            // alignSelf: '',
+            width: '100%',
+            flexDirection: 'row',
             alignItems: 'center',
-            marginBottom: 24,
+            justifyContent: 'space-between',
+            // marginHorizontal: 15,
+            // paddingTop: 10,
+            paddingRight: insets.right || 15,
+            paddingLeft: insets.left || 15,
           }}>
-          <View
-            style={{
-              height: 32,
-              // alignSelf: '',
-              width: '100%',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              // marginHorizontal: 15,
-              // paddingTop: 10,
-              paddingRight: insets.right || 15,
-              paddingLeft: insets.left || 15,
-            }}>
-            {route.params?.id !== undefined ? (
-              <BackButton onPress={() => navigation.goBack()} color={'white'} />
-            ) : (
-              <Pressable
-                onPress={() => {
-                  navigation.navigate('Upload');
-                }}>
-                <PlusIcon fill={'white'} width={32} height={32} />
-              </Pressable>
-            )}
-            <Menu
-              visible={visible}
-              onDismiss={closeMenu}
-              contentStyle={{backgroundColor: 'black'}}
-              anchor={
-                <TouchableOpacity
-                  onPress={openMenu}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <DotIcon fill={'white'} width={24} height={24} />
-                </TouchableOpacity>
-              }>
-              <Menu.Item
-                dense={true}
-                onPress={() => {
-                  navigation.navigate('EditProfile', {
-                    // id: '123',
-                    // nickname: '123',
-                    description: '123',
-                    id: user?.id,
-                    nickname: user?.nickname,
-                  });
-                  closeMenu();
-                }}
-                title={<Text style={styles.menuText}>프로필 수정</Text>}
-              />
-              <Menu.Item
-                dense={true}
-                onPress={() => {}}
-                title={<Text style={styles.menuText}>광고 수익</Text>}
-              />
-              <Divider />
-              <Menu.Item
-                dense={true}
-                onPress={() => {
-                  navigation.navigate('Settings', {
-                    id: '123',
-                    nickname: '123',
-                    description: '123',
-                  });
-                  closeMenu();
-                }}
-                title={<Text style={styles.menuText}>설정</Text>}
-              />
-              {isMine && (
-                <Menu.Item
-                  dense={true}
-                  onPress={() => {
-                    Keychain.resetGenericPassword().then();
-                    closeMenu();
-                  }}
-                  title={<Text style={styles.menuText}>로그아웃</Text>}
-                />
-              )}
-
-              <Menu.Item
-                dense={true}
-                onPress={() => {
-                  Toast.show({
-                    type: 'error',
-                    text1: '만료된 인증번호 입니다.',
-                    position: 'bottom',
-                  });
-                }}
-                title={<Text style={styles.menuText}>테스트</Text>}
-              />
-            </Menu>
-          </View>
-          <View
-            style={{
-              marginBottom: 12,
-              flexDirection: 'row',
-              justifyContent: 'center',
-            }}>
-            <Avatar avatar={user?.avatar} />
-          </View>
-          <View style={{marginBottom: 4}}>
-            <Text style={styles.nicknameText}>{user?.nickname}</Text>
-          </View>
-          <View style={{flexDirection: 'row'}}>
-            <View style={{marginHorizontal: 20}}>
-              <Text style={styles.counterText}>
-                구독자 {user?.subscriberCounter}명
-              </Text>
-            </View>
-            <View style={{marginHorizontal: 20}}>
-              <Text style={styles.counterText}>PDF {user?.postCounter}개</Text>
-            </View>
-          </View>
-          {!isMine && (
-            <Button
-              buttonStyle={{
-                borderRadius: 24,
-                paddingVertical: 15,
-                paddingHorizontal: 60,
-                marginVertical: 15,
-                backgroundColor: '#99c729',
-              }}
-              titleStyle={styles.subscribeButtonTitle}
-              title={'구독중'}
-            />
+          {route.params?.id !== undefined ? (
+            <BackButton onPress={() => navigation.goBack()} color={'white'} />
+          ) : (
+            <Pressable
+              onPress={() => {
+                navigation.navigate('Upload');
+              }}>
+              <PlusIcon fill={'white'} width={32} height={32} />
+            </Pressable>
           )}
+          <Menu
+            visible={visible}
+            onDismiss={closeMenu}
+            contentStyle={{backgroundColor: 'black'}}
+            anchor={
+              <TouchableOpacity
+                onPress={openMenu}
+                style={{
+                  width: 32,
+                  height: 32,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <DotIcon fill={'white'} width={24} height={24} />
+              </TouchableOpacity>
+            }>
+            <Menu.Item
+              dense={true}
+              onPress={() => {
+                navigation.navigate('EditProfile', {
+                  // id: '123',
+                  // nickname: '123',
+                  description: '123',
+                  id: user?.id,
+                  nickname: user?.nickname,
+                });
+                closeMenu();
+              }}
+              title={<Text style={styles.menuText}>프로필 수정</Text>}
+            />
+            <Menu.Item
+              dense={true}
+              onPress={() => {}}
+              title={<Text style={styles.menuText}>광고 수익</Text>}
+            />
+            <Divider />
+            <Menu.Item
+              dense={true}
+              onPress={() => {
+                navigation.navigate('Settings', {
+                  id: '123',
+                  nickname: '123',
+                  description: '123',
+                });
+                closeMenu();
+              }}
+              title={<Text style={styles.menuText}>설정</Text>}
+            />
+            {isMine && (
+              <Menu.Item
+                dense={true}
+                onPress={() => {
+                  Keychain.resetGenericPassword().then();
+                  closeMenu();
+                }}
+                title={<Text style={styles.menuText}>로그아웃</Text>}
+              />
+            )}
+
+            <Menu.Item
+              dense={true}
+              onPress={() => {
+                Toast.show({
+                  type: 'error',
+                  text1: '만료된 인증번호 입니다.',
+                  position: 'bottom',
+                });
+              }}
+              title={<Text style={styles.menuText}>테스트</Text>}
+            />
+          </Menu>
         </View>
-        {isMine && (
-          <ButtonGroup
-            buttons={['내 PDF', '좋아요', '팔로우']}
-            selectedIndex={selectedIndex}
-            onPress={value => {
-              setSelectedIndex(value);
+        <View
+          style={{
+            marginBottom: 12,
+            flexDirection: 'row',
+            justifyContent: 'center',
+          }}>
+          <Avatar avatar={user?.avatar} />
+        </View>
+        <View style={{marginBottom: 4}}>
+          <Text style={styles.nicknameText}>{user?.nickname}</Text>
+        </View>
+        <View style={{flexDirection: 'row'}}>
+          <View style={{marginHorizontal: 20}}>
+            <Text style={styles.counterText}>
+              구독자 {user?.subscriberCounter}명
+            </Text>
+          </View>
+          <View style={{marginHorizontal: 20}}>
+            <Text style={styles.counterText}>PDF {user?.postCounter}개</Text>
+          </View>
+        </View>
+        {!isMine && (
+          <Button
+            buttonStyle={{
+              borderRadius: 24,
+              paddingVertical: 15,
+              paddingHorizontal: 60,
+              marginVertical: 15,
+              backgroundColor: '#99c729',
             }}
-            buttonContainerStyle={{margin: 0}}
-            innerBorderStyle={{width: 0}}
-            containerStyle={{
-              borderWidth: 0,
-              marginHorizontal: 0,
-              marginVertical: 0,
-              borderRadius: 0,
-            }}
-            buttonStyle={{backgroundColor: '#000'}}
+            titleStyle={styles.subscribeButtonTitle}
+            title={'구독중'}
           />
         )}
       </View>
-    </Provider>
+      {isMine && (
+        <ButtonGroup
+          buttons={['내 PDF', '좋아요', '팔로우']}
+          selectedIndex={selectedIndex}
+          onPress={value => {
+            setSelectedIndex(value);
+          }}
+          buttonContainerStyle={{margin: 0}}
+          innerBorderStyle={{width: 0}}
+          containerStyle={{
+            borderWidth: 0,
+            marginHorizontal: 0,
+            marginVertical: 0,
+            borderRadius: 0,
+          }}
+          buttonStyle={{backgroundColor: '#000'}}
+        />
+      )}
+    </View>
+    // </Provider>
   );
 };
 

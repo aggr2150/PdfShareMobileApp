@@ -1,9 +1,9 @@
-import {View} from 'react-native';
+import {ListRenderItem, View} from 'react-native';
 import Avatar from '@components/Avatar';
 import {Text} from '@rneui/themed';
 import React from 'react';
 
-const Comment = () => {
+const Comment: ListRenderItem<IComment> = ({item}) => {
   return (
     <View style={{marginVertical: 6}}>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -18,10 +18,10 @@ const Comment = () => {
           }}>
           <Avatar style={{width: 20, height: 20}} />
         </View>
-        <Text style={{fontSize: 13}}>11111 님</Text>
+        <Text style={{fontSize: 13}}>{item.author.nickname} 님</Text>
       </View>
       <View style={{marginLeft: 24}}>
-        <Text style={{fontSize: 13}}>궁시렁궁시렁</Text>
+        <Text style={{fontSize: 13}}>{item.content}</Text>
       </View>
     </View>
   );

@@ -64,3 +64,16 @@ declare interface IUser extends ISession {
   subscribingCounter?: number;
   subscribeStatus?: boolean;
 }
+declare interface IComment {
+  _id: string;
+  author: IAuthor;
+  postId: string;
+  parentCommentId?: string;
+  content: string;
+  createdAt: Date;
+  updatedAt?: Date;
+  likeCounter: number;
+  replyCounter?: number;
+  likeStatus: number;
+  isDeleted: boolean;
+}

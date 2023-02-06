@@ -6,8 +6,14 @@ interface BackButtonProps {
   onPress: () => void;
   color?: ColorValue;
   disabled?: boolean;
+  size?: number;
 }
-const BackButton: React.FC<BackButtonProps> = ({onPress, color, disabled}) => {
+const BackButton: React.FC<BackButtonProps> = ({
+  onPress,
+  color,
+  disabled,
+  size,
+}) => {
   return (
     <Pressable onPress={onPress} disabled={disabled}>
       <Ionicons
@@ -17,7 +23,7 @@ const BackButton: React.FC<BackButtonProps> = ({onPress, color, disabled}) => {
           ios: 'ios-chevron-back',
           default: 'ios-chevron-back',
         })}
-        size={30}
+        size={size || 30}
       />
     </Pressable>
   );

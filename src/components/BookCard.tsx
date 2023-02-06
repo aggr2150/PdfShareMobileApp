@@ -1,5 +1,5 @@
 import React from 'react';
-import {Pressable, View} from 'react-native';
+import {Pressable, TouchableOpacity, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
 import Book from '@src/components/Book';
@@ -8,11 +8,12 @@ interface BookCardProps {
   item: IPost;
   index: number;
 }
-const BookCard: React.FC<BookCardProps> = ({item, index}) => {
+const BookCard: React.FC<BookCardProps> = ({item, index, onPress}) => {
   const styles = useStyles();
   const navigation = useNavigation();
   return (
     <Pressable
+      // onPress={onPress}
       onPress={() => navigation.navigate('Viewer', item)}
       style={{
         aspectRatio: 16 / 9,

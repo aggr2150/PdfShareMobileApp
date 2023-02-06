@@ -34,6 +34,7 @@ const collectionsSlice = createSlice({
     },
     setAll: collectionAdapter.setAll,
     updateCollection: collectionAdapter.updateOne,
+    removeCollection: collectionAdapter.removeOne,
   },
 });
 
@@ -44,6 +45,7 @@ export const {
   collectionAdded,
   setAll,
   updateCollection,
+  removeCollection,
 } = collectionsSlice.actions;
 
 export const postSelectors = collectionAdapter.getSelectors<RootState>(

@@ -22,6 +22,7 @@ import codePush from 'react-native-code-push';
 import Toast from 'react-native-toast-message';
 import {RootStore} from '@redux/store/RootStore';
 import {Provider} from 'react-redux';
+import {Provider as PaperProvider} from 'react-native-paper';
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -29,15 +30,17 @@ const App = () => {
   return (
     <>
       <ThemeProvider theme={theme}>
-        <SafeAreaProvider>
-          <Provider store={RootStore}>
-            <NavigationContainer>
-              <SheetProvider>
-                <RootNavigation />
-              </SheetProvider>
-            </NavigationContainer>
-          </Provider>
-        </SafeAreaProvider>
+        <PaperProvider>
+          <SafeAreaProvider>
+            <Provider store={RootStore}>
+              <NavigationContainer>
+                <SheetProvider>
+                  <RootNavigation />
+                </SheetProvider>
+              </NavigationContainer>
+            </Provider>
+          </SafeAreaProvider>
+        </PaperProvider>
       </ThemeProvider>
       <Toast />
     </>

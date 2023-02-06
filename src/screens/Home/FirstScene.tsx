@@ -1,16 +1,13 @@
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {makeStyles} from '@rneui/themed';
-import ThrottleFlatList from '@components/ThrottleFlatlist';
 import BookCard from '@components/BookCard';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {FlatList, TouchableOpacity, useWindowDimensions} from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  TouchableOpacity,
+  useWindowDimensions,
+} from 'react-native';
 import {apiInstance} from '@utils/Networking';
 import _ from 'lodash';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
@@ -30,7 +27,7 @@ const FirstScene = () => {
   useEffect(() => {
     apiInstance.post<response<IPost[]>>('/api/feeds/recent').then(response => {
       if (response.data.data.length !== 0) {
-        setData(response.data.data.slice(0, 3));
+        setData(response.data.data);
         dispatch(postAddedMany(response.data.data));
         setFetching(false);
       }
@@ -42,22 +39,17 @@ const FirstScene = () => {
         apiInstance
           .post<response<IPost[]>>('/api/feeds/recent', {pagingKey})
           .then(response => {
-            console.log(response.data, response.data.data.slice(0, 3));
             if (response.data.data.length !== 0) {
               if (initial) {
                 setData(response.data.data);
               } else {
-                setData(prevState => [
-                  ...prevState,
-                  ...response.data.data.slice(0, 3),
-                ]);
+                setData(prevState => [...prevState, ...response.data.data]);
               }
               dispatch(postAddedMany(response.data.data));
             }
           })
           .catch(error => console.log(error))
           .finally(() => {
-            console.log('fin');
             setFetching(false);
             setRefreshing(false);
           });
@@ -65,7 +57,6 @@ const FirstScene = () => {
     [dispatch],
   );
   const onEndReached = useCallback(() => {
-    console.log(data, fetching);
     if (!fetching) {
       throttleEventCallback(data[data.length - 1]?._id);
     }
@@ -84,14 +75,21 @@ const FirstScene = () => {
       data={posts}
       contentContainerStyle={{
         width: '100%',
-        paddingTop: insets.top + 46 + 24,
-        minHeight: dimensions.height - tabBarHeight + 46 + 24,
+        // paddingTop: (insets.top || 24) + 46,
+        paddingTop: (insets.top || 24) + 46 + 12,
+        minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
       }}
-      contentOffset={{y: insets.top + 46 + 24, x: 0}}
+      // contentOffset={{y: insets.top + 46 + 24, x: 0}}
+      // contentOffset={{y: (insets.top ? insets.top + 6 : 24) + 12, x: 0}}
+      contentOffset={{y: (insets.top ? insets.top + 6 : 24) + 12, x: 0}}
       onEndReached={onEndReached}
       onRefresh={onRefresh}
       refreshing={refreshing}
-      renderItem={({item, index}) => <BookCard item={item} index={index} />}
+      renderItem={({item, index}) => (
+        // <TouchableOpacity>
+        <BookCard item={item} index={index} />
+        // </TouchableOpacity>
+      )}
     />
   );
 };

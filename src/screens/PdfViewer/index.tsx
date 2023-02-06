@@ -26,7 +26,10 @@ import HeartIcon from '@assets/icon/heart.svg';
 import HeartOutLineIcon from '@assets/icon/heart-outline.svg';
 import CommentIcon from '@assets/icon/comment.svg';
 import DotIcon from '@assets/icon/dot.svg';
-import ActionSheet, {ActionSheetRef} from 'react-native-actions-sheet';
+import ActionSheet, {
+  ActionSheetRef,
+  SheetManager,
+} from 'react-native-actions-sheet';
 import Separator from '@components/Seperator';
 import {StackScreenProps} from '@react-navigation/stack';
 import {RootStackParamList} from '@src/types/navigations';
@@ -35,6 +38,7 @@ import {postAdded, selectById, updatePost} from '@redux/reducer/postsReducer';
 import Spinner from '@components/Spinner';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {likeAdded, likeRemoved} from '@redux/reducer/likesReducer';
+import BoxIcon from '@assets/icon/box.svg';
 type ViewerProps = StackScreenProps<RootStackParamList, 'Viewer'>;
 const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -205,6 +209,34 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                 alignSelf: 'flex-end',
               }}>
               <TouchableOpacity
+                onPress={() => {
+                  SheetManager.show('appendToCollectionSheet', {
+                    payload: {
+                      postId: post._id,
+                    },
+                  }).then();
+                }}
+                style={{
+                  width: 34,
+                  height: 34,
+                  marginBottom: 15,
+                  backgroundColor: 'white',
+                  // backgroundColor: '#99c729',
+                  borderRadius: 34,
+                  shadowColor: '#000',
+                  shadowOffset: {
+                    width: 0,
+                    height: 1,
+                  },
+                  shadowOpacity: 0.22,
+                  shadowRadius: 2.22,
+                  elevation: 3,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <BoxIcon fill={'#99c729'} width={24} height={24} />
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={
                   likeCallback
                   // () => {}
@@ -236,7 +268,9 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                 )}
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => navigation.navigate('Comments')}
+                onPress={() =>
+                  navigation.navigate('Comments', {postId: post._id})
+                }
                 style={{
                   width: 34,
                   height: 34,

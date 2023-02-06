@@ -20,8 +20,8 @@ import _ from 'lodash';
 import {postAddedMany} from '@redux/reducer/postsReducer';
 import {useHeaderHeight} from 'react-native-screens/native-stack';
 
-type CommentsProps = StackScreenProps<RootStackParamList, 'Comments'>;
-const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
+type ReplyProps = StackScreenProps<RootStackParamList, 'Replies'>;
+const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
   const [csrfToken, setCsrfToken] = useState<string>();
@@ -38,6 +38,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
     apiInstance
       .post<response<IComment[]>>('/api/comment/list', {
         postId: route.params.postId,
+        parentCommentId: route.params.parentCommentId,
       })
       .then(response => {
         if (response.data.data) {
@@ -45,13 +46,14 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
           setData(response.data.data);
         }
       });
-  }, [dispatch, route.params.postId]);
+  }, [dispatch, route.params.parentCommentId, route.params.postId]);
   const throttleEventCallback = useMemo(
     () =>
       _.throttle((pagingKey, initial?) => {
         apiInstance
           .post<response<IComment[]>>('/api/comment/list', {
             postId: route.params.postId,
+            parentCommentId: route.params.parentCommentId,
             pagingKey,
           })
           .then(response => {
@@ -71,7 +73,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
             setRefreshing(false);
           });
       }),
-    [dispatch],
+    [dispatch, route.params.parentCommentId, route.params.postId],
   );
   const onEndReached = useCallback(() => {
     if (!fetching) {
@@ -90,6 +92,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
         postId: route.params.postId,
         content: content,
         _csrf: csrfToken,
+        parentCommentId: route.params.parentCommentId,
       })
       .then(response => {
         if (response.data.code === 200) {
@@ -98,7 +101,13 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
           setContent('');
         }
       });
-  }, [content, csrfToken, dispatch, route.params.postId]);
+  }, [
+    content,
+    csrfToken,
+    dispatch,
+    route.params.parentCommentId,
+    route.params.postId,
+  ]);
   return (
     <SafeAreaView style={{flex: 1}}>
       {/*<View style={styles.header}>*/}
@@ -236,4 +245,4 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.black,
   },
 }));
-export default Comments;
+export default Reply;

@@ -53,18 +53,18 @@ const SecondScene: React.FC = () => {
   );
   const onEndReached = useCallback(() => {
     if (!fetching) {
-      throttleEventCallback();
+      throttleEventCallback(data[data.length - 1]?._id);
     }
-  }, [fetching, throttleEventCallback]);
+  }, [data, fetching, throttleEventCallback]);
   return (
     <FlatList<IPost>
       data={posts}
       onEndReached={onEndReached}
       contentContainerStyle={{
-        marginTop: insets.top + 46 + 24,
-        minHeight: dimensions.height - tabBarHeight + 46 + 24,
+        paddingTop: (insets.top || 24) + 46 + 12,
+        minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
       }}
-      contentOffset={{y: insets.top + 46 + 24, x: 0}}
+      contentOffset={{y: (insets.top ? insets.top + 6 : 24) + 12, x: 0}}
       // contentContainerStyle={{width: '100%'}}
       renderItem={({item, index}) => <BookCard item={item} index={index} />}
     />

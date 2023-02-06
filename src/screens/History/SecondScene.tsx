@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {FlatList, Pressable, View} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {FlatList, Pressable, useWindowDimensions, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import ThrottleFlatList from '@components/ThrottleFlatlist';
 import {SheetManager} from 'react-native-actions-sheet';
@@ -27,6 +27,8 @@ const SecondScene: React.FC = () => {
   const [fetching, setFetching] = useState(true);
 
   const navigation = useNavigation();
+  const dimensions = useWindowDimensions();
+  const [refreshing, setRefreshing] = useState(false);
   const dispatch = useAppDispatch();
   useEffect(() => {
     apiInstance
@@ -39,16 +41,32 @@ const SecondScene: React.FC = () => {
         }
       });
   }, [dispatch]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    apiInstance
+      .post<response<ICollection[]>>('/api/collection/list')
+      .then(response => {
+        if (response.data.data.length !== 0) {
+          dispatch(collectionAddedMany(response.data.data));
+          setFetching(false);
+          setRefreshing(false);
+        }
+      });
+  }, [dispatch]);
   const collections = useAppSelector(state => selectAll(state.collections));
   return (
     <View style={{flex: 1}}>
       <FlatList<ICollection>
         data={collections}
+        onRefresh={onRefresh}
+        refreshing={refreshing}
         // style={{width: '100%'}}
         contentContainerStyle={{
-          paddingTop: insets.top + 46 + 24,
+          paddingTop: (insets.top || 24) + 46 + 12,
+          minHeight: dimensions.height - tabBarHeight + 46 + 24,
         }}
-        contentOffset={{y: insets.top + 46 + 24, x: 0}}
+        // contentOffset={{y: insets.top + 46 + 24 + tabBarHeight, x: 0}}
         ItemSeparatorComponent={Separator}
         renderItem={({item, index}) => (
           <Pressable

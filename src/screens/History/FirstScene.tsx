@@ -90,13 +90,13 @@ const FirstScene = () => {
       data={posts}
       contentContainerStyle={{
         width: '100%',
-        paddingTop: insets.top + 46 + 24,
-        minHeight: dimensions.height - tabBarHeight + 46 + 24,
+        paddingTop: (insets.top || 24) + 46 + 12,
+        minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
       }}
       // style={{
       //   paddingTop: insets.top + 46 + 24,
       // }}
-      // contentOffset={{y: insets.top + 46 + 24, x: 0}}
+      contentOffset={{y: (insets.top ? insets.top + 6 : 24) + 12, x: 0}}
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
