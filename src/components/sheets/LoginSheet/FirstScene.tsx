@@ -52,6 +52,7 @@ const FirstScene = props => {
           Keychain.setGenericPassword(email, password).then(r =>
             console.log(r),
           );
+          props.setClosable(true);
           SheetManager.hide('loginSheet').then(() => {
             navigation.dispatch(
               CommonActions.reset({
@@ -69,7 +70,7 @@ const FirstScene = props => {
           });
         }
       });
-  }, [csrfToken, dispatch, email, navigation, password]);
+  }, [csrfToken, dispatch, email, navigation, password, props]);
 
   return (
     <View>

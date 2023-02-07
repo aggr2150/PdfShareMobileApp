@@ -71,6 +71,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({navigation}) => {
         _csrf: csrfToken,
       })
       .then(response => {
+        console.log('email', response.data);
         switch (response.data.code) {
           case 200:
             // setSelectedIndex(EnumSelectedIndex.resetPassword);
