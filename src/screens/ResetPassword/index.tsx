@@ -74,6 +74,10 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({navigation}) => {
         console.log('email', response.data);
         switch (response.data.code) {
           case 200:
+            navigation.navigate('ResetPasswordConfirm', {
+              email: email,
+              verificationCode: verificationCode,
+            });
             // setSelectedIndex(EnumSelectedIndex.resetPassword);
             break;
           case 422:
@@ -133,8 +137,9 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({navigation}) => {
                     contentStyle={styles.textInputContent}
                     activeUnderlineColor={'#99c729'}
                     keyboardType={'email-address'}
+                    spellCheck={false}
+                    autoCorrect={false}
                     autoCapitalize={'none'}
-                    multiline={true}
                     textColor={'#fff'}
                     underlineColor={'#99c729'}
                     onSubmitEditing={sendVerificationCode}
@@ -154,6 +159,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({navigation}) => {
                 contentStyle={styles.textInputContent}
                 activeUnderlineColor={'#99c729'}
                 keyboardType={'numeric'}
+                spellCheck={false}
                 autoCorrect={false}
                 multiline={true}
                 textColor={'#fff'}
