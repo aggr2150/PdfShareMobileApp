@@ -62,7 +62,7 @@ declare interface IUser extends ISession {
   description: string;
   postCounter: number;
   subscriberCounter: number;
-  subscribingCounter?: number;
+  subscribingCounter: number;
   subscribeStatus?: boolean;
 }
 declare interface IComment {

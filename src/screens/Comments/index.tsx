@@ -18,7 +18,8 @@ import {commentAdded, commentAddedMany} from '@redux/reducer/commentsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import _ from 'lodash';
 import {postAddedMany} from '@redux/reducer/postsReducer';
-import {useHeaderHeight} from 'react-native-screens/native-stack';
+// import {useHeaderHeight} from 'react-native-screens/native-stack';
+import {useHeaderHeight} from '@react-navigation/elements';
 
 type CommentsProps = StackScreenProps<RootStackParamList, 'Comments'>;
 const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
@@ -83,7 +84,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
     throttleEventCallback.cancel();
     throttleEventCallback(undefined, true);
   }, [throttleEventCallback]);
-  // const headerHeight = useHeaderHeight();
+  const headerHeight = useHeaderHeight();
   const submit = useCallback(() => {
     apiInstance
       .post<response<IComment>>('/api/comment/write', {
@@ -100,16 +101,13 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
       });
   }, [content, csrfToken, dispatch, route.params.postId]);
   return (
-    <SafeAreaView style={{flex: 1}}>
-      {/*<View style={styles.header}>*/}
-      {/*  <Text style={styles.headerText}>댓글</Text>*/}
-      {/*</View>*/}
+    <SafeAreaView style={{flex: 1}} edges={['bottom', 'left', 'right']}>
       <View style={{flex: 1, paddingHorizontal: 15}}>
         <FlatList
-          scrollEnabled={true}
+          // scrollEnabled={true}
           data={comments}
           renderItem={Comment}
-          inverted={true}
+          // inverted={true}
           onEndReached={onEndReached}
           onRefresh={onRefresh}
           refreshing={refreshing}
@@ -123,26 +121,18 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
           }
         />
       </View>
+
       <KeyboardAvoidingView
+        // keyboardVerticalOffset={insets.bottom}
+        keyboardVerticalOffset={headerHeight}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={insets.bottom}
-        style={{
-          // flex: 0,
-          width: '100%',
-          // position: 'absolute',
-          // top: 0,
-          // bottom: 0,
-          // left: 0,
-          // right: 0,
-          // width: 300,
-          // height: 300,
-        }}>
+        // behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
         <View
           style={{
             flexDirection: 'row',
-            paddingBottom: insets.bottom,
-            justifyContent: 'center',
-            alignItems: 'center',
+            // justifyContent: 'center',
+            // alignItems: 'center',
           }}>
           <View
             style={{
@@ -151,6 +141,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
               flex: 1,
               borderRadius: 20,
               overflow: 'hidden',
+              marginVertical: 5,
             }}>
             <TextInput
               style={{
@@ -162,10 +153,10 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
               // style={styles.textInput}
               placeholder={'댓글 입력'}
               placeholderTextColor={'#606060'}
-              inputContainerStyle={{borderBottomWidth: 0}}
-              renderErrorMessage={false}
-              containerStyle={{paddingLeft: 10, flex: 1}}
-              inputStyle={{margin: 0}}
+              // inputContainerStyle={{borderBottomWidth: 0}}
+              // renderErrorMessage={false}
+              // containerStyle={{paddingLeft: 10}}
+              // inputStyle={{margin: 0}}
               value={content}
               textAlignVertical={'center'}
               // textAlign={'center'}

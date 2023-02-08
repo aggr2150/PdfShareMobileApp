@@ -385,8 +385,12 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
           <View style={{paddingVertical: 25}}>
             <Text style={styles.titleLabel}>이 PDF의 정보</Text>
             <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-              <Text style={styles.counterLabel}>조회수 99292023회</Text>
-              <Text style={styles.counterLabel}>좋아요 22387398789개</Text>
+              <Text style={styles.counterLabel}>
+                조회수 {post.viewCounter}회
+              </Text>
+              <Text style={styles.counterLabel}>
+                좋아요 {post.likeCounter}개
+              </Text>
             </View>
             <Separator style={{marginVertical: 15}} />
             <View style={{alignSelf: 'flex-start'}}>

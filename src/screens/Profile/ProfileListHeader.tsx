@@ -1,4 +1,4 @@
-import React, {Dispatch, useState} from 'react';
+import React, {Dispatch, useCallback, useEffect, useState} from 'react';
 import {Pressable, TouchableOpacity, View} from 'react-native';
 import {Button, ButtonGroup, makeStyles, Text} from '@rneui/themed';
 import {CommonActions, useNavigation, useRoute} from '@react-navigation/native';
@@ -10,9 +10,15 @@ import PlusIcon from '@assets/icon/plus1.svg';
 import BackButton from '@components/BackButton';
 import Keychain from 'react-native-keychain';
 import Toast from 'react-native-toast-message';
-import {apiInstance} from '@utils/Networking';
-import {useAppDispatch} from '@redux/store/RootStore';
-import {signOut} from '@redux/reducer/authReducer';
+import {apiInstance, getCsrfToken} from '@utils/Networking';
+import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
+import {getSession, signOut} from '@redux/reducer/authReducer';
+import {
+  selectById,
+  updateManyUser,
+  updateUser,
+} from '@redux/reducer/usersReducer';
+import {SheetManager} from 'react-native-actions-sheet';
 
 interface ProfileListHeaderProps {
   selectedIndex: number;
@@ -31,15 +37,106 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
   const route = useRoute();
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
-  console.log(
-    navigation.getState().routes.length,
-    navigation.getState().key,
-    route.key,
-  );
-
   const closeMenu = () => setVisible(false);
-  const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
+  const [csrfToken, setCsrfToken] = useState<string>();
+  const authSession = useAppSelector(state => getSession(state));
+  const sessionUser = useAppSelector(state =>
+    selectById(state.users, authSession?.id || ''),
+  );
+  useEffect(() => {
+    getCsrfToken.then(token => setCsrfToken(token));
+  }, []);
+  const insets = useSafeAreaInsets();
+  const subscribe = useCallback(() => {
+    if (user && authSession) {
+      dispatch(
+        updateManyUser([
+          {
+            id: user.id,
+            changes: {
+              subscribeStatus: !user.subscribeStatus,
+              subscriberCounter:
+                user.subscriberCounter + (!user.subscribeStatus ? +1 : -1),
+            },
+          },
+          ...(sessionUser
+            ? [
+                {
+                  id: sessionUser.id,
+                  changes: {
+                    subscribingCounter:
+                      sessionUser.subscribingCounter +
+                      (!user.subscribeStatus ? +1 : -1),
+                  },
+                },
+              ]
+            : []),
+        ]),
+      );
+      apiInstance
+        .post<response>('/api/subscribe/' + user._id, {
+          subscribeStatus: !user.subscribeStatus,
+          _csrf: csrfToken,
+        })
+        .then(response => {
+          if (response.data.code !== 200) {
+            dispatch(
+              updateManyUser([
+                {
+                  id: user.id,
+                  changes: {
+                    subscribeStatus: user.subscribeStatus,
+                    subscriberCounter:
+                      user.subscriberCounter + (user.subscribeStatus ? +1 : -1),
+                  },
+                },
+                ...(sessionUser
+                  ? [
+                      {
+                        id: sessionUser.id,
+                        changes: {
+                          subscribingCounter:
+                            sessionUser.subscribingCounter +
+                            (user.subscribeStatus ? +1 : -1),
+                        },
+                      },
+                    ]
+                  : []),
+              ]),
+            );
+          }
+        })
+        .catch(() =>
+          dispatch(
+            updateManyUser([
+              {
+                id: user.id,
+                changes: {
+                  subscribeStatus: user.subscribeStatus,
+                  subscriberCounter:
+                    user.subscriberCounter + (user.subscribeStatus ? +1 : -1),
+                },
+              },
+              ...(sessionUser
+                ? [
+                    {
+                      id: sessionUser.id,
+                      changes: {
+                        subscribingCounter:
+                          sessionUser.subscribingCounter +
+                          (user.subscribeStatus ? +1 : -1),
+                      },
+                    },
+                  ]
+                : []),
+            ]),
+          ),
+        );
+    } else {
+      SheetManager.show('loginSheet', {payload: {closable: true}}).then();
+    }
+  }, [authSession, csrfToken, dispatch, sessionUser, user]);
   return (
     // <Provider>
     <View>
@@ -88,59 +185,69 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
                 <DotIcon fill={'white'} width={24} height={24} />
               </TouchableOpacity>
             }>
-            <Menu.Item
-              dense={true}
-              onPress={() => {
-                navigation.navigate('EditProfile', {
-                  // id: '123',
-                  // nickname: '123',
-                  avatar: user?.avatar,
-                  link: user?.link,
-                  description: user?.description,
-                  id: user?.id,
-                  nickname: user?.nickname,
-                });
-                closeMenu();
-              }}
-              title={<Text style={styles.menuText}>프로필 수정</Text>}
-            />
-            <Menu.Item
-              dense={true}
-              onPress={() => {}}
-              title={<Text style={styles.menuText}>광고 수익</Text>}
-            />
-            <Divider />
-            <Menu.Item
-              dense={true}
-              onPress={() => {
-                navigation.navigate('Settings', {
-                  id: '123',
-                  nickname: '123',
-                  description: '123',
-                });
-                closeMenu();
-              }}
-              title={<Text style={styles.menuText}>설정</Text>}
-            />
-            {isMine && (
-              <Menu.Item
-                dense={true}
-                onPress={() => {
-                  apiInstance.post('/api/auth/signOut').then();
-                  Keychain.resetGenericPassword().then();
-                  dispatch(signOut());
-                  closeMenu();
-                  navigation.dispatch(
-                    CommonActions.reset({
-                      // stale: true,
-                      // stale: false,
-                      // index: 0,
-                      routes: [{name: 'SignIn'}],
-                    }),
-                  );
-                }}
-                title={<Text style={styles.menuText}>로그아웃</Text>}
-              />
+            {isMine ? (
+              <>
+                <Menu.Item
+                  dense={true}
+                  onPress={() => {
+                    navigation.navigate('EditProfile', {
+                      // id: '123',
+                      // nickname: '123',
+                      avatar: user?.avatar,
+                      link: user?.link,
+                      description: user?.description,
+                      id: user?.id,
+                      nickname: user?.nickname,
+                    });
+                    closeMenu();
+                  }}
+                  title={<Text style={styles.menuText}>프로필 수정</Text>}
+                />
+                <Menu.Item
+                  dense={true}
+                  onPress={() => {}}
+                  title={<Text style={styles.menuText}>광고 수익</Text>}
+                />
+                <Divider />
+                <Menu.Item
+                  dense={true}
+                  onPress={() => {
+                    navigation.navigate('Settings', {
+                      id: '123',
+                      nickname: '123',
+                      description: '123',
+                    });
+                    closeMenu();
+                  }}
+                  title={<Text style={styles.menuText}>설정</Text>}
+                />
+                <Menu.Item
+                  dense={true}
+                  onPress={() => {
+                    apiInstance.post('/api/auth/signOut').then();
+                    Keychain.resetGenericPassword().then();
+                    dispatch(signOut());
+                    closeMenu();
+                    navigation.dispatch(
+                      CommonActions.reset({
+                        // stale: true,
+                        // stale: false,
+                        // index: 0,
+                        routes: [{name: 'SignIn'}],
+                      }),
+                    );
+                  }}
+                  title={<Text style={styles.menuText}>로그아웃</Text>}
+                />
+              </>
+            ) : (
+              <>
+                <Menu.Item
+                  dense={true}
+                  onPress={() => {}}
+                  title={<Text style={styles.menuText}>신고하기</Text>}
+                />
+              </>
             )}
 
             <Menu.Item
@@ -184,16 +291,17 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
               paddingVertical: 15,
               paddingHorizontal: 60,
               marginVertical: 15,
-              backgroundColor: '#99c729',
+              backgroundColor: user?.subscribeStatus ? '#99c729' : '#3a3a3a',
             }}
+            onPress={subscribe}
             titleStyle={styles.subscribeButtonTitle}
-            title={'구독중'}
+            title={user?.subscribeStatus ? '구독중' : '구독하기'}
           />
         )}
       </View>
       {isMine && (
         <ButtonGroup
-          buttons={['내 PDF', '좋아요', '팔로우']}
+          buttons={['내 PDF', '좋아요', '구독중']}
           selectedIndex={selectedIndex}
           onPress={value => {
             setSelectedIndex(value);

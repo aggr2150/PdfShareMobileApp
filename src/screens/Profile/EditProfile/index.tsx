@@ -29,6 +29,7 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
   useEffect(() => {
     getCsrfToken.then(token => setCsrfToken(token));
   }, []);
+  console.log(route.params);
   const openImagePicker = useCallback(() => {
     ImagePicker.openPicker({
       mediaType: 'photo',

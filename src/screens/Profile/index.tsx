@@ -85,6 +85,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
       )
       .then(response => {
         if (response.data.code === 200 && response.data.data.user) {
+          console.log('usss', response.data.data.user);
           dispatch(setOneUser(response.data.data.user));
           if (response.data.data.feeds.length !== 0) {
             setTabData(prevState => [

@@ -103,7 +103,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({navigation}) => {
             break;
         }
       });
-  }, [email, verificationCode, csrfToken]);
+  }, [email, verificationCode, csrfToken, navigation]);
   return (
     <SafeAreaView style={{flex: 1}}>
       <StatusBar backgroundColor={'black'} barStyle={'light-content'} />

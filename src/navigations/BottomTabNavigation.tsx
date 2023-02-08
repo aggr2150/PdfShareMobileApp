@@ -13,6 +13,7 @@ import ProfileIcon from '@assets/icon/person.svg';
 import HistoryStackNavigation from '@navigations/HistoryStackNavigation';
 import ProfileStackNavigation from '@navigations/ProfileStackNavigation';
 import HomeStackNavigation from '@navigations/tabs/HomeStackNavigation';
+import Search from '@screens/Search';
 
 function SettingsScreen() {
   return (
@@ -55,7 +56,7 @@ export default () => {
       />
       <Tab.Screen
         name="Search"
-        component={HomeStackNavigation}
+        component={Search}
         options={{
           tabBarIcon: ({size, color}) => (
             <SearchIcon
