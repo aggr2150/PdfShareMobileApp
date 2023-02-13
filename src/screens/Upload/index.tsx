@@ -87,6 +87,7 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
           'Content-Type': 'multipart/form-data',
         },
         withCredentials: true,
+        timeout: 180000,
       })
       .then(response => {
         console.log(response.data);
@@ -180,6 +181,7 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
                 keyboardType={'url'}
                 placeholderTextColor={'#1ba639'}
                 placeholder={'컨텐츠의 제목을 넣어주세요'}
+                autoCorrect={false}
               />
               <TextInput
                 style={styles.contentInput}

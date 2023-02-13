@@ -236,12 +236,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                 <BoxIcon fill={'#99c729'} width={24} height={24} />
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={
-                  likeCallback
-                  // () => {}
-                  // () => navigation.navigate('Comments')
-                  // () => SheetManager.show('commentSheet')
-                }
+                onPress={likeCallback}
                 style={{
                   width: 34,
                   height: 34,

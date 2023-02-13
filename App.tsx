@@ -50,4 +50,10 @@ const App = () => {
 export default codePush({
   checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
   installMode: codePush.InstallMode.IMMEDIATE,
+  rollbackRetryOptions: {
+    delayInHours: 0,
+    maxRetryAttempts: 5,
+  },
+  // mandatoryInstallMode:
 })(App);
+// export default App
