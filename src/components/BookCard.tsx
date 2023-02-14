@@ -1,20 +1,49 @@
-import React from 'react';
-import {Pressable, TouchableOpacity, View} from 'react-native';
+import React, {useEffect} from 'react';
+import {Platform, Pressable, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
 import Book from '@src/components/Book';
+import {TestIds, useInterstitialAd} from 'react-native-google-mobile-ads';
+import {humanizeNumber} from '@utils/Humanize';
 
 interface BookCardProps {
   item: IPost;
   index: number;
 }
+// const adUnitId = __DEV__
+//   ? TestIds.INTERSTITIAL
+//   : Platform.OS === 'android'
+//   ? 'ca-app-pub-9881103194147827~4317322839'
+//   : 'ca-app-pub-9881103194147827~1787346509';
+
+const adUnitId = TestIds.INTERSTITIAL;
+
+// const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
+//   requestNonPersonalizedAdsOnly: true,
+//   // keywords: ['fashion', 'clothing'],
+// });
+
+// interstitial.load();
 const BookCard: React.FC<BookCardProps> = ({item, index, onPress}) => {
   const styles = useStyles();
   const navigation = useNavigation();
+  const {isLoaded, isClosed, load, show} = useInterstitialAd(adUnitId, {
+    requestNonPersonalizedAdsOnly: true,
+  });
+  useEffect(() => {
+    // Start loading the interstitial straight away
+    load();
+  }, [load]);
   return (
     <Pressable
-      // onPress={onPress}
-      onPress={() => navigation.navigate('Viewer', item)}
+      onPress={() => {
+        if (isLoaded) {
+          show();
+        } else {
+          load();
+          navigation.navigate('Viewer', item);
+        }
+      }}
       style={{
         aspectRatio: 16 / 9,
         backgroundColor: index % 2 === 0 ? '#1a3692' : '#e73f90',
@@ -27,17 +56,23 @@ const BookCard: React.FC<BookCardProps> = ({item, index, onPress}) => {
           justifyContent: 'space-between',
         }}>
         <View style={{flex: 1, margin: 8, justifyContent: 'space-between'}}>
-          <Text style={{fontSize: 22, fontWeight: 'bold'}} numberOfLines={2}>
-            {item?.title}
-          </Text>
           <View>
+            <Text
+              style={{fontSize: 22, fontWeight: 'bold', marginBottom: 24}}
+              numberOfLines={2}>
+              {item?.title}
+            </Text>
             <Text style={{fontSize: 12}} numberOfLines={3}>
-              올린이는 크리스마스 에세이에 대한 정보를 피드에 간단히 보여줄 수
-              있 습니다.
               {item?.content}
             </Text>
+          </View>
+          <View>
             <Text style={{marginTop: 5, fontSize: 12, alignSelf: 'flex-end'}}>
               {item?.author?.nickname}
+            </Text>
+            <Text style={{marginTop: 5, fontSize: 12, alignSelf: 'flex-start'}}>
+              조회수 {humanizeNumber(item?.viewCounter)}
+              {/*{humanizeNumber(2533)}*/}
             </Text>
           </View>
         </View>

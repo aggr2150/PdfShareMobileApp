@@ -6,7 +6,7 @@ import {apiInstance} from '@utils/Networking';
 import _ from 'lodash';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {postAddedMany} from '@redux/reducer/postsReducer';
+import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {StackScreenProps} from '@react-navigation/stack';
 
@@ -31,7 +31,7 @@ const SearchResult: React.FC<SearchResultProps> = ({navigation, route}) => {
     apiInstance.post<response<IPost[]>>('/api/search?query=').then(response => {
       if (response.data.data.length !== 0) {
         setData(prevState => [...prevState, ...response.data.data]);
-        dispatch(postAddedMany(response.data.data));
+        dispatch(postSetMany(response.data.data));
       }
     });
   }, [dispatch]);
@@ -47,7 +47,7 @@ const SearchResult: React.FC<SearchResultProps> = ({navigation, route}) => {
               } else {
                 setData(prevState => [...prevState, ...response.data.data]);
               }
-              dispatch(postAddedMany(response.data.data));
+              dispatch(postSetMany(response.data.data));
             }
           })
           .finally(() => setFetching(false));

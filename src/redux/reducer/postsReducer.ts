@@ -33,13 +33,20 @@ const postsSlice = createSlice({
       postAdapter.setOne(state, action.payload.posts);
     },
     setAll: postAdapter.setAll,
+    postSetMany: postAdapter.setMany,
     updatePost: postAdapter.updateOne,
   },
 });
 
 export default postsSlice.reducer;
-export const {setOnePost, postAddedMany, postAdded, setAll, updatePost} =
-  postsSlice.actions;
+export const {
+  setOnePost,
+  postAddedMany,
+  postAdded,
+  setAll,
+  updatePost,
+  postSetMany,
+} = postsSlice.actions;
 
 export const postSelectors = postAdapter.getSelectors<RootState>(
   state => state.posts,

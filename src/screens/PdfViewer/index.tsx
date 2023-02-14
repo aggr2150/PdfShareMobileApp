@@ -33,7 +33,12 @@ import ActionSheet, {
 import Separator from '@components/Seperator';
 import {StackScreenProps} from '@react-navigation/stack';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
-import {postAdded, selectById, updatePost} from '@redux/reducer/postsReducer';
+import {
+  postAdded,
+  postSetMany,
+  selectById,
+  updatePost,
+} from '@redux/reducer/postsReducer';
 import Spinner from '@components/Spinner';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {likeAdded, likeRemoved} from '@redux/reducer/likesReducer';
@@ -67,6 +72,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   const actionSheetRef = useRef<ActionSheetRef>(null);
   const detailsActionSheetRef = useRef<ActionSheetRef>(null);
   const styles = useStyles();
+  const dimensions = useWindowDimensions();
   const dispatch = useAppDispatch();
   useEffect(() => {
     getCsrfToken.then(token => setCsrfToken(token));
@@ -74,7 +80,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
       .post<response<IPost>>('/api/post/' + route.params._id)
       .then(response => {
         if (response.data.data) {
-          dispatch(postAdded(response.data.data));
+          dispatch(postSetMany(response.data.data));
         }
       });
   }, [dispatch, route.params._id]);
@@ -118,7 +124,15 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <View style={[styles.container, {overflow: 'visible'}]}>
+      <View
+        style={[
+          styles.container,
+          {
+            overflow: 'visible',
+            width: dimensions.width,
+            height: dimensions.height,
+          },
+        ]}>
         <Pdf
           trustAllCerts={false}
           source={source}
@@ -441,9 +455,9 @@ const useStyles = makeStyles(theme => ({
   container: {
     width: '100%',
     height: '100%',
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    // flex: 1,
+    // justifyContent: 'flex-start',
+    // alignItems: 'center',
     // marginTop: 25,
   },
   sectionContainer: {

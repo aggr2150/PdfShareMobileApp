@@ -6,7 +6,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import BookCard from '@components/BookCard';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {apiInstance} from '@utils/Networking';
-import {postAddedMany} from '@redux/reducer/postsReducer';
+import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
 import _ from 'lodash';
 import Spinner from '@components/Spinner';
 import queryString from 'query-string';
@@ -27,7 +27,7 @@ const Search = () => {
     apiInstance.post<response<IPost[]>>('/api/feeds/sample').then(response => {
       if (response.data.data.length !== 0) {
         setSample(response.data.data);
-        dispatch(postAddedMany(response.data.data));
+        dispatch(postSetMany(response.data.data));
         // setFetching(false);
         setInitialized(true);
       }
@@ -45,11 +45,11 @@ const Search = () => {
             console.log('search', response.data.data);
             if (initial) {
               setData(response.data.data);
-              dispatch(postAddedMany(response.data.data));
+              dispatch(postSetMany(response.data.data));
             } else {
               if (response.data.data.length !== 0) {
                 setData(prevState => [...prevState, ...response.data.data]);
-                dispatch(postAddedMany(response.data.data));
+                dispatch(postSetMany(response.data.data));
               }
             }
           })
@@ -76,7 +76,7 @@ const Search = () => {
               // } else {
               //   setData(prevState => [...prevState, ...response.data.data]);
               // }
-              dispatch(postAddedMany(response.data.data));
+              dispatch(postSetMany(response.data.data));
             }
           })
           .catch(error => console.log(error))
@@ -107,7 +107,7 @@ const Search = () => {
       // data[data.length - 1]?._id
       throttleKeywordEventCallback(
         keyword,
-        keyword.startsWith('#') ? data.length : data[data.length - 1]?._id,
+        keyword.startsWith('#') ? data[data.length - 1]?._id : data.length,
       );
     }
   }, [data, fetching, keyword, throttleKeywordEventCallback]);

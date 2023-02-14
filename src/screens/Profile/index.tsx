@@ -1,31 +1,17 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {FlatList, ScrollView, View} from 'react-native';
-import {Button, Text} from '@rneui/themed';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import ThrottleFlatList from '@components/ThrottleFlatlist';
-import ToggleBtn from '@components/ToggleBtn';
-import Avatar from '@components/Avatar';
+import {FlatList, View} from 'react-native';
 import ProfileListHeader from '@screens/Profile/ProfileListHeader';
 import BookCard from '@components/BookCard';
 import Spinner from '@components/Spinner';
-import Animated, {
-  FadeIn,
-  FadeOut,
-  SlideInRight,
-  SlideOutLeft,
-} from 'react-native-reanimated';
+import Animated, {FadeIn} from 'react-native-reanimated';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {StackScreenProps} from '@react-navigation/stack';
-import {selectById, setOneUser, userAdded} from '@redux/reducer/usersReducer';
+import {selectById, setOneUser} from '@redux/reducer/usersReducer';
 import {apiInstance} from '@utils/Networking';
-import {postAddedMany} from '@redux/reducer/postsReducer';
-import {
-  likeAddedMany,
-  selectAll,
-  setAllLike,
-} from '@redux/reducer/likesReducer';
+import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
+import {selectAll, setAllLike} from '@redux/reducer/likesReducer';
 import {getSession} from '@redux/reducer/authReducer';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 enum ETabIndex {
   'PDF',
@@ -93,7 +79,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
               response.data.data.likes,
               prevState[2],
             ]);
-            dispatch(postAddedMany(response.data.data.feeds));
+            dispatch(postSetMany(response.data.data.feeds));
           }
           if (
             response.data.data.likes &&
@@ -123,7 +109,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
               response.data.data.likes,
               prevState[2],
             ]);
-            dispatch(postAddedMany(response.data.data.feeds));
+            dispatch(postSetMany(response.data.data.feeds));
           }
           if (
             response.data.data.likes &&
@@ -207,14 +193,11 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
             />
           )}
           renderItem={renderItem}
-          keyExtractor={item => `${selectedIndex}${item._id}`}
+          // keyExtractor={item => `${selectedIndex}${item._id}`}
         />
       )}
     </View>
   );
-  // ) : (
-  //   <Spinner />
-  // );
 };
 
 export default Profile;

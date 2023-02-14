@@ -8,7 +8,7 @@ import Book from '@components/Book';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {StackScreenProps} from '@react-navigation/stack';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
-import {postAddedMany} from '@redux/reducer/postsReducer';
+import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import BackButton from '@components/BackButton';
 import Toast from 'react-native-toast-message';
@@ -34,7 +34,7 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
           // setData(response.data.data.feeds);
           console.log('feeds', response.data.data);
           setTitle(response.data.data.collection.title);
-          dispatch(postAddedMany(response.data.data.feeds));
+          dispatch(postSetMany(response.data.data.feeds));
           setFetching(false);
         }
       });

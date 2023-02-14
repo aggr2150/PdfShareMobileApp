@@ -6,7 +6,7 @@ import {FlatList, useWindowDimensions} from 'react-native';
 import {apiInstance} from '@utils/Networking';
 import _ from 'lodash';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
-import {postAddedMany} from '@redux/reducer/postsReducer';
+import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 
 const FirstScene = () => {
@@ -23,7 +23,7 @@ const FirstScene = () => {
     apiInstance.post<response<IPost[]>>('/api/feeds/sample').then(response => {
       if (response.data.data.length !== 0) {
         setData(response.data.data);
-        dispatch(postAddedMany(response.data.data));
+        dispatch(postSetMany(response.data.data));
         setFetching(false);
       }
     });
@@ -40,7 +40,7 @@ const FirstScene = () => {
               } else {
                 setData(prevState => [...prevState, ...response.data.data]);
               }
-              dispatch(postAddedMany(response.data.data));
+              dispatch(postSetMany(response.data.data));
             }
           })
           .catch(error => console.log(error))

@@ -7,7 +7,7 @@ import {apiInstance} from '@utils/Networking';
 import _ from 'lodash';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {postAddedMany} from '@redux/reducer/postsReducer';
+import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 
 const SecondScene: React.FC = () => {
@@ -28,7 +28,7 @@ const SecondScene: React.FC = () => {
       .then(response => {
         if (response.data.data.length !== 0) {
           setData(prevState => [...prevState, ...response.data.data]);
-          dispatch(postAddedMany(response.data.data));
+          dispatch(postSetMany(response.data.data));
         }
       });
   }, [dispatch]);
@@ -44,7 +44,7 @@ const SecondScene: React.FC = () => {
               } else {
                 setData(prevState => [...prevState, ...response.data.data]);
               }
-              dispatch(postAddedMany(response.data.data));
+              dispatch(postSetMany(response.data.data));
             }
           })
           .finally(() => setFetching(false));
