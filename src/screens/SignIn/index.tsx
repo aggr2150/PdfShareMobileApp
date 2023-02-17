@@ -114,7 +114,7 @@ const SignIn: React.FC = () => {
       initializeCallback();
     });
   }, [initializeCallback, navigation]);
-
+  const dimensions = useWindowDimensions();
   const styles = useStyles();
   return (
     <SafeAreaView style={styles.wrapper}>
@@ -123,12 +123,19 @@ const SignIn: React.FC = () => {
         backgroundColor={styles.statusBar.backgroundColor}
       />
       <Pressable
-        style={styles.container} //onLayout={showSheet}
+        style={[
+          styles.container,
+          {
+            justifyContent:
+              dimensions.height >= 240 * 2 ? 'flex-end' : 'center',
+          },
+        ]} //onLayout={showSheet}
         onPress={showSheet}>
-        <View style={{marginBottom: 300}}>
-          <AppLogo width={300} height={300} />
-        </View>
+        {/*<View style={{marginBottom: '50%'}}>*/}
+        <AppLogo width={240} height={240} />
+        {/*</View>*/}
       </Pressable>
+      {dimensions.height >= 240 * 2 && <View style={{flex: 1}}></View>}
     </SafeAreaView>
   );
 };
@@ -143,7 +150,7 @@ const useStyles = makeStyles(theme => ({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     // marginTop: 25,
   },

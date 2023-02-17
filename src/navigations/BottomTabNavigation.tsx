@@ -1,6 +1,9 @@
 import React from 'react';
 import {View} from 'react-native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {
+  BottomTabBar,
+  createBottomTabNavigator,
+} from '@react-navigation/bottom-tabs';
 import {Button, makeStyles, Text} from '@rneui/themed';
 import Home from '@screens/Home';
 import {SheetManager} from 'react-native-actions-sheet';
@@ -14,31 +17,27 @@ import HistoryStackNavigation from '@navigations/HistoryStackNavigation';
 import ProfileStackNavigation from '@navigations/ProfileStackNavigation';
 import HomeStackNavigation from '@navigations/tabs/HomeStackNavigation';
 import Search from '@screens/Search';
-
-function SettingsScreen() {
-  return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text>Settings!</Text>
-      <Button
-        color={'primary'}
-        title={'navigate'}
-        onPress={() => SheetManager.show('loginSheet')}
-      />
-    </View>
-  );
-}
+import {useAppSelector} from '@redux/store/RootStore';
+import {EAuthState, getAuthState, getSession} from '@redux/reducer/authReducer';
+import SearchStackNavigation from '@navigations/SearchStackNavigation';
+// import {BottomTab} from '@react-navigation/bottom-tabs';
+// import BottomTabBarItem from '@react-navigation/bottom-tabs/lib/typescript/src/views/BottomTabItem';
+// import {tab} from '@react-navigation/bottom-tabs';
 
 const Tab = createBottomTabNavigator();
 
-export default () => {
+export default ({navigation}) => {
   const styles = useStyles();
+  const authState = useAppSelector(state => getAuthState(state));
   return (
     <Tab.Navigator
+      tabBar={props => <BottomTabBar {...props} />}
       screenOptions={{
         tabBarStyle: styles.tabBarContainer,
         tabBarShowLabel: false,
         headerShown: false,
         tabBarActiveTintColor: '#99c729',
+        // tabBarButton: props => <Tab. {...props} />,
       }}>
       <Tab.Screen
         name="HomeTab"
@@ -55,8 +54,8 @@ export default () => {
         }}
       />
       <Tab.Screen
-        name="Search"
-        component={Search}
+        name="SearchTab"
+        component={SearchStackNavigation}
         options={{
           tabBarIcon: ({size, color}) => (
             <SearchIcon
@@ -80,6 +79,17 @@ export default () => {
               fill={color}
             />
           ),
+          // tabBarButton: props =>  <BottomTabBar {props} />,
+        }}
+        listeners={{
+          tabPress: e => {
+            if (authState !== EAuthState.AUTHORIZED) {
+              SheetManager.show('loginSheet', {
+                payload: {closable: true},
+              }).then();
+              e.preventDefault();
+            }
+          },
         }}
       />
       <Tab.Screen

@@ -23,6 +23,16 @@ const adUnitId = TestIds.INTERSTITIAL;
 //   // keywords: ['fashion', 'clothing'],
 // });
 
+const getBackgroundColor = (index: number) => {
+  switch (index % 3) {
+    case 0:
+      return '#1a3692';
+    case 1:
+      return '#e73f90';
+    case 2:
+      return '#e5c642';
+  }
+};
 // interstitial.load();
 const BookCard: React.FC<BookCardProps> = ({item, index, onPress}) => {
   const styles = useStyles();
@@ -41,12 +51,12 @@ const BookCard: React.FC<BookCardProps> = ({item, index, onPress}) => {
           show();
         } else {
           load();
-          navigation.navigate('Viewer', item);
         }
+        navigation.navigate('Viewer', item);
       }}
       style={{
         aspectRatio: 16 / 9,
-        backgroundColor: index % 2 === 0 ? '#1a3692' : '#e73f90',
+        backgroundColor: getBackgroundColor(index),
         width: '100%',
       }}>
       <View

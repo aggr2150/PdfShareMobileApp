@@ -1,10 +1,16 @@
 import React, {Dispatch, useCallback, useEffect, useState} from 'react';
 import {Pressable, TouchableOpacity, View} from 'react-native';
 import {Button, ButtonGroup, makeStyles, Text} from '@rneui/themed';
-import {CommonActions, useNavigation, useRoute} from '@react-navigation/native';
+import {
+  CommonActions,
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import Avatar from '@components/Avatar';
 import DotIcon from '@assets/icon/dot.svg';
-import {Divider, Menu, Provider} from 'react-native-paper';
+import {Divider, Menu} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import PlusIcon from '@assets/icon/plus1.svg';
 import BackButton from '@components/BackButton';
@@ -13,11 +19,7 @@ import Toast from 'react-native-toast-message';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {getSession, signOut} from '@redux/reducer/authReducer';
-import {
-  selectById,
-  updateManyUser,
-  updateUser,
-} from '@redux/reducer/usersReducer';
+import {selectById, updateManyUser} from '@redux/reducer/usersReducer';
 import {SheetManager} from 'react-native-actions-sheet';
 
 interface ProfileListHeaderProps {
@@ -33,23 +35,27 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
   isMine,
 }) => {
   const styles = useStyles();
-  const navigation = useNavigation();
-  const route = useRoute();
+  const navigation =
+    useNavigation<NavigationProp<RootStackParamList, 'ProfileTab'>>();
+  const route =
+    useRoute<RouteProp<ProfileStackScreenParams, 'Profile' | 'My'>>();
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
   const dispatch = useAppDispatch();
   const [csrfToken, setCsrfToken] = useState<string>();
-  const authSession = useAppSelector(state => getSession(state));
+  const session = useAppSelector(state => getSession(state));
   const sessionUser = useAppSelector(state =>
-    selectById(state.users, authSession?.id || ''),
+    selectById(state.users, session?.id || ''),
   );
   useEffect(() => {
     getCsrfToken.then(token => setCsrfToken(token));
   }, []);
   const insets = useSafeAreaInsets();
   const subscribe = useCallback(() => {
-    if (user && authSession) {
+    if (!session) {
+      SheetManager.show('loginSheet', {payload: {closable: true}}).then();
+    } else if (user && user._id !== session._id) {
       dispatch(
         updateManyUser([
           {
@@ -136,7 +142,7 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
     } else {
       SheetManager.show('loginSheet', {payload: {closable: true}}).then();
     }
-  }, [authSession, csrfToken, dispatch, sessionUser, user]);
+  }, [session, csrfToken, dispatch, sessionUser, user]);
   return (
     // <Provider>
     <View>
@@ -144,7 +150,7 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          marginBottom: 24,
+          // marginBottom: 24,
         }}>
         <View
           style={{
@@ -185,7 +191,7 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
                 <DotIcon fill={'white'} width={24} height={24} />
               </TouchableOpacity>
             }>
-            {isMine ? (
+            {isMine && user ? (
               <>
                 <Menu.Item
                   dense={true}
@@ -205,18 +211,14 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
                 />
                 <Menu.Item
                   dense={true}
-                  onPress={() => {}}
+                  onPress={() => navigation.navigate('Revenue')}
                   title={<Text style={styles.menuText}>광고 수익</Text>}
                 />
                 <Divider />
                 <Menu.Item
                   dense={true}
                   onPress={() => {
-                    navigation.navigate('Settings', {
-                      id: '123',
-                      nickname: '123',
-                      description: '123',
-                    });
+                    navigation.navigate('Settings');
                     closeMenu();
                   }}
                   title={<Text style={styles.menuText}>설정</Text>}
@@ -291,13 +293,16 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
               paddingVertical: 15,
               paddingHorizontal: 60,
               marginVertical: 15,
-              backgroundColor: user?.subscribeStatus ? '#99c729' : '#3a3a3a',
+              backgroundColor: user?.subscribeStatus ? '#3a3a3a' : '#99c729',
             }}
             onPress={subscribe}
             titleStyle={styles.subscribeButtonTitle}
             title={user?.subscribeStatus ? '구독중' : '구독하기'}
           />
         )}
+      </View>
+      <View style={{flex: 1}}>
+        <Text style={{width: '100%', padding: 15}}>{user?.description}</Text>
       </View>
       {isMine && (
         <ButtonGroup

@@ -13,7 +13,9 @@ import _ from 'lodash';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
 import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
+import {TestIds, useInterstitialAd} from 'react-native-google-mobile-ads';
 
+const adUnitId = TestIds.INTERSTITIAL;
 const FirstScene = () => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
@@ -24,6 +26,13 @@ const FirstScene = () => {
   const dimensions = useWindowDimensions();
   const tabBarHeight = useBottomTabBarHeight();
   const dispatch = useAppDispatch();
+  const {isLoaded, isClosed, load, show} = useInterstitialAd(adUnitId, {
+    requestNonPersonalizedAdsOnly: true,
+  });
+  useEffect(() => {
+    // Start loading the interstitial straight away
+    load();
+  }, [load]);
   useEffect(() => {
     apiInstance.post<response<IPost[]>>('/api/feeds/recent').then(response => {
       if (response.data.data.length !== 0) {
@@ -83,6 +92,7 @@ const FirstScene = () => {
       onEndReached={onEndReached}
       onRefresh={onRefresh}
       refreshing={refreshing}
+      keyExtractor={item => item._id}
       renderItem={({item, index}) => (
         // <TouchableOpacity>
         <BookCard item={item} index={index} />

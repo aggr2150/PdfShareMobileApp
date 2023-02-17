@@ -1,32 +1,25 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, Pressable, useWindowDimensions, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
-import ThrottleFlatList from '@components/ThrottleFlatlist';
 import {SheetManager} from 'react-native-actions-sheet';
 import Separator from '@components/Seperator';
-import ToggleBtn from '@components/ToggleBtn';
 import PlusButton from '@components/buttons/PlusButton';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
 import {apiInstance} from '@utils/Networking';
-import {postAddedMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
-import {useNavigation} from '@react-navigation/native';
-import {
-  collectionAddedMany,
-  selectAll,
-} from '@redux/reducer/collectionsReducer';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {collectionSetMany, selectAll} from '@redux/reducer/collectionsReducer';
 
 const SecondScene: React.FC = () => {
   const styles = useStyles();
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
-  // const [data, setData] = useState<ICollection[]>([]);
   const [fetching, setFetching] = useState(true);
 
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NavigationProp<RootStackParamList, 'HistoryTab'>>();
   const dimensions = useWindowDimensions();
   const [refreshing, setRefreshing] = useState(false);
   const dispatch = useAppDispatch();
@@ -36,7 +29,7 @@ const SecondScene: React.FC = () => {
       .then(response => {
         if (response.data.data.length !== 0) {
           // setData(response.data.data);
-          dispatch(collectionAddedMany(response.data.data));
+          dispatch(collectionSetMany(response.data.data));
           setFetching(false);
         }
       });
@@ -48,7 +41,7 @@ const SecondScene: React.FC = () => {
       .post<response<ICollection[]>>('/api/collection/list')
       .then(response => {
         if (response.data.data.length !== 0) {
-          dispatch(collectionAddedMany(response.data.data));
+          dispatch(collectionSetMany(response.data.data));
           setFetching(false);
           setRefreshing(false);
         }
@@ -67,7 +60,7 @@ const SecondScene: React.FC = () => {
           minHeight: dimensions.height - tabBarHeight + 46 + 24,
         }}
         ItemSeparatorComponent={Separator}
-        renderItem={({item, index}) => (
+        renderItem={({item}) => (
           <Pressable
             onPress={() => {
               navigation.navigate('Collection', {_id: item._id});
@@ -98,7 +91,7 @@ const SecondScene: React.FC = () => {
   );
 };
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   container: {
     justifyContent: 'center',
     alignItems: 'center',

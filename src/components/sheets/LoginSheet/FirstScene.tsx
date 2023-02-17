@@ -108,7 +108,7 @@ const FirstScene = props => {
       </View>
       <View>
         <Button containerStyle={styles.submitButton} onPress={submit}>
-          aaa
+          로그인
         </Button>
       </View>
       <View

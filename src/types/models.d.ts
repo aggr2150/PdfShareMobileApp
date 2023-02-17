@@ -78,3 +78,8 @@ declare interface IComment {
   likeStatus: number;
   isDeleted: boolean;
 }
+type TSettlement = {
+  postViewCounter: number;
+  settledAmount: number;
+  settledViewCounter: number;
+};

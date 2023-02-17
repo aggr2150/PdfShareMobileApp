@@ -40,6 +40,7 @@ const Avatar: React.FC<AvatarProps> = ({style, avatar}) => {
           height: '100%',
           borderRadius: 90,
         }}
+        fallback={true}
       />
       <View></View>
     </View>

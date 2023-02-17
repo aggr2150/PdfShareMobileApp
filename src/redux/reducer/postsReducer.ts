@@ -29,9 +29,10 @@ const postsSlice = createSlice({
   reducers: {
     postAdded: postAdapter.addOne,
     postAddedMany: postAdapter.addMany,
-    setOnePost: (state, action) => {
-      postAdapter.setOne(state, action.payload.posts);
-    },
+    // postSetOne: (state, action) => {
+    //   postAdapter.setOne(state, action.payload.posts);
+    // },
+    postSetOne: postAdapter.setOne,
     setAll: postAdapter.setAll,
     postSetMany: postAdapter.setMany,
     updatePost: postAdapter.updateOne,
@@ -40,7 +41,7 @@ const postsSlice = createSlice({
 
 export default postsSlice.reducer;
 export const {
-  setOnePost,
+  postSetOne,
   postAddedMany,
   postAdded,
   setAll,

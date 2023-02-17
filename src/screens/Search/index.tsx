@@ -12,7 +12,6 @@ import Spinner from '@components/Spinner';
 import queryString from 'query-string';
 const Search = () => {
   const styles = useStyles();
-  const navigation = useNavigation();
   const [keyword, setKeyword] = useState<string>('');
   const insets = useSafeAreaInsets();
   const [initialized, setInitialized] = useState(false);

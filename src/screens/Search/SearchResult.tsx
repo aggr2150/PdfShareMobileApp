@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {makeStyles} from '@rneui/themed';
+import {makeStyles, SearchBar} from '@rneui/themed';
 import BookCard from '@components/BookCard';
-import {FlatList, useWindowDimensions} from 'react-native';
+import {FlatList, StatusBar, useWindowDimensions, View} from 'react-native';
 import {apiInstance} from '@utils/Networking';
 import _ from 'lodash';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
@@ -9,6 +9,9 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {StackScreenProps} from '@react-navigation/stack';
+import {useNavigation} from '@react-navigation/native';
+import queryString from 'query-string';
+import Spinner from '@components/Spinner';
 
 type SearchResultProps = StackScreenProps<
   SearchStackScreenParams,
@@ -17,75 +20,253 @@ type SearchResultProps = StackScreenProps<
 
 const SearchResult: React.FC<SearchResultProps> = ({navigation, route}) => {
   const styles = useStyles();
+  const [keyword, setKeyword] = useState<string>(route.params.keyword);
   const insets = useSafeAreaInsets();
+  const [initialized, setInitialized] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [data, setData] = useState<IPost[]>([]);
-  const [fetching, setFetching] = useState(true);
+  const [sample, setSample] = useState<IPost[]>([]);
   const dimensions = useWindowDimensions();
-  const tabBarHeight = useBottomTabBarHeight();
-  const posts = useAppSelector(state => {
-    return data.map(item => state.posts.entities[item._id] || item);
-  });
   const dispatch = useAppDispatch();
   useEffect(() => {
-    apiInstance.post<response<IPost[]>>('/api/search?query=').then(response => {
+    apiInstance.post<response<IPost[]>>('/api/feeds/sample').then(response => {
       if (response.data.data.length !== 0) {
-        setData(prevState => [...prevState, ...response.data.data]);
+        setSample(response.data.data);
         dispatch(postSetMany(response.data.data));
+        // setFetching(false);
+        setInitialized(true);
       }
     });
   }, [dispatch]);
+  const throttleKeywordEventCallback = useMemo(
+    () =>
+      _.throttle((query: string, pagingKey?, initial = false) => {
+        apiInstance
+          .post<response<IPost[]>>(
+            '/api/search?' + queryString.stringify({query}),
+            {pagingKey},
+          )
+          .then(response => {
+            console.log('search', response.data.data);
+            if (initial) {
+              setData(response.data.data);
+              dispatch(postSetMany(response.data.data));
+            } else {
+              if (response.data.data.length !== 0) {
+                setData(prevState => [...prevState, ...response.data.data]);
+                dispatch(postSetMany(response.data.data));
+              }
+            }
+          })
+          .catch(error => console.log(error))
+          .finally(() => {
+            setLoading(false);
+            setFetching(false);
+            setRefreshing(false);
+          });
+      }, 1000),
+    [dispatch],
+  );
+
   const throttleEventCallback = useMemo(
     () =>
-      _.throttle((pagingKey, initial?) => {
+      _.throttle(() => {
         apiInstance
-          .post<response<IPost[]>>('/api/feeds/subscribe')
+          .post<response<IPost[]>>('/api/feeds/sample')
           .then(response => {
+            console.log('sample');
             if (response.data.data.length !== 0) {
-              if (initial) {
-                setData(response.data.data);
-              } else {
-                setData(prevState => [...prevState, ...response.data.data]);
-              }
+              // if (initial) {
+              setSample(response.data.data);
+              // } else {
+              //   setData(prevState => [...prevState, ...response.data.data]);
+              // }
               dispatch(postSetMany(response.data.data));
             }
           })
-          .finally(() => setFetching(false));
+          .catch(error => console.log(error))
+          .finally(() => {
+            setFetching(false);
+            setRefreshing(false);
+          });
       }),
     [dispatch],
   );
+  const onChangeText = useCallback(
+    (value: string) => {
+      console.log(value);
+      setKeyword(value);
+      if (value.length === 0) {
+        throttleKeywordEventCallback.cancel();
+        throttleEventCallback();
+      } else {
+        setLoading(true);
+        throttleEventCallback.cancel();
+        throttleKeywordEventCallback(value, undefined, true);
+      }
+    },
+    [throttleEventCallback, throttleKeywordEventCallback],
+  );
   const onEndReached = useCallback(() => {
     if (!fetching) {
-      throttleEventCallback(data[data.length - 1]?._id);
+      // data[data.length - 1]?._id
+      throttleKeywordEventCallback(
+        keyword,
+        keyword.startsWith('#') ? data[data.length - 1]?._id : data.length,
+      );
     }
-  }, [data, fetching, throttleEventCallback]);
+  }, [data, fetching, keyword, throttleKeywordEventCallback]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    if (keyword.length !== 0) {
+      throttleKeywordEventCallback(keyword, undefined, true);
+    }
+  }, [keyword, throttleKeywordEventCallback]);
+  const posts = useAppSelector(state => {
+    return data.map(item => state.posts.entities[item._id] || item);
+  });
   return (
-    <FlatList<IPost>
-      data={posts}
-      onEndReached={onEndReached}
-      contentContainerStyle={{
-        paddingTop: (insets.top || 24) + 46 + 12,
-        minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
-      }}
-      contentOffset={{y: (insets.top ? insets.top + 6 : 46 + 24) + 12, x: 0}}
-      // contentContainerStyle={{width: '100%'}}
-      renderItem={({item, index}) => <BookCard item={item} index={index} />}
-    />
-    // <ThrottleFlatList<TPlace>
-    //   data={Array(20)}
-    //   contentContainerStyle={{width: '100%'}}
-    //   renderItem={BookCard}
-    // />
+    <View style={styles.container}>
+      <StatusBar backgroundColor={'black'} barStyle={'light-content'} />
+      {/*<TouchableOpacity*/}
+      {/*  onPress={() => navigation.goBack()}*/}
+      {/*  style={{*/}
+      {/*    position: 'absolute',*/}
+      {/*    top: insets.top || 24,*/}
+      {/*    zIndex: 1,*/}
+      {/*    left: 0,*/}
+      {/*    width: 36,*/}
+      {/*    height: 36,*/}
+      {/*    borderRadius: 36,*/}
+      {/*    backgroundColor: 'white',*/}
+      {/*    shadowColor: '#000',*/}
+      {/*    shadowOffset: {*/}
+      {/*      width: 0,*/}
+      {/*      height: 1,*/}
+      {/*    },*/}
+      {/*    shadowOpacity: 0.22,*/}
+      {/*    shadowRadius: 2.22,*/}
+
+      {/*    elevation: 3,*/}
+      {/*    justifyContent: 'center',*/}
+      {/*    alignItems: 'center',*/}
+      {/*  }}>*/}
+      {/*  <Pressable onPress={() => navigation.goBack()}>*/}
+      {/*    <Ionicons*/}
+      {/*      name={Platform.select({*/}
+      {/*        android: 'arrow-back',*/}
+      {/*        ios: 'ios-chevron-back',*/}
+      {/*        default: 'ios-chevron-back',*/}
+      {/*      })}*/}
+      {/*      size={Platform.select({*/}
+      {/*        android: 24,*/}
+      {/*        ios: 30,*/}
+      {/*        default: 30,*/}
+      {/*      })}*/}
+      {/*    />*/}
+      {/*  </Pressable>*/}
+      {/*</TouchableOpacity>*/}
+      <View
+        style={{
+          position: 'absolute',
+          top: insets.top || 24,
+          zIndex: 1,
+          left: 0,
+          right: 0,
+          marginHorizontal: 60,
+        }}>
+        <SearchBar
+          showLoading={loading}
+          value={keyword}
+          onChangeText={onChangeText}
+          // inputContainerStyle={{}}
+          // style={{borderRadius: 20, overflow: 'hidden'}}
+          inputContainerStyle={{
+            // height: 36,
+            alignItems: 'center',
+            justifyContent: 'center',
+            // backgroundColor: 'red',
+            // height: 46,
+          }}
+          inputStyle={{
+            fontSize: 12,
+            minHeight: 35,
+            marginLeft: 0,
+            // textAlignVertical: 'top',
+            height: 46,
+          }}
+          rightIconContainerStyle={{
+            height: 46,
+          }}
+          leftIconContainerStyle={{
+            paddingHorizontal: 10,
+            height: 46,
+          }}
+          style={{
+            height: 46,
+          }}
+          containerStyle={{
+            // alignItems: 'center',
+            justifyContent: 'center',
+            height: 46,
+
+            maxHeight: 46,
+            maxWidth: 700,
+            // width: '100%',
+            borderRadius: 300,
+            overflow: 'hidden',
+            padding: 0,
+            borderTopWidth: 0,
+            borderBottomWidth: 0,
+          }}
+          platform={'default'}
+        />
+      </View>
+      <View
+        style={{
+          width: '100%',
+          height: '100%',
+          flex: 1,
+        }}>
+        {!initialized ? (
+          <Spinner />
+        ) : (
+          <FlatList<IPost>
+            data={keyword.length === 0 ? sample : posts}
+            contentContainerStyle={{
+              width: '100%',
+              // paddingTop: (insets.top || 24) + 46,
+              paddingTop: (insets.top || 24) + 43 + 12,
+              minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
+            }}
+            contentOffset={{
+              y: (insets.top ? insets.top + 6 : 43 + 24) + 12,
+              x: 0,
+            }}
+            onEndReached={onEndReached}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            renderItem={({item, index}) => (
+              // <TouchableOpacity>
+              <BookCard item={item} index={index} />
+              // </TouchableOpacity>
+            )}
+          />
+        )}
+      </View>
+    </View>
   );
 };
 
 const useStyles = makeStyles(theme => ({
   container: {
-    backgroundColor: theme.colors.background,
-    paddingHorizontal: 25,
-    // justifyContent: 'center',
-    borderTopRightRadius: 45,
-    borderTopLeftRadius: 45,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000',
   },
 }));
 export default SearchResult;

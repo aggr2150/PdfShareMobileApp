@@ -17,9 +17,9 @@ enum EnumSelectedIndex {
   '콜렉션',
 }
 
-const History = () => {
+const History = ({navigation}) => {
   const styles = useStyles();
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
   const [selectedIndex, setSelectedIndex] = useState<EnumSelectedIndex>(
     EnumSelectedIndex.히스토리,
   );

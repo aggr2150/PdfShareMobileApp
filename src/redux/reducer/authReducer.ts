@@ -5,7 +5,7 @@ interface authState {
   authState: EAuthState;
   session: Nullable<ISession>;
 }
-enum EAuthState {
+export enum EAuthState {
   INIT = 'INIT',
   NONE = 'NONE',
   AUTHORIZED = 'AUTHORIZED',
@@ -43,6 +43,6 @@ export const authSlice = createSlice({
   },
 });
 export const {signOut, signIn, initialized, editAccount} = authSlice.actions;
-export const authState = (state: RootState) => state.auth.authState;
+export const getAuthState = (state: RootState) => state.auth.authState;
 export const getSession = (state: RootState) => state.auth.session;
 export default authSlice.reducer;

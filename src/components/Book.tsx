@@ -32,7 +32,7 @@ const Book: React.FC<BookProps> = ({title, author, thumbnail}) => {
       //   uri: 'https://cdn.everypdf.cc/oG9zKbHFYs/4bee0b92-9add-4f8a-965f-5dd1538e6dce/thumbnail-1675343774579-360710141.jpeg.resize.webp',
       //   cache: FastImage.cacheControl.web,
       // }}
-      onError={() => console.log(123)}
+      // onError={() => console.log(123)}
       fallback={true}
     />
   ) : (

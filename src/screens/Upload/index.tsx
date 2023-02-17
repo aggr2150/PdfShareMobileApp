@@ -20,6 +20,7 @@ import ImagePicker, {Image} from 'react-native-image-crop-picker';
 import BackButton from '@components/BackButton';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import BookCover from '@components/BookCover';
+import CheckButton from '@components/CheckButton';
 
 type UploadProps = StackScreenProps<RootStackParamList, 'Upload'>;
 const Upload: React.FC<UploadProps> = ({navigation, route}) => {
@@ -81,6 +82,7 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
     // form.append('pdf', pdf);
     form.append('pdf', {uri: pdf?.uri, type: pdf?.type, name: pdf?.name});
     form.append('_csrf', csrfToken);
+    setPdf(undefined);
     apiInstance
       .post('/api/post/upload', form, {
         headers: {
@@ -138,8 +140,8 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
             <View style={{padding: 5}}>
               <BackButton onPress={() => navigation.goBack()} color={'white'} />
             </View>
-            <View>
-              <BackButton
+            <View style={{padding: 5}}>
+              <CheckButton
                 onPress={submit}
                 color={'white'}
                 disabled={title.length === 0 && !thumbnail && !pdf}
@@ -164,11 +166,11 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
                 paddingVertical: 5,
                 paddingHorizontal: 45,
                 marginBottom: 24,
-                backgroundColor: '#99c729',
+                backgroundColor: pdf ? '#3a3a3a' : '#99c729',
               }}
               title={
                 <View style={{alignItems: 'center', justifyContent: 'center'}}>
-                  <Text style={{fontSize: 8}} />
+                  <Text style={{fontSize: 8}}></Text>
                   <Text style={{fontSize: 13}}>내 PDF 업로드</Text>
                   <Text style={{fontSize: 8}}>(최대 20MB)</Text>
                 </View>
@@ -178,7 +180,6 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
               <TextInput
                 onChangeText={setTitle}
                 style={styles.titleInput}
-                keyboardType={'url'}
                 placeholderTextColor={'#1ba639'}
                 placeholder={'컨텐츠의 제목을 넣어주세요'}
                 autoCorrect={false}

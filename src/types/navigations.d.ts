@@ -6,6 +6,7 @@ declare type BottomTabParamList = {
 };
 declare type ProfileStackScreenParams = {
   My: undefined;
+  Revenue: undefined;
   Profile: IUser | {id: string};
 };
 declare type HistoryStackScreenParams = {
@@ -20,11 +21,17 @@ declare type SearchStackScreenParams = {
 
 declare type RootStackParamList = {
   Tabs: import('@react-navigation/native').NavigatorScreenParams<BottomTabParamList>;
+  ProfileTab: undefined;
+  Collection: {_id: string};
   Viewer: IPost;
   SignIn: undefined;
   Comments: {postId: string};
   Replies: IComment;
+  HistoryTab: undefined;
   History: undefined;
+  SearchTab: undefined;
+  Revenue: undefined;
+  SearchResult: {keyword: string};
   EditProfile: {
     id: string;
     nickname: string;

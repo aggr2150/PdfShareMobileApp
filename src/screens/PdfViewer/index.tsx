@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
+  Alert,
   Dimensions,
   Linking,
   Platform,
@@ -33,22 +34,22 @@ import ActionSheet, {
 import Separator from '@components/Seperator';
 import {StackScreenProps} from '@react-navigation/stack';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
-import {
-  postAdded,
-  postSetMany,
-  selectById,
-  updatePost,
-} from '@redux/reducer/postsReducer';
+import {postSetOne, selectById, updatePost} from '@redux/reducer/postsReducer';
 import Spinner from '@components/Spinner';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {likeAdded, likeRemoved} from '@redux/reducer/likesReducer';
 import BoxIcon from '@assets/icon/box.svg';
+import {getSession} from '@redux/reducer/authReducer';
+import TagText from '@components/TagText';
+import reactStringReplace from 'react-string-replace';
+
 type ViewerProps = StackScreenProps<RootStackParamList, 'Viewer'>;
 const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   const isDarkMode = useColorScheme() === 'dark';
   const post = useAppSelector(state =>
     selectById(state.posts, route.params._id),
   );
+  const session = useAppSelector(state => getSession(state));
   const backgroundStyle = {
     flex: 1,
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -80,12 +81,16 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
       .post<response<IPost>>('/api/post/' + route.params._id)
       .then(response => {
         if (response.data.data) {
-          dispatch(postSetMany(response.data.data));
+          console.log('response.data.data', response.data.data);
+          dispatch(postSetOne(response.data.data));
         }
       });
-  }, [dispatch, route.params._id]);
+  }, [session, dispatch, route.params._id]);
   const likeCallback = useCallback(() => {
-    if (post) {
+    if (!session) {
+      console.log('session', session);
+      SheetManager.show('loginSheet', {payload: {closable: true}}).then();
+    } else if (post) {
       console.log(post.likeStatus);
       dispatch(
         updatePost({
@@ -114,7 +119,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
           console.log('response', response.data);
         });
     }
-  }, [csrfToken, dispatch, post]);
+  }, [csrfToken, dispatch, post, session]);
 
   return !post ? (
     <Spinner />
@@ -134,11 +139,11 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
           },
         ]}>
         <Pdf
+          fitPolicy={0}
           trustAllCerts={false}
           source={source}
-          // source={require('../../assets/test_3.pdf')}
           onPageSingleTap={() => setUIVisible(prevState => !prevState)}
-          onLoadComplete={(numberOfPages, filePath) => {
+          onLoadComplete={numberOfPages => {
             console.log(`Number of pages: ${numberOfPages}`);
           }}
           onPageChanged={(page, numberOfPages) => {
@@ -172,15 +177,6 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                 height: 36,
                 borderRadius: 36,
                 backgroundColor: 'white',
-                // shadowColor: '#000',
-                // shadowOffset: {
-                //   width: 0,
-                //   height: 1,
-                // },
-                // shadowOpacity: 0.22,
-                // shadowRadius: 1.22,
-                // elevation: 1,
-
                 shadowColor: '#000',
                 shadowOffset: {
                   width: 0,
@@ -188,7 +184,6 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                 },
                 shadowOpacity: 0.22,
                 shadowRadius: 2.22,
-
                 elevation: 3,
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -223,11 +218,17 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
               }}>
               <TouchableOpacity
                 onPress={() => {
-                  SheetManager.show('appendToCollectionSheet', {
-                    payload: {
-                      postId: post._id,
-                    },
-                  }).then();
+                  if (!session) {
+                    SheetManager.show('loginSheet', {
+                      payload: {closable: true},
+                    }).then();
+                  } else {
+                    SheetManager.show('appendToCollectionSheet', {
+                      payload: {
+                        postId: post._id,
+                      },
+                    }).then();
+                  }
                 }}
                 style={{
                   width: 34,
@@ -377,9 +378,37 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
           </Animated.View>
         )}
       </View>
-      <ActionSheet ref={actionSheetRef}>
-        <View style={{backgroundColor: '#606060'}}>
-          <Text>abcabc</Text>
+      <ActionSheet
+        ref={actionSheetRef}
+        containerStyle={styles.sheetContainer}
+        useBottomSafeAreaPadding={true}>
+        <View style={{marginTop: 40}}>
+          <Pressable style={{paddingVertical: 10}}>
+            <Text>콘텐츠 신고</Text>
+          </Pressable>
+          <Pressable style={{paddingVertical: 10}}>
+            <Text>콘텐츠 차단</Text>
+          </Pressable>
+          <Pressable style={{paddingVertical: 10}}>
+            <Text>콘텐츠 수정</Text>
+          </Pressable>
+          <Pressable
+            style={{paddingVertical: 10}}
+            onPress={() => {
+              Alert.alert('삭제하시겠습니까?', undefined, [
+                {
+                  text: '취소',
+                  onPress: () => console.log('Ask me later pressed'),
+                },
+                {
+                  text: '삭제',
+                  onPress: () => console.log('Ask me later pressed'),
+                  style: 'destructive',
+                },
+              ]);
+            }}>
+            <Text>콘텐츠 삭제</Text>
+          </Pressable>
         </View>
       </ActionSheet>
       <ActionSheet
@@ -389,7 +418,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
         // drawUnderStatusBar={true}
         // statusBarTranslucent
         // snapPoints={[50]}
-        containerStyle={styles.sheetContainer}>
+        containerStyle={styles.scrollSheetContainer}>
         <ScrollView>
           <View style={{paddingVertical: 25}}>
             <Text style={styles.titleLabel}>이 PDF의 정보</Text>
@@ -406,19 +435,85 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
               <Text style={styles.contentText}>제목 : {post.title}</Text>
               <Text style={styles.contentText}>날짜 : 219023912380</Text>
               <Text style={styles.contentText}>
-                설명 : {post.content}
-                {/*능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ*/}
-                {/*나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으*/}
-                {/*아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으*/}
-                {/*ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으*/}
-                {/*아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ*/}
-                {/*능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아*/}
-                {/*ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능*/}
-                {/*미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣ*/}
-                {/*ㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미*/}
-                {/*ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ*/}
-                {/*느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣ*/}
-                {/*ㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ으ㅏ능미ㅏㅡ나미으아ㅣㅁ느ㅏㅣ*/}
+                설명 :{' '}
+                {reactStringReplace(
+                  reactStringReplace(
+                    `https://naver.com#ddd #ddmk dsanjkadnjknjksda`,
+                    // post.content,
+                    // /#(\w+)/g,
+                    /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi,
+                    link => (
+                      <TagText
+                        style={{
+                          color: 'blue',
+                          fontSize: 13,
+                        }}
+                        onPress={() => {
+                          console.log('def');
+                          // if (!navigation.getState().routes[0].state) {
+                          //   navigation.navigate('Tabs', {
+                          //     screen: 'SearchTab',
+                          //     params: {
+                          //       screen: 'SearchResult',
+                          //       initial: false,
+                          //       params: {
+                          //         keyword: tag,
+                          //       },
+                          //     },
+                          //   });
+                          // } else {
+                          //   navigation.navigate('SearchTab');
+                          //   navigation.dispatch(
+                          //     StackActions.push('SearchResult', {
+                          //       keyword: tag,
+                          //     }),
+                          //   );
+                          //   navigation.navigate('SearchResult', {
+                          //     keyword: tag,
+                          //   });
+                          // }
+                        }}>
+                        {link}
+                      </TagText>
+                    ),
+                  ),
+                  /#([\p{L}|\p{N}]{1,20})(?=\s|#|$)/giu,
+
+                  tag => (
+                    <TagText
+                      style={{
+                        color: 'yellow',
+                        fontSize: 13,
+                      }}
+                      onPress={() => {
+                        console.log('abc');
+                        // if (!navigation.getState().routes[0].state) {
+                        //   navigation.navigate('Tabs', {
+                        //     screen: 'SearchTab',
+                        //     params: {
+                        //       screen: 'SearchResult',
+                        //       initial: false,
+                        //       params: {
+                        //         keyword: link,
+                        //       },
+                        //     },
+                        //   });
+                        // } else {
+                        //   navigation.navigate('SearchTab');
+                        //   navigation.dispatch(
+                        //     StackActions.push('SearchResult', {
+                        //       keyword: link,
+                        //     }),
+                        //   );
+                        //   navigation.navigate('SearchResult', {
+                        //     keyword: tag,
+                        //   });
+                        // }
+                      }}>
+                      #{tag}
+                    </TagText>
+                  ),
+                )}
               </Text>
             </View>
           </View>
@@ -432,11 +527,14 @@ const useStyles = makeStyles(theme => ({
   sheetContainer: {
     backgroundColor: theme.colors.background,
     paddingHorizontal: 25,
-    // paddingBottom: 100,
-    // justifyContent: 'center',
     borderTopRightRadius: 45,
     borderTopLeftRadius: 45,
-    // backgroundColor: 'blue',
+  },
+  scrollSheetContainer: {
+    backgroundColor: theme.colors.background,
+    paddingHorizontal: 25,
+    borderTopRightRadius: 45,
+    borderTopLeftRadius: 45,
     height: '60%',
     maxHeight: '60%',
   },

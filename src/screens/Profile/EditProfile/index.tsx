@@ -12,6 +12,7 @@ import Toast from 'react-native-toast-message';
 import {useAppDispatch} from '@redux/store/RootStore';
 import {editAccount} from '@redux/reducer/authReducer';
 import {StackActions} from '@react-navigation/native';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 type EditProfileProps = StackScreenProps<RootStackParamList, 'EditProfile'>;
 
@@ -106,7 +107,7 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
   ]);
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <KeyboardAwareScrollView>
         <View
           style={[
             styles.backButton,
@@ -209,7 +210,7 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
         {/*<Input />*/}
         {/*<Input />*/}
         {/*<Input />*/}
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 };
@@ -264,7 +265,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.colors.black,
     color: theme.colors.secondary,
     fontFamily: 'Apple SD Gothic Neo',
-    textAlignVertical: 'center',
+    textAlignVertical: 'bottom',
     // alignSelf: 'stretch',
     textAlign: 'left',
     fontSize: 13,

@@ -10,21 +10,9 @@ import {Button, makeStyles, Text} from '@rneui/themed';
 import Upload from '@screens/Upload';
 import ResetPassword from '@screens/ResetPassword';
 import ResetPasswordConfirm from '@screens/ResetPassword/ResetPasswordConfirm';
+import Settings from '@screens/Settings';
 
 const RootStack = createStackNavigator<RootStackParamList>();
-
-function SettingsScreen({navigation}) {
-  return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text>Settings!</Text>
-      <Button
-        color={'primary'}
-        title={'navigate'}
-        onPress={() => navigation.goBack()}
-      />
-    </View>
-  );
-}
 
 const RootStackNavigator = () => {
   const styles = useStyles();
@@ -80,7 +68,7 @@ const RootStackNavigator = () => {
       />
       <RootStack.Screen
         name="Settings"
-        component={SettingsScreen}
+        component={Settings}
         options={{
           headerTintColor: 'white',
           headerStyle: {
@@ -89,6 +77,7 @@ const RootStackNavigator = () => {
           headerTitleStyle: {
             color: '#fff',
           },
+          headerLeftLabelVisible: false,
           // headerShown: false,
         }}
       />
