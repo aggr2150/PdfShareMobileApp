@@ -441,7 +441,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   return (
     <View
       style={{
-        paddingTop: insets.top,
+        paddingTop: insets.top || 5,
         paddingBottom: insets.bottom,
         paddingRight: insets.right,
         paddingLeft: insets.left,

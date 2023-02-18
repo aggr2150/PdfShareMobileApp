@@ -171,7 +171,9 @@ const Upload: React.FC<UploadProps> = ({navigation, route}) => {
               title={
                 <View style={{alignItems: 'center', justifyContent: 'center'}}>
                   <Text style={{fontSize: 8}}></Text>
-                  <Text style={{fontSize: 13}}>내 PDF 업로드</Text>
+                  <Text style={{fontSize: 13}}>
+                    {pdf ? 'PDF 선택완료' : '내 PDF 업로드'}
+                  </Text>
                   <Text style={{fontSize: 8}}>(최대 20MB)</Text>
                 </View>
               }

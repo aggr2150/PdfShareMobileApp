@@ -132,10 +132,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
           height: dimensions.height,
         },
       ]}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
+      <StatusBar barStyle={'dark-content'} backgroundColor={'#eee'} />
       <View
         style={[
           styles.container,
@@ -339,19 +336,24 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                 width: '100%',
                 // alignSelf: 'center',
               }}>
-              <Pressable
+              <View
                 style={[
                   styles.titleContainer,
                   {
-                    paddingBottom:
-                      insets.bottom + styles.titleContainer.paddingHorizontal,
+                    // alignSelf: 'center',
+                    //   paddingBottom:
+                    //     insets.bottom + styles.titleContainer.paddingHorizontal,
                   },
                 ]}
                 onPress={() => detailsActionSheetRef.current?.show()}>
                 <Pressable
+                  style={{
+                    paddingLeft: 15,
+                    paddingVertical: 8,
+                    flexDirection: 'row',
+                  }}
                   onPress={() => {
                     if (route.params?.author.id) {
-                      console.log(navigation.getState().routes[0].state);
                       if (!navigation.getState().routes[0].state) {
                         navigation.navigate('Tabs', {
                           screen: 'ProfileTab',
@@ -374,11 +376,31 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                     }
                   }}>
                   <Avatar style={{width: 20, height: 20, marginRight: 5}} />
+                  <Text>{post.author.nickname} 님의 </Text>
                 </Pressable>
-                <Text>
-                  {post.author.nickname} 님의 {post.title}
-                </Text>
-              </Pressable>
+                <Pressable
+                  onPress={() => detailsActionSheetRef.current?.show()}
+                  style={{
+                    flex: 1,
+                    paddingRight: 15,
+                    // justifyContent: 'center',
+                    // alignItems: 'center',
+                  }}>
+                  <View style={{flex: 1, justifyContent: 'center'}}>
+                    <Text
+                      style={
+                        {
+                          // flex: 1,
+                          // justifyContent: 'center',
+                          // alignSelf: 'center',
+                          // textAlignVertical: 'center',
+                        }
+                      }>
+                      {post.title}
+                    </Text>
+                  </View>
+                </Pressable>
+              </View>
             </Animated.View>
           </Animated.View>
         )}
@@ -587,8 +609,6 @@ const useStyles = makeStyles(theme => ({
   titleContainer: {
     alignItems: 'center',
     width: '100%',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
     flexDirection: 'row',
     backgroundColor: theme.colors.background,
   },
