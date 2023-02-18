@@ -14,6 +14,10 @@ import BackButton from '@components/BackButton';
 import Toast from 'react-native-toast-message';
 import {Button, Menu, Provider} from 'react-native-paper';
 import CollectionHeader from '@screens/History/CollectionList/CollectionHeader';
+import {
+  collectionSetMany,
+  collectionSetOne,
+} from '@redux/reducer/collectionsReducer';
 
 type CollectionProps = StackScreenProps<HistoryStackScreenParams, 'Collection'>;
 const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
@@ -24,21 +28,26 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
   const dispatch = useAppDispatch();
   const [title, setTitle] = useState(collection?.title);
   const [csrfToken, setCsrfToken] = useState<string>();
-  const [visible, setVisible] = React.useState(false);
   const initialize = useCallback(() => {
     apiInstance
-      .post('/api/feeds/collection', {collectionId: route.params._id})
+      .post<response<{collection: ICollection; feeds: IPost[]}>>(
+        '/api/feeds/collection',
+        {collectionId: route.params._id},
+      )
       .then(response => {
-        if (response.data.data.length !== 0) {
+        if (response.data.data.collection) {
           setCollection(response.data.data.collection);
+          dispatch(collectionSetOne(response.data.data.collection));
           // setData(response.data.data.feeds);
           console.log('feeds', response.data.data);
           setTitle(response.data.data.collection.title);
           dispatch(postSetMany(response.data.data.feeds));
           setFetching(false);
+        } else {
+          navigation.goBack();
         }
       });
-  }, [dispatch, route.params._id]);
+  }, [dispatch, navigation, route.params._id]);
 
   useEffect(() => {
     getCsrfToken.then(token => setCsrfToken(token));
@@ -51,8 +60,6 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
       return state.posts.entities[item] as IPost;
     });
   });
-  const closeMenu = () => setVisible(false);
-  const openMenu = () => setVisible(true);
   const submit = useCallback(() => {
     apiInstance
       .post('/api/collection/edit', {

@@ -64,6 +64,7 @@ declare interface IUser extends ISession {
   subscriberCounter: number;
   subscribingCounter: number;
   subscribeStatus?: boolean;
+  subscribedAt?: Date;
 }
 declare interface IComment {
   _id: string;

@@ -26,11 +26,9 @@ const FirstScene = () => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
-  const [initialized, setInitialized] = useState(false);
   const [data, setData] = useState<IHistoryPost[]>([]);
   const [fetching, setFetching] = useState(true);
   const dimensions = useWindowDimensions();
-  const tabBarHeight = useBottomTabBarHeight();
   const dispatch = useAppDispatch();
   // const pagingKey =
   useEffect(() => {
@@ -66,7 +64,7 @@ const FirstScene = () => {
             setFetching(false);
             setRefreshing(false);
           });
-      }),
+      }, 1000),
     [dispatch],
   );
   const onEndReached = useCallback(() => {

@@ -1,27 +1,22 @@
 import React, {useState} from 'react';
-import {Pressable, ScrollView, View} from 'react-native';
-import {makeStyles, Text} from '@rneui/themed';
-import {useNavigation} from '@react-navigation/native';
+import {View} from 'react-native';
+import {makeStyles} from '@rneui/themed';
 import ToggleBtn from '@components/ToggleBtn';
 import Pages from '@components/Pages';
 import FirstScene from '@screens/History/FirstScene';
 import SecondScene from '@screens/History/SecondScene';
-import Separator from '@components/Seperator';
-import {SheetManager} from 'react-native-actions-sheet';
-import ThrottleFlatList from '@components/ThrottleFlatlist';
-import PlusIcon from '@assets/icon/plus2.svg';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 enum EnumSelectedIndex {
-  '히스토리',
-  '콜렉션',
+  'History',
+  'Collection',
 }
 
-const History = ({navigation}) => {
+const History = () => {
   const styles = useStyles();
   // const navigation = useNavigation();
   const [selectedIndex, setSelectedIndex] = useState<EnumSelectedIndex>(
-    EnumSelectedIndex.히스토리,
+    EnumSelectedIndex.History,
   );
   const insets = useSafeAreaInsets();
   return (

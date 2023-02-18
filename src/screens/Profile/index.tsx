@@ -13,19 +13,19 @@ import {
   userSetMany,
 } from '@redux/reducer/usersReducer';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
-import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
-import {selectAll, setAllLike} from '@redux/reducer/likesReducer';
+import {postSetMany} from '@redux/reducer/postsReducer';
+import {likeSetMany, selectAll, setAllLike} from '@redux/reducer/likesReducer';
 import {getSession} from '@redux/reducer/authReducer';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import SubscribingRow from '@components/SubscribingRow';
 import {SheetManager} from 'react-native-actions-sheet';
 import _ from 'underscore';
-import {useSelector} from 'react-redux';
+import {throttle} from 'lodash';
 
 enum ETabIndex {
   'PDF',
   'Likes',
-  'Follow',
+  'Subscribing',
 }
 
 type ProfileProps = StackScreenProps<
@@ -42,6 +42,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   const user = useAppSelector(state =>
     selectById(state.users, route.params?.id || session?.id || ''),
   );
+  const [fetching, setFetching] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [csrfToken, setCsrfToken] = useState<string>();
   const [tabData, setTabData] = useState<[IPost[], ILikePost[], IUser[]]>([
@@ -92,31 +93,25 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
       })
       .then(response => {
         if (response.data.code === 200 && response.data.data.user) {
-          console.log('responseresponse', response.data.data);
           dispatch(setOneUser(response.data.data.user));
           dispatch(postSetMany(response.data.data.feeds));
-          dispatch(setAllLike(response.data.data.likes));
-          dispatch(userSetMany(response.data.data.subscribing));
+          if (response.data.data.likes) {
+            dispatch(postSetMany(response.data.data.likes));
+            dispatch(setAllLike(response.data.data.likes));
+          }
+          if (response.data.data.subscribing) {
+            dispatch(userSetMany(response.data.data.subscribing));
+          }
           setTabData([
             response.data.data.feeds,
-            response.data.data.likes,
-            response.data.data.subscribing,
+            response.data.data.likes || [],
+            response.data.data.subscribing || [],
           ]);
-          // if (response.data.data.feeds.length !== 0) {
-          //   setTabData([
-          //     response.data.data.feeds,
-          //     response.data.data.likes,
-          //     response.data.data.subscribing,
-          //   ]);
-          //   dispatch(postSetMany(response.data.data.feeds));
-          // }
-          // if (
-          //   response.data.data.likes &&
-          //   response.data.data.likes.length !== 0
-          // ) {
-          //   dispatch(setAllLike(response.data.data.likes));
-          // }
         }
+      })
+      .finally(() => {
+        setFetching(false);
+        setRefreshing(false);
       });
   }, [dispatch, route.params?.id]);
 
@@ -139,16 +134,16 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
           if (response.data.data.feeds.length !== 0) {
             setTabData([
               response.data.data.feeds,
-              response.data.data.likes,
-              response.data.data.subscribing,
+              response.data.data.likes || [],
+              response.data.data.subscribing || [],
             ]);
-            console.log(response.data.data.subscribing);
             dispatch(postSetMany(response.data.data.feeds));
           }
           if (
             response.data.data.likes &&
             response.data.data.likes.length !== 0
           ) {
+            dispatch(postSetMany(response.data.data.likes));
             dispatch(setAllLike(response.data.data.likes));
           }
           if (
@@ -160,25 +155,26 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
         }
       })
       .finally(() => {
+        setFetching(false);
         setRefreshing(false);
       });
   }, [dispatch, route.params?.id]);
 
   let data;
   const subscribe = useCallback(
-    user => {
-      console.log('subscribe', user, user.subscribeStatus);
+    (targetUser: IUser) => {
       if (!session) {
         SheetManager.show('loginSheet', {payload: {closable: true}}).then();
-      } else if (user && user._id !== session._id) {
+      } else if (targetUser && targetUser._id !== session._id) {
         dispatch(
           updateManyUser([
             {
-              id: user.id,
+              id: targetUser.id,
               changes: {
-                subscribeStatus: !user.subscribeStatus,
+                subscribeStatus: !targetUser.subscribeStatus,
                 subscriberCounter:
-                  user.subscriberCounter + (!user.subscribeStatus ? +1 : -1),
+                  targetUser.subscriberCounter +
+                  (!targetUser.subscribeStatus ? +1 : -1),
               },
             },
             ...(sessionUser
@@ -188,7 +184,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
                     changes: {
                       subscribingCounter:
                         sessionUser.subscribingCounter +
-                        (!user.subscribeStatus ? +1 : -1),
+                        (!targetUser.subscribeStatus ? +1 : -1),
                     },
                   },
                 ]
@@ -196,22 +192,22 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
           ]),
         );
         apiInstance
-          .post<response>('/api/subscribe/' + user._id, {
-            subscribeStatus: !user.subscribeStatus,
+          .post<response>('/api/subscribe/' + targetUser._id, {
+            subscribeStatus: !targetUser.subscribeStatus,
             _csrf: csrfToken,
           })
           .then(response => {
-            console.log('response', response.data, user.subscribeStatus);
+            console.log('response', response.data, targetUser.subscribeStatus);
             if (response.data.code !== 200) {
               dispatch(
                 updateManyUser([
                   {
-                    id: user.id,
+                    id: targetUser.id,
                     changes: {
-                      subscribeStatus: user.subscribeStatus,
+                      subscribeStatus: targetUser.subscribeStatus,
                       subscriberCounter:
-                        user.subscriberCounter +
-                        (user.subscribeStatus ? +1 : -1),
+                        targetUser.subscriberCounter +
+                        (targetUser.subscribeStatus ? +1 : -1),
                     },
                   },
                   ...(sessionUser
@@ -221,7 +217,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
                           changes: {
                             subscribingCounter:
                               sessionUser.subscribingCounter +
-                              (user.subscribeStatus ? +1 : -1),
+                              (targetUser.subscribeStatus ? +1 : -1),
                           },
                         },
                       ]
@@ -231,15 +227,15 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
             }
           })
           .catch(() => {
-            console.log('catch');
             dispatch(
               updateManyUser([
                 {
-                  id: user.id,
+                  id: targetUser.id,
                   changes: {
-                    subscribeStatus: user.subscribeStatus,
+                    subscribeStatus: targetUser.subscribeStatus,
                     subscriberCounter:
-                      user.subscriberCounter + (user.subscribeStatus ? +1 : -1),
+                      targetUser.subscriberCounter +
+                      (targetUser.subscribeStatus ? +1 : -1),
                   },
                 },
                 ...(sessionUser
@@ -249,7 +245,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
                         changes: {
                           subscribingCounter:
                             sessionUser.subscribingCounter +
-                            (user.subscribeStatus ? +1 : -1),
+                            (targetUser.subscribeStatus ? +1 : -1),
                         },
                       },
                     ]
@@ -263,30 +259,174 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
     },
     [session, dispatch, sessionUser, csrfToken],
   );
+
+  const PDFThrottleEventCallback = useMemo(
+    () =>
+      throttle((pagingKey, initial?) => {
+        setFetching(true);
+        apiInstance
+          .post<response<IPost[]>>('/api/feeds/user', {
+            id: route.params?.id,
+            pagingKey,
+          })
+          .then(response => {
+            if (response.data.data.length !== 0) {
+              if (initial) {
+                setTabData(prevState => [
+                  response.data.data,
+                  prevState[1],
+                  prevState[2],
+                ]);
+              } else {
+                setTabData(prevState => [
+                  [...prevState[0], ...response.data.data],
+                  prevState[1],
+                  prevState[2],
+                ]);
+              }
+              dispatch(postSetMany(response.data.data));
+            }
+          })
+          .catch(error => console.log(error))
+          .finally(() => {
+            setFetching(false);
+            setRefreshing(false);
+          });
+      }, 1000),
+    [dispatch, route.params?.id],
+  );
+
+  const LikesThrottleEventCallback = useMemo(
+    () =>
+      throttle(
+        (pagingKey, initial?) => {
+          setFetching(true);
+          console.log('thth');
+          apiInstance
+            .post<response<ILikePost[]>>('/api/feeds/likes', {
+              pagingKey,
+            })
+            .then(response => {
+              console.log(response.data.data);
+              if (response.data.data.length !== 0) {
+                if (initial) {
+                  setTabData(prevState => [
+                    prevState[0],
+                    response.data.data,
+                    prevState[2],
+                  ]);
+                } else {
+                  setTabData(prevState => [
+                    prevState[0],
+                    [...prevState[1], ...response.data.data],
+                    prevState[2],
+                  ]);
+                }
+                dispatch(postSetMany(response.data.data));
+                dispatch(likeSetMany(response.data.data));
+              }
+            })
+            .catch(error => console.log(error))
+            .finally(() => {
+              setFetching(false);
+              setRefreshing(false);
+            });
+        },
+        1000,
+        // {leading: true, trailing: false},
+      ),
+    [dispatch],
+  );
+
+  const SubscribingThrottleEventCallback = useMemo(
+    () =>
+      throttle((pagingKey, initial?) => {
+        setFetching(true);
+        apiInstance
+          .post<response<IUser[]>>('/api/user/subscribing', {
+            pagingKey,
+          })
+          .then(response => {
+            if (response.data.data.length !== 0) {
+              if (initial) {
+                setTabData(prevState => [
+                  prevState[0],
+                  prevState[1],
+                  response.data.data,
+                ]);
+              } else {
+                setTabData(prevState => [
+                  prevState[0],
+                  prevState[1],
+                  [...prevState[2], ...response.data.data],
+                ]);
+              }
+              dispatch(userSetMany(response.data.data));
+            }
+          })
+          .catch(error => console.log(error))
+          .finally(() => {
+            setFetching(false);
+            setRefreshing(false);
+          });
+      }, 1000),
+    [dispatch],
+  );
+
+  const onEndReached = useCallback(() => {
+    if (!fetching) {
+      switch (selectedIndex) {
+        case ETabIndex.PDF:
+          PDFThrottleEventCallback(tabData[0][tabData[0].length - 1]?._id);
+          break;
+        case ETabIndex.Likes:
+          LikesThrottleEventCallback(tabData[1][tabData[1].length - 1]?.likeAt);
+          break;
+        case ETabIndex.Subscribing:
+          console.log(tabData[2]);
+          SubscribingThrottleEventCallback(
+            tabData[2][tabData[2].length - 1]?.subscribedAt,
+          );
+          break;
+      }
+    }
+  }, [
+    fetching,
+    selectedIndex,
+    PDFThrottleEventCallback,
+    tabData,
+    LikesThrottleEventCallback,
+    SubscribingThrottleEventCallback,
+  ]);
+
   const renderItem = useMemo<
-    React.FC<{item: IPost; index: number}>
-  >((): React.FC<{item: IPost; index: number}> => {
+    React.FC<{item: IPost | IUser; index: number}>
+  >((): React.FC<{item: IPost | IUser; index: number}> => {
     switch (selectedIndex) {
       case ETabIndex.PDF:
         return ({item, index}) => (
           <Animated.View entering={FadeIn}>
-            <BookCard item={item} index={index} />
-          </Animated.View>
-        );
-      case ETabIndex.Follow:
-        return ({item, index}) => (
-          <Animated.View entering={FadeIn}>
-            <SubscribingRow item={item} index={index} subscribe={subscribe} />
+            <BookCard item={item as IPost} index={index} />
           </Animated.View>
         );
       case ETabIndex.Likes:
         return ({item, index}) => (
           <Animated.View entering={FadeIn}>
-            <BookCard item={item} index={index} />
+            <BookCard item={item as IPost} index={index} />
+          </Animated.View>
+        );
+      case ETabIndex.Subscribing:
+        return ({item, index}) => (
+          <Animated.View entering={FadeIn}>
+            <SubscribingRow
+              item={item as IUser}
+              index={index}
+              subscribe={subscribe}
+            />
           </Animated.View>
         );
     }
-  }, [selectedIndex]);
+  }, [selectedIndex, subscribe]);
   switch (selectedIndex) {
     case 0:
       data = PDFData;
@@ -311,7 +451,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
       {!user ? (
         <Spinner />
       ) : (
-        <FlatList<IPost>
+        <FlatList<IPost | IUser>
           data={data}
           onRefresh={onRefresh}
           refreshing={refreshing}
@@ -322,6 +462,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
           // exiting={SlideOutLeft}
           // style={{overflow: 'visible'}}
           // contentContainerStyle={{width: '100%'}}
+          onEndReached={onEndReached}
           ListHeaderComponent={() => (
             <ProfileListHeader
               user={user}

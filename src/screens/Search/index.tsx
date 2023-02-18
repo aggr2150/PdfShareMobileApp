@@ -83,7 +83,7 @@ const Search = () => {
             setFetching(false);
             setRefreshing(false);
           });
-      }),
+      }, 1000),
     [dispatch],
   );
   const onChangeText = useCallback(
@@ -102,7 +102,7 @@ const Search = () => {
     [throttleEventCallback, throttleKeywordEventCallback],
   );
   const onEndReached = useCallback(() => {
-    if (!fetching) {
+    if (!fetching && keyword.length !== 0) {
       // data[data.length - 1]?._id
       throttleKeywordEventCallback(
         keyword,
@@ -115,8 +115,23 @@ const Search = () => {
     setRefreshing(true);
     if (keyword.length !== 0) {
       throttleKeywordEventCallback(keyword, undefined, true);
+    } else {
+      apiInstance
+        .post<response<IPost[]>>('/api/feeds/sample')
+        .then(response => {
+          if (response.data.data.length !== 0) {
+            setSample(response.data.data);
+            dispatch(postSetMany(response.data.data));
+            // setFetching(false);
+            setInitialized(true);
+          }
+        })
+        .finally(() => {
+          setFetching(false);
+          setRefreshing(false);
+        });
     }
-  }, [keyword, throttleKeywordEventCallback]);
+  }, [dispatch, keyword, throttleKeywordEventCallback]);
   const posts = useAppSelector(state => {
     return data.map(item => state.posts.entities[item._id] || item);
   });

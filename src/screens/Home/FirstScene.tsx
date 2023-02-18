@@ -1,17 +1,11 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {makeStyles} from '@rneui/themed';
 import BookCard from '@components/BookCard';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {
-  FlatList,
-  Pressable,
-  TouchableOpacity,
-  useWindowDimensions,
-} from 'react-native';
+import {FlatList, useWindowDimensions} from 'react-native';
 import {apiInstance} from '@utils/Networking';
 import _ from 'lodash';
-import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
-import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
+import {postSetMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {TestIds, useInterstitialAd} from 'react-native-google-mobile-ads';
 
@@ -20,19 +14,10 @@ const FirstScene = () => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
-  const [initialized, setInitialized] = useState(false);
   const [data, setData] = useState<IPost[]>([]);
   const [fetching, setFetching] = useState(true);
   const dimensions = useWindowDimensions();
-  const tabBarHeight = useBottomTabBarHeight();
   const dispatch = useAppDispatch();
-  const {isLoaded, isClosed, load, show} = useInterstitialAd(adUnitId, {
-    requestNonPersonalizedAdsOnly: true,
-  });
-  useEffect(() => {
-    // Start loading the interstitial straight away
-    load();
-  }, [load]);
   useEffect(() => {
     apiInstance.post<response<IPost[]>>('/api/feeds/recent').then(response => {
       if (response.data.data.length !== 0) {
@@ -62,7 +47,7 @@ const FirstScene = () => {
             setFetching(false);
             setRefreshing(false);
           });
-      }),
+      }, 1000),
     [dispatch],
   );
   const onEndReached = useCallback(() => {

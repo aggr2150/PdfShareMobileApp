@@ -48,7 +48,7 @@ const SecondScene: React.FC = () => {
             }
           })
           .finally(() => setFetching(false));
-      }),
+      }, 1000),
     [dispatch],
   );
   const onEndReached = useCallback(() => {

@@ -34,6 +34,7 @@ const likesSlice = createSlice({
       likeAdapter.setOne(state, action.payload.likes);
     },
     setAllLike: likeAdapter.setAll,
+    likeSetMany: likeAdapter.setMany,
     updateLike: likeAdapter.updateOne,
     likeRemoved: likeAdapter.removeOne,
   },
@@ -44,6 +45,7 @@ export const {
   likeAddedMany,
   updateLike,
   setOneLike,
+  likeSetMany,
   setAllLike,
   likeAdded,
   likeRemoved,

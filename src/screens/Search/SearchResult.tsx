@@ -91,7 +91,7 @@ const SearchResult: React.FC<SearchResultProps> = ({navigation, route}) => {
             setFetching(false);
             setRefreshing(false);
           });
-      }),
+      }, 1000),
     [dispatch],
   );
   const onChangeText = useCallback(

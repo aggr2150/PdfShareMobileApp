@@ -211,7 +211,10 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
                 />
                 <Menu.Item
                   dense={true}
-                  onPress={() => navigation.navigate('Revenue')}
+                  onPress={() => {
+                    navigation.navigate('Revenue');
+                    closeMenu();
+                  }}
                   title={<Text style={styles.menuText}>광고 수익</Text>}
                 />
                 <Divider />

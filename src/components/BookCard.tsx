@@ -5,6 +5,7 @@ import {useNavigation} from '@react-navigation/native';
 import Book from '@src/components/Book';
 import {TestIds, useInterstitialAd} from 'react-native-google-mobile-ads';
 import {humanizeNumber} from '@utils/Humanize';
+import InterstitialAdsController from '@components/InterstitialAdsController';
 
 interface BookCardProps {
   item: IPost;
@@ -37,21 +38,10 @@ const getBackgroundColor = (index: number) => {
 const BookCard: React.FC<BookCardProps> = ({item, index, onPress}) => {
   const styles = useStyles();
   const navigation = useNavigation();
-  const {isLoaded, isClosed, load, show} = useInterstitialAd(adUnitId, {
-    requestNonPersonalizedAdsOnly: true,
-  });
-  useEffect(() => {
-    // Start loading the interstitial straight away
-    load();
-  }, [load]);
   return (
     <Pressable
       onPress={() => {
-        if (isLoaded) {
-          show();
-        } else {
-          load();
-        }
+        InterstitialAdsController.requestAds();
         navigation.navigate('Viewer', item);
       }}
       style={{

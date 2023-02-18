@@ -72,7 +72,7 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
             setFetching(false);
             setRefreshing(false);
           });
-      }),
+      }, 1000),
     [dispatch, route.params.parentCommentId, route.params.postId],
   );
   const onEndReached = useCallback(() => {

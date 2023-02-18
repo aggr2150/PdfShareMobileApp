@@ -124,7 +124,14 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   return !post ? (
     <Spinner />
   ) : (
-    <View style={backgroundStyle}>
+    <View
+      style={[
+        backgroundStyle,
+        {
+          width: dimensions.width,
+          height: dimensions.height,
+        },
+      ]}>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
@@ -134,8 +141,6 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
           styles.container,
           {
             overflow: 'visible',
-            width: dimensions.width,
-            height: dimensions.height,
           },
         ]}>
         <Pdf

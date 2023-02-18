@@ -71,8 +71,8 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
             setFetching(false);
             setRefreshing(false);
           });
-      }),
-    [dispatch],
+      }, 1000),
+    [dispatch, route.params.postId],
   );
   const onEndReached = useCallback(() => {
     if (!fetching) {

@@ -29,9 +29,7 @@ const collectionsSlice = createSlice({
   reducers: {
     collectionAdded: collectionAdapter.addOne,
     collectionAddedMany: collectionAdapter.addMany,
-    collectionSetOne: (state, action) => {
-      collectionAdapter.setOne(state, action.payload.collections);
-    },
+    collectionSetOne: collectionAdapter.setOne,
     collectionSetMany: collectionAdapter.setMany,
     setAll: collectionAdapter.setAll,
     updateCollection: collectionAdapter.updateOne,

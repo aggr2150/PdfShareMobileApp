@@ -9,6 +9,7 @@ import {selectById} from '@redux/reducer/usersReducer';
 interface SubscribingRowProps {
   item: IUser;
   index: number;
+  subscribe: (targetUser: IUser) => void;
 }
 
 // const interstitial = InterstitialAd.createForAdRequest(adUnitId, {

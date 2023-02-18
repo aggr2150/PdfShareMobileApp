@@ -76,7 +76,7 @@ const Revenue: React.FC<RevenueProps> = ({navigation, route}) => {
             setFetching(false);
             setRefreshing(false);
           });
-      }),
+      }, 1000),
     [],
   );
 

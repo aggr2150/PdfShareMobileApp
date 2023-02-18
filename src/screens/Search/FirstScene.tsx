@@ -48,7 +48,7 @@ const FirstScene = () => {
             setFetching(false);
             setRefreshing(false);
           });
-      }),
+      }, 1000),
     [dispatch],
   );
   const onEndReached = useCallback(() => {
