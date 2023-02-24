@@ -21,6 +21,7 @@ import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {getSession, signOut} from '@redux/reducer/authReducer';
 import {selectById, updateManyUser} from '@redux/reducer/usersReducer';
 import {SheetManager} from 'react-native-actions-sheet';
+import Separator from '@components/Seperator';
 
 interface ProfileListHeaderProps {
   selectedIndex: number;
@@ -176,6 +177,7 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
             </Pressable>
           )}
           <Menu
+            anchorPosition={'bottom'}
             visible={visible}
             onDismiss={closeMenu}
             contentStyle={{backgroundColor: 'black'}}
@@ -217,7 +219,8 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
                   }}
                   title={<Text style={styles.menuText}>광고 수익</Text>}
                 />
-                <Divider />
+                <Separator />
+                {/*<Divider />*/}
                 <Menu.Item
                   dense={true}
                   onPress={() => {
@@ -279,24 +282,26 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
         <View style={{marginBottom: 4}}>
           <Text style={styles.nicknameText}>{user?.nickname}</Text>
         </View>
-        <View style={{flexDirection: 'row'}}>
-          <View style={{marginHorizontal: 20}}>
-            <Text style={styles.counterText}>
-              구독자 {user?.subscriberCounter}명
-            </Text>
+        {user && (
+          <View style={{flexDirection: 'row'}}>
+            <View style={{marginHorizontal: 20}}>
+              <Text style={styles.counterText}>
+                구독자 {user?.subscriberCounter}명
+              </Text>
+            </View>
+            <View style={{marginHorizontal: 20}}>
+              <Text style={styles.counterText}>PDF {user?.postCounter}개</Text>
+            </View>
           </View>
-          <View style={{marginHorizontal: 20}}>
-            <Text style={styles.counterText}>PDF {user?.postCounter}개</Text>
-          </View>
-        </View>
-        {!isMine && (
+        )}
+        {!isMine && user && (
           <Button
             buttonStyle={{
               borderRadius: 24,
               paddingVertical: 15,
               paddingHorizontal: 60,
               marginVertical: 15,
-              backgroundColor: user?.subscribeStatus ? '#3a3a3a' : '#99c729',
+              backgroundColor: user.subscribeStatus ? '#3a3a3a' : '#99c729',
             }}
             onPress={subscribe}
             titleStyle={styles.subscribeButtonTitle}
@@ -304,9 +309,11 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
           />
         )}
       </View>
-      <View style={{flex: 1}}>
-        <Text style={{width: '100%', padding: 15}}>{user?.description}</Text>
-      </View>
+      {user && (
+        <View style={{flex: 1}}>
+          <Text style={{width: '100%', padding: 15}}>{user?.description}</Text>
+        </View>
+      )}
       {isMine && (
         <ButtonGroup
           buttons={['내 PDF', '좋아요', '구독중']}

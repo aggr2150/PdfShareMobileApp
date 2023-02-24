@@ -1,6 +1,7 @@
 import {
   FlatList,
   KeyboardAvoidingView,
+  ListRenderItem,
   Platform,
   RefreshControl,
   TextInput,
@@ -14,12 +15,24 @@ import Comment from '@components/Comment';
 import SendIcon from '@assets/icon/send.svg';
 import {StackScreenProps} from '@react-navigation/stack';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
-import {commentAdded, commentAddedMany} from '@redux/reducer/commentsReducer';
+import {
+  commentAdded,
+  commentAddedMany,
+  commentSetMany,
+  removeComment,
+  updateComment,
+} from '@redux/reducer/commentsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import _ from 'lodash';
-import {postAddedMany} from '@redux/reducer/postsReducer';
+import {postAddedMany, updatePost} from '@redux/reducer/postsReducer';
 // import {useHeaderHeight} from 'react-native-screens/native-stack';
 import {useHeaderHeight} from '@react-navigation/elements';
+import {getSession} from '@redux/reducer/authReducer';
+import {SheetManager} from 'react-native-actions-sheet';
+import {likeAdded, likeRemoved} from '@redux/reducer/likesReducer';
+import {updateManyUser} from '@redux/reducer/usersReducer';
+import Spinner from '@components/Spinner';
+import ListEmptyComponent from '@components/ListEmptyComponent';
 
 type CommentsProps = StackScreenProps<RootStackParamList, 'Comments'>;
 const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
@@ -31,8 +44,16 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
   const [refreshing, setRefreshing] = useState(false);
   const dispatch = useAppDispatch();
   const [content, setContent] = useState('');
+  const headerHeight = useHeaderHeight();
   const comments = useAppSelector(state => {
-    return data.map(item => state.comments.entities[item._id] as IComment);
+    return data.reduce<IComment[]>((previousValue, currentValue) => {
+      currentValue &&
+        state.comments.entities[currentValue._id] &&
+        previousValue.push(
+          state.comments.entities[currentValue._id] as IComment,
+        );
+      return previousValue;
+    }, []);
   });
   useEffect(() => {
     getCsrfToken.then(token => setCsrfToken(token));
@@ -42,11 +63,12 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
       })
       .then(response => {
         if (response.data.data) {
-          dispatch(commentAddedMany(response.data.data));
+          dispatch(commentSetMany(response.data.data));
           setData(response.data.data);
         }
       });
   }, [dispatch, route.params.postId]);
+  const session = useAppSelector(state => getSession(state));
   const throttleEventCallback = useMemo(
     () =>
       _.throttle((pagingKey, initial?) => {
@@ -63,7 +85,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
               } else {
                 setData(prevState => [...prevState, ...response.data.data]);
               }
-              dispatch(commentAddedMany(response.data.data));
+              dispatch(commentSetMany(response.data.data));
             }
           })
           .catch(error => console.log(error))
@@ -84,7 +106,6 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
     throttleEventCallback.cancel();
     throttleEventCallback(undefined, true);
   }, [throttleEventCallback]);
-  const headerHeight = useHeaderHeight();
   const submit = useCallback(() => {
     apiInstance
       .post<response<IComment>>('/api/comment/write', {
@@ -100,24 +121,116 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
         }
       });
   }, [content, csrfToken, dispatch, route.params.postId]);
+  const deleteCallback = useCallback(
+    (comment: IComment) => {
+      if (!session) {
+        SheetManager.show('loginSheet', {payload: {closable: true}}).then();
+      } else if (comment && comment.author._id === session._id) {
+        dispatch(removeComment(comment._id));
+        apiInstance
+          .post('/api/comment/delete' + comment._id, {
+            commentId: !comment._id,
+            _csrf: csrfToken,
+          })
+          .then(response => {
+            if (response.data.code !== 200) {
+              dispatch(commentAdded(comment));
+            }
+          })
+          .catch(() => {
+            dispatch(commentAdded(comment));
+          });
+      }
+    },
+    [csrfToken, dispatch, session],
+  );
+  const likeCallback = useCallback(
+    (comment: IComment) => {
+      if (!session) {
+        console.log('session', session);
+        SheetManager.show('loginSheet', {payload: {closable: true}}).then();
+      } else if (comment) {
+        dispatch(
+          updateComment({
+            id: comment._id,
+            changes: {
+              likeStatus: !comment.likeStatus,
+              likeCounter: !comment.likeStatus
+                ? comment.likeCounter + 1
+                : comment.likeCounter - 1,
+            },
+          }),
+        );
+        apiInstance
+          .post('/api/like/comment/' + comment._id, {
+            likeStatus: !comment.likeStatus,
+            _csrf: csrfToken,
+          })
+          .then(response => {
+            if (response.data.code !== 200) {
+              dispatch(
+                updateComment({
+                  id: comment._id,
+                  changes: {
+                    likeStatus: comment.likeStatus,
+                    likeCounter:
+                      comment.likeCounter + (comment.likeStatus ? +1 : -1),
+                  },
+                }),
+              );
+            }
+          })
+          .catch(() => {
+            dispatch(
+              updateComment({
+                id: comment._id,
+                changes: {
+                  likeStatus: comment.likeStatus,
+                  likeCounter:
+                    comment.likeCounter + (comment.likeStatus ? +1 : -1),
+                },
+              }),
+            );
+          });
+      }
+    },
+    [csrfToken, dispatch, session],
+  );
+  const renderItem = useMemo(
+    () => {
+      const render: ListRenderItem<IComment> = props => {
+        return (
+          <Comment
+            navigation={navigation}
+            session={session}
+            isMine={session?._id === props.item.author._id}
+            likeCallback={likeCallback}
+            deleteCallback={deleteCallback}
+            item={props.item}
+          />
+        );
+      };
+      return render;
+    }, // props => <Comment {...props} />,
+    [deleteCallback, likeCallback, navigation, session],
+  );
   return (
-    <SafeAreaView style={{flex: 1}} edges={['bottom', 'left', 'right']}>
-      <View style={{flex: 1, paddingHorizontal: 15}}>
-        <FlatList
-          // scrollEnabled={true}
+    <SafeAreaView style={{flex: 1}} edges={['left', 'right', 'bottom']}>
+      <View style={{flex: 1}}>
+        <FlatList<IComment>
           data={comments}
-          renderItem={Comment}
+          // renderItem={props => <Comment item={props.item} />}
+          renderItem={renderItem}
           // inverted={true}
           onEndReached={onEndReached}
           onRefresh={onRefresh}
           refreshing={refreshing}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={'white'}
-              titleColor={'white'}
-            />
+          ListEmptyComponent={() =>
+            fetching ? (
+              <Spinner />
+            ) : (
+              <ListEmptyComponent>빈 콜렉션입니다.</ListEmptyComponent>
+            )
           }
         />
       </View>
@@ -131,8 +244,6 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
         <View
           style={{
             flexDirection: 'row',
-            // justifyContent: 'center',
-            // alignItems: 'center',
           }}>
           <View
             style={{

@@ -1,4 +1,5 @@
 import {
+  Alert,
   Pressable,
   SectionList,
   SectionListRenderItem,
@@ -10,6 +11,7 @@ import Separator from '@components/Seperator';
 
 interface SectionItem {
   labelText: string;
+  onPress: () => void;
 }
 // const section = [{labelText: '회원탈퇴'}];
 const Settings = ({navigation}) => {
@@ -20,7 +22,25 @@ const Settings = ({navigation}) => {
           {
             title: 'Title1',
             data: [
-              {labelText: '회원탈퇴'},
+              {
+                labelText: '회원탈퇴',
+                onPress: () =>
+                  Alert.alert('탈퇴하시겠습니까?', undefined, [
+                    {
+                      text: '취소',
+                      onPress: () => console.log('Ask me later pressed'),
+                    },
+                    {
+                      text: '탈퇴',
+                      onPress: () => console.log('Ask me later pressed'),
+                      style: 'destructive',
+                    },
+                  ]),
+              },
+              {
+                labelText: '비밀번호 변경',
+                onPress: () => navigation.navigate('PasswordReset'),
+              },
               {labelText: '1:1 문의'},
               {labelText: '차단 관리'},
             ],
@@ -40,7 +60,9 @@ const Settings = ({navigation}) => {
 };
 const ListItem: SectionListRenderItem<SectionItem> = item => {
   return (
-    <Pressable style={{paddingHorizontal: 20, paddingVertical: 12}}>
+    <Pressable
+      style={{paddingHorizontal: 20, paddingVertical: 12}}
+      onPress={item.item.onPress}>
       <Text style={{fontSize: 13}}>{item.item.labelText}</Text>
     </Pressable>
   );

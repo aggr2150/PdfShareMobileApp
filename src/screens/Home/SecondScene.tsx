@@ -24,7 +24,7 @@ const SecondScene: React.FC = () => {
     apiInstance
       .post<response<IPost[]>>('/api/feeds/subscribe')
       .then(response => {
-        if (response.data.data.length !== 0) {
+        if (response.data.code === 200 && response.data.data.length !== 0) {
           setData(prevState => [...prevState, ...response.data.data]);
           dispatch(postSetMany(response.data.data));
         }
@@ -36,7 +36,7 @@ const SecondScene: React.FC = () => {
         apiInstance
           .post<response<IPost[]>>('/api/feeds/subscribe')
           .then(response => {
-            if (response.data.data.length !== 0) {
+            if (response.data.code === 200 && response.data.data.length !== 0) {
               if (initial) {
                 setData(response.data.data);
               } else {
@@ -70,7 +70,7 @@ const SecondScene: React.FC = () => {
         paddingTop: (insets.top || 24) + 46 + 12,
         minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
       }}
-      contentOffset={{y: (insets.top ? insets.top + 6 : 46 + 24) + 12, x: 0}}
+      // contentOffset={{y: (insets.top ? insets.top + 6 : 46 + 24) + 12, x: 0}}
       onEndReached={onEndReached}
       onRefresh={onRefresh}
       refreshing={refreshing}

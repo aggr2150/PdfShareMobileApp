@@ -21,6 +21,8 @@ import SubscribingRow from '@components/SubscribingRow';
 import {SheetManager} from 'react-native-actions-sheet';
 import _ from 'underscore';
 import {throttle} from 'lodash';
+import ListEmptyComponent from '@components/ListEmptyComponent';
+import {Button} from '@rneui/themed';
 
 enum ETabIndex {
   'PDF',
@@ -39,8 +41,9 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
   const [selectedIndex, setSelectedIndex] = useState<ETabIndex>(ETabIndex.PDF);
   const session = useAppSelector(state => getSession(state));
-  const user = useAppSelector(state =>
-    selectById(state.users, route.params?.id || session?.id || ''),
+  const user = useAppSelector(
+    state => selectById(state.users, route.params?.id || session?.id || ''),
+    // selectById(state.users, ''),
   );
   const [fetching, setFetching] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -438,21 +441,47 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
       data = FollowData;
       break;
   }
+  function emptyText(index: ETabIndex) {
+    switch (index) {
+      case ETabIndex.PDF:
+        return '게시물이 없습니다.';
+      case ETabIndex.Likes:
+        return '좋아요 한 게시물이 없습니다.';
+      case ETabIndex.Subscribing:
+        return '구독중인 유저가 없습니다.';
+    }
+  }
   return (
     <View
       style={{
         paddingTop: insets.top || 5,
-        paddingBottom: insets.bottom,
+        paddingBottom: 0,
         paddingRight: insets.right,
         paddingLeft: insets.left,
         overflow: 'visible',
         flex: 1,
       }}>
-      {!user ? (
+      {!user && fetching ? (
         <Spinner />
+      ) : !user && !route.params?.id ? (
+        <ListEmptyComponent
+          ExtraComponent={
+            <Button
+              style={{marginTop: 24}}
+              title={'로그인'}
+              onPress={() =>
+                SheetManager.show('loginSheet', {
+                  payload: {closable: true},
+                }).then()
+              }
+            />
+          }>
+          아직 프로필이 없습니다. 로그인을 해 주세요!
+        </ListEmptyComponent>
       ) : (
         <FlatList<IPost | IUser>
           data={data}
+          // data={[]}
           onRefresh={onRefresh}
           refreshing={refreshing}
           // extraData={data}
@@ -462,6 +491,19 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
           // exiting={SlideOutLeft}
           // style={{overflow: 'visible'}}
           // contentContainerStyle={{width: '100%'}}
+
+          contentContainerStyle={{flexGrow: 1}}
+          ListEmptyComponent={() =>
+            fetching ? (
+              <Spinner />
+            ) : (
+              <ListEmptyComponent>
+                {user
+                  ? emptyText(selectedIndex)
+                  : '삭제된 아이디 또는 존재하지 않는 사용자입니다.'}
+              </ListEmptyComponent>
+            )
+          }
           onEndReached={onEndReached}
           ListHeaderComponent={() => (
             <ProfileListHeader

@@ -142,7 +142,7 @@ const Revenue: React.FC<RevenueProps> = ({navigation, route}) => {
               <View style={{flex: 1}}>
                 <Text
                   style={{fontSize: 20, textAlign: 'right', color: '#99c729'}}>
-                  ₩ {(item.viewCounter * 0.5).toFixed(0)}
+                  ₩ {(item.viewCounter * 0.24).toFixed(2)}
                 </Text>
               </View>
             </View>

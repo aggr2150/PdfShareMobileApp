@@ -11,13 +11,17 @@ import Upload from '@screens/Upload';
 import ResetPassword from '@screens/ResetPassword';
 import ResetPasswordConfirm from '@screens/ResetPassword/ResetPasswordConfirm';
 import Settings from '@screens/Settings';
+import Replies from '@screens/Replies';
 
 const RootStack = createStackNavigator<RootStackParamList>();
 
 const RootStackNavigator = () => {
   const styles = useStyles();
   return (
-    <RootStack.Navigator screenOptions={{cardStyle: {backgroundColor: '#000'}}}>
+    <RootStack.Navigator
+      screenOptions={{
+        cardStyle: {backgroundColor: '#000', borderBottomWidth: 0},
+      }}>
       <RootStack.Screen
         name="SignIn"
         component={SignIn}
@@ -31,22 +35,42 @@ const RootStackNavigator = () => {
           // header: ViewerHeader,
         }}
       />
-      <RootStack.Screen
-        name="Comments"
-        component={Comments}
-        options={{
-          headerTintColor: 'white',
-          headerStyle: {
-            backgroundColor: '#000',
-          },
-          headerTitleStyle: {
-            color: '#fff',
-          },
-          // headerShown: false,
-          // header: ViewerHeader,
-          // header: ViewerHeader,
-        }}
-      />
+      <RootStack.Group>
+        <RootStack.Screen
+          name="Comments"
+          component={Comments}
+          options={{
+            headerTintColor: 'white',
+            headerStyle: {
+              backgroundColor: '#000',
+            },
+            headerTitleStyle: {
+              color: '#fff',
+            },
+            presentation: 'modal',
+            // headerShown: false,
+            // header: ViewerHeader,
+            // header: ViewerHeader,
+          }}
+        />
+        <RootStack.Screen
+          name="Replies"
+          component={Replies}
+          options={{
+            headerTintColor: 'white',
+            headerStyle: {
+              backgroundColor: '#000',
+            },
+            headerTitleStyle: {
+              color: '#fff',
+            },
+            presentation: 'modal',
+            // headerShown: false,
+            // header: ViewerHeader,
+            // header: ViewerHeader,
+          }}
+        />
+      </RootStack.Group>
       <RootStack.Screen
         name={'Tabs'}
         component={BottomTabNavigation}
@@ -70,9 +94,13 @@ const RootStackNavigator = () => {
         name="Settings"
         component={Settings}
         options={{
+          title: '설정',
           headerTintColor: 'white',
           headerStyle: {
             backgroundColor: '#000',
+            borderBottomWidth: 0,
+            // borderBottomColor: '#333',
+            shadowOpacity: 0,
           },
           headerTitleStyle: {
             color: '#fff',

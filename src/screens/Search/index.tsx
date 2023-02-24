@@ -255,10 +255,10 @@ const Search = () => {
               paddingTop: (insets.top || 24) + 43 + 12,
               minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
             }}
-            contentOffset={{
-              y: (insets.top ? insets.top + 6 : 43 + 24) + 12,
-              x: 0,
-            }}
+            // contentOffset={{
+            //   y: (insets.top ? insets.top + 6 : 43 + 24) + 12,
+            //   x: 0,
+            // }}
             onEndReached={onEndReached}
             onRefresh={onRefresh}
             refreshing={refreshing}

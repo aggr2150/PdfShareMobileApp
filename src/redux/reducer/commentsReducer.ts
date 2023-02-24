@@ -33,6 +33,7 @@ const commentsSlice = createSlice({
       commentAdapter.setOne(state, action.payload.collections);
     },
     setAll: commentAdapter.setAll,
+    commentSetMany: commentAdapter.setMany,
     updateComment: commentAdapter.updateOne,
     removeComment: commentAdapter.removeOne,
   },
@@ -43,6 +44,7 @@ export const {
   setOneComment,
   commentAddedMany,
   commentAdded,
+  commentSetMany,
   setAll,
   updateComment,
   removeComment,

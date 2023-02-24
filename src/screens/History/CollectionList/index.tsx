@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Pressable, TextInput, View} from 'react-native';
+import {FlatList, Pressable, TextInput, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import Separator from '@components/Seperator';
 import ActionSheet, {ActionSheetRef} from 'react-native-actions-sheet';
@@ -8,16 +8,14 @@ import Book from '@components/Book';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {StackScreenProps} from '@react-navigation/stack';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
-import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
+import {postSetMany} from '@redux/reducer/postsReducer';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import BackButton from '@components/BackButton';
 import Toast from 'react-native-toast-message';
-import {Button, Menu, Provider} from 'react-native-paper';
+import {Provider} from 'react-native-paper';
 import CollectionHeader from '@screens/History/CollectionList/CollectionHeader';
-import {
-  collectionSetMany,
-  collectionSetOne,
-} from '@redux/reducer/collectionsReducer';
+import {collectionSetOne} from '@redux/reducer/collectionsReducer';
+import ListEmptyComponent from '@components/ListEmptyComponent';
+import Spinner from '@components/Spinner';
 
 type CollectionProps = StackScreenProps<HistoryStackScreenParams, 'Collection'>;
 const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
@@ -36,12 +34,11 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
       )
       .then(response => {
         if (response.data.data.collection) {
-          setCollection(response.data.data.collection);
-          dispatch(collectionSetOne(response.data.data.collection));
-          // setData(response.data.data.feeds);
-          console.log('feeds', response.data.data);
           setTitle(response.data.data.collection.title);
           dispatch(postSetMany(response.data.data.feeds));
+          setCollection(response.data.data.collection);
+          dispatch(collectionSetOne(response.data.data.collection));
+          console.log('feeds', response.data.data);
           setFetching(false);
         } else {
           navigation.goBack();
@@ -55,10 +52,12 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
   }, [initialize]);
 
   const data = useAppSelector(state => {
-    return collection?.posts.map<IPost>(item => {
-      console.log(state.posts.entities[item], item);
-      return state.posts.entities[item] as IPost;
-    });
+    return collection?.posts.reduce<IPost[]>((previousValue, currentValue) => {
+      currentValue &&
+        (state.posts.entities[currentValue] as IPost) &&
+        previousValue.push(state.posts.entities[currentValue] as IPost);
+      return previousValue;
+    }, []);
   });
   const submit = useCallback(() => {
     apiInstance
@@ -84,55 +83,70 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
   return (
     <SafeAreaView style={styles.container}>
       <Provider>
-        <ThrottleFlatList<IPost>
+        <CollectionHeader collection={collection} openSheet={openSheet} />
+        <FlatList<IPost>
+          contentContainerStyle={{flexGrow: 1}}
           data={data}
           // style={{width: '100%'}}
-          ListHeaderComponent={() => (
-            <CollectionHeader collection={collection} openSheet={openSheet} />
-          )}
+          // ListHeaderComponent={() => (
+          //   <CollectionHeader collection={collection} openSheet={openSheet} />
+          // )}
           ItemSeparatorComponent={Separator}
-          renderItem={({item}) => (
-            <Pressable
-              onPress={() => {
-                navigation.navigate('Viewer', item);
-              }}
-              style={{
-                backgroundColor: '#282828',
-                paddingHorizontal: 21,
-                paddingVertical: 21,
-                aspectRatio: 32 / 12,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                flex: 1,
-              }}>
-              <View style={{flex: 1}}>
-                <Book
-                  author={item.author}
-                  title={item.title}
-                  thumbnail={item.thumbnail}
-                />
-              </View>
-              <View style={{justifyContent: 'space-between'}}>
-                <Text
-                  style={{fontSize: 22, textAlign: 'right', marginBottom: 37}}>
-                  {item.title}
-                </Text>
-                {/*<Menu*/}
-                {/*  visible={visible}*/}
-                {/*  onDismiss={closeMenu}*/}
-                {/*  style={{zIndex: 100}}*/}
-                {/*  anchor={<Button onPress={openMenu}>Show menu</Button>}>*/}
-                {/*  <Menu.Item onPress={() => {}} title="Item 1" />*/}
-                {/*  <Menu.Item onPress={() => {}} title="Item 2" />*/}
-                {/*  /!*<Divider />*!/*/}
-                {/*  <Menu.Item onPress={() => {}} title="Item 3" />*/}
-                {/*</Menu>*/}
-                <Text style={{fontSize: 16, textAlign: 'right'}}>
-                  {item.author.nickname}
-                </Text>
-              </View>
-            </Pressable>
-          )}
+          ListEmptyComponent={() =>
+            fetching ? (
+              <Spinner />
+            ) : (
+              <ListEmptyComponent>빈 콜렉션입니다.</ListEmptyComponent>
+            )
+          }
+          renderItem={({item}) => {
+            return (
+              <Pressable
+                onPress={() => {
+                  navigation.navigate('Viewer', item);
+                }}
+                style={{
+                  backgroundColor: '#282828',
+                  paddingHorizontal: 21,
+                  paddingVertical: 21,
+                  aspectRatio: 32 / 12,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  flex: 1,
+                }}>
+                <View style={{flex: 1}}>
+                  <Book
+                    author={item.author}
+                    title={item.title}
+                    thumbnail={item.thumbnail}
+                  />
+                </View>
+                <View style={{justifyContent: 'space-between'}}>
+                  <Text
+                    style={{
+                      fontSize: 22,
+                      textAlign: 'right',
+                      marginBottom: 37,
+                    }}>
+                    {item.title}
+                  </Text>
+                  {/*<Menu*/}
+                  {/*  visible={visible}*/}
+                  {/*  onDismiss={closeMenu}*/}
+                  {/*  style={{zIndex: 100}}*/}
+                  {/*  anchor={<Button onPress={openMenu}>Show menu</Button>}>*/}
+                  {/*  <Menu.Item onPress={() => {}} title="Item 1" />*/}
+                  {/*  <Menu.Item onPress={() => {}} title="Item 2" />*/}
+                  {/*  /!*<Divider />*!/*/}
+                  {/*  <Menu.Item onPress={() => {}} title="Item 3" />*/}
+                  {/*</Menu>*/}
+                  <Text style={{fontSize: 16, textAlign: 'right'}}>
+                    {item.author.nickname}
+                  </Text>
+                </View>
+              </Pressable>
+            );
+          }}
         />
         <ActionSheet
           ref={renameSheetRef}

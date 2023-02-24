@@ -1,7 +1,7 @@
 import {TextInput, TouchableOpacity, View} from 'react-native';
 import {Button, Input, makeStyles, Text} from '@rneui/themed';
 import Keychain from 'react-native-keychain';
-import {apiInstance} from '@utils/Networking';
+import {apiInstance, getCsrfToken} from '@utils/Networking';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {CommonActions, useNavigation} from '@react-navigation/native';
@@ -9,6 +9,7 @@ import {Input as BaseInput} from '@rneui/base/dist/Input/Input';
 import {SheetManager} from 'react-native-actions-sheet';
 import {useAppDispatch} from '@redux/store/RootStore';
 import {signIn} from '@redux/reducer/authReducer';
+import Toast from 'react-native-toast-message';
 
 const FirstScene = props => {
   const styles = useStyles(props);
@@ -20,20 +21,9 @@ const FirstScene = props => {
   const [csrfToken, setCsrfToken] = useState<string>();
   const dispatch = useAppDispatch();
   useEffect(() => {
-    apiInstance.post<CsrfTokenResponse>('/api/csrfToken').then(response => {
-      if (response.status === 200) {
-        setCsrfToken(response.data.data._csrf);
-        apiInstance.defaults.data = {
-          _csrf: response.data.data._csrf,
-        };
-      }
-    });
+    getCsrfToken.then(token => setCsrfToken(token));
   }, []);
   const submit = useCallback(() => {
-    // SheetManager.hide('loginSheet').then(() => {
-    //   console.log('loginSheetHide');
-    // });
-    // navigation.reset({routes: [{name: 'Tabs'}]});
     apiInstance
       .post<response<ISession>>('/api/auth/signIn', {
         _csrf: csrfToken,
@@ -41,33 +31,35 @@ const FirstScene = props => {
         password: password,
       })
       .then(response => {
-        console.log(
-          'response',
-          csrfToken,
-          response.data.code,
-          response.data.status,
-        );
-        if (response.data.code === 200) {
-          dispatch(signIn(response.data.data));
-          Keychain.setGenericPassword(email, password).then(r =>
-            console.log(r),
-          );
-          props.setClosable(true);
-          SheetManager.hide('loginSheet').then(() => {
-            navigation.dispatch(
-              CommonActions.reset({
-                // stale: true,
-                // stale: false,
-                // index: 0,
-                routes: [{name: 'Tabs'}],
-              }),
+        switch (response.data.code) {
+          case 200:
+            dispatch(signIn(response.data.data));
+            Keychain.setGenericPassword(email, password).then(r =>
+              console.log(r),
             );
-            // navigation.reset({
-            //   stale: false,
-            //   index: 0,
-            //   routes: [{name: 'Tabs'}],
-            // });
-          });
+            props.setClosable(true);
+            SheetManager.hide('loginSheet').then(() => {
+              navigation.dispatch(
+                CommonActions.reset({
+                  routes: [{name: 'Tabs'}],
+                }),
+              );
+            });
+            break;
+          case 422:
+            Toast.show({
+              type: 'error',
+              text1: '올바른 이메일과 비밀번호를 입력해주세요.',
+              position: 'bottom',
+            });
+            break;
+          case 440:
+            Toast.show({
+              type: 'error',
+              text1: '비밀번호가 일치하지 않습니다.',
+              position: 'bottom',
+            });
+            break;
         }
       });
   }, [csrfToken, dispatch, email, navigation, password, props]);
@@ -107,7 +99,11 @@ const FirstScene = props => {
         />
       </View>
       <View>
-        <Button containerStyle={styles.submitButton} onPress={submit}>
+        <Button
+          buttonStyle={{minHeight: 40}}
+          containerStyle={styles.submitButton}
+          onPress={submit}
+          titleStyle={styles.labelText}>
           로그인
         </Button>
       </View>
@@ -147,6 +143,7 @@ const FirstScene = props => {
 const useStyles = makeStyles(theme => ({
   submitButton: {
     borderRadius: 20,
+    minHeight: 40,
   },
   container: {
     backgroundColor: theme.colors.sheetsBackground,
@@ -173,6 +170,10 @@ const useStyles = makeStyles(theme => ({
   },
   headerText: {
     fontSize: 17,
+    color: theme.colors.black,
+  },
+  labelText: {
+    fontSize: 15,
     color: theme.colors.black,
   },
 }));

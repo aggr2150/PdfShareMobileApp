@@ -84,8 +84,8 @@ const RevenueListHeader: React.FC<RevenueListHeaderProps> = ({
             ₩{' '}
             {(
               (settlement.postViewCounter - settlement.settledViewCounter) *
-              0.5
-            ).toFixed(0)}
+              0.24
+            ).toFixed(2)}
           </Text>
         </View>
         <Text style={{fontSize: 14, paddingVertical: 10}}>

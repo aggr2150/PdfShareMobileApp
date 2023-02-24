@@ -108,7 +108,10 @@ const AppendToCollectionSheet: React.FC<
           <Text style={{fontSize: 13}}>{item.title}</Text>
         </View>
         {/*<View style={{width: 50, height: 50}}>*/}
-        <Checkbox.Android status={item.checked ? 'checked' : 'unchecked'} />
+        <Checkbox.Android
+          status={item.checked ? 'checked' : 'unchecked'}
+          color={'#99C729'}
+        />
         {/*<Text style={{fontSize: 13}}>{item.title}</Text>*/}
         {/*</View>*/}
       </TouchableOpacity>

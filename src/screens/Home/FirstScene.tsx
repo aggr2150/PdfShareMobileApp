@@ -20,7 +20,8 @@ const FirstScene = () => {
   const dispatch = useAppDispatch();
   useEffect(() => {
     apiInstance.post<response<IPost[]>>('/api/feeds/recent').then(response => {
-      if (response.data.data.length !== 0) {
+      console.log(response.data);
+      if (response.data.code === 200 && response.data.data?.length !== 0) {
         setData(response.data.data);
         dispatch(postSetMany(response.data.data));
         setFetching(false);
@@ -33,7 +34,7 @@ const FirstScene = () => {
         apiInstance
           .post<response<IPost[]>>('/api/feeds/recent', {pagingKey})
           .then(response => {
-            if (response.data.data.length !== 0) {
+            if (response.data.code === 200 && response.data.data.length !== 0) {
               if (initial) {
                 setData(response.data.data);
               } else {
@@ -73,7 +74,7 @@ const FirstScene = () => {
         paddingTop: (insets.top || 24) + 46 + 12,
         minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
       }}
-      contentOffset={{y: (insets.top ? insets.top + 6 : 46 + 24) + 12, x: 0}}
+      // contentOffset={{y: (insets.top ? insets.top + 6 : 46 + 24) + 12, x: 0}}
       onEndReached={onEndReached}
       onRefresh={onRefresh}
       refreshing={refreshing}

@@ -1,24 +1,32 @@
 import {
   FlatList,
   KeyboardAvoidingView,
+  ListRenderItem,
   Platform,
-  RefreshControl,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Input, makeStyles} from '@rneui/themed';
+import {makeStyles} from '@rneui/themed';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Comment from '@components/Comment';
 import SendIcon from '@assets/icon/send.svg';
 import {StackScreenProps} from '@react-navigation/stack';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
-import {commentAdded, commentAddedMany} from '@redux/reducer/commentsReducer';
+import {
+  commentAdded,
+  commentAddedMany,
+  removeComment,
+  updateComment,
+} from '@redux/reducer/commentsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import _ from 'lodash';
-import {postAddedMany} from '@redux/reducer/postsReducer';
-import {useHeaderHeight} from 'react-native-screens/native-stack';
+import {SheetManager} from 'react-native-actions-sheet';
+import {getSession} from '@redux/reducer/authReducer';
+import {useHeaderHeight} from '@react-navigation/elements';
+import ListEmptyComponent from '@components/ListEmptyComponent';
+import Spinner from '@components/Spinner';
 
 type ReplyProps = StackScreenProps<RootStackParamList, 'Replies'>;
 const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
@@ -30,34 +38,45 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
   const [refreshing, setRefreshing] = useState(false);
   const dispatch = useAppDispatch();
   const [content, setContent] = useState('');
+  const headerHeight = useHeaderHeight();
   const comments = useAppSelector(state => {
-    return data.map(item => state.comments.entities[item._id] as IComment);
+    return data.reduce<IComment[]>((previousValue, currentValue) => {
+      currentValue &&
+        state.comments.entities[currentValue._id] &&
+        previousValue.push(
+          state.comments.entities[currentValue._id] as IComment,
+        );
+      return previousValue;
+    }, []);
   });
+  const session = useAppSelector(state => getSession(state));
   useEffect(() => {
     getCsrfToken.then(token => setCsrfToken(token));
     apiInstance
       .post<response<IComment[]>>('/api/comment/list', {
         postId: route.params.postId,
-        parentCommentId: route.params.parentCommentId,
+        parentCommentId: route.params._id,
       })
       .then(response => {
         if (response.data.data) {
           dispatch(commentAddedMany(response.data.data));
           setData(response.data.data);
         }
+      })
+      .finally(() => {
+        setFetching(false);
       });
-  }, [dispatch, route.params.parentCommentId, route.params.postId]);
+  }, [dispatch, route.params._id, route.params.postId]);
   const throttleEventCallback = useMemo(
     () =>
       _.throttle((pagingKey, initial?) => {
         apiInstance
           .post<response<IComment[]>>('/api/comment/list', {
             postId: route.params.postId,
-            parentCommentId: route.params.parentCommentId,
+            parentCommentId: route.params._id,
             pagingKey,
           })
           .then(response => {
-            console.log(response.data);
             if (response.data.data.length !== 0) {
               if (initial) {
                 setData(response.data.data);
@@ -73,7 +92,7 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
             setRefreshing(false);
           });
       }, 1000),
-    [dispatch, route.params.parentCommentId, route.params.postId],
+    [dispatch, route.params._id, route.params.postId],
   );
   const onEndReached = useCallback(() => {
     if (!fetching) {
@@ -92,7 +111,7 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
         postId: route.params.postId,
         content: content,
         _csrf: csrfToken,
-        parentCommentId: route.params.parentCommentId,
+        parentCommentId: route.params._id,
       })
       .then(response => {
         if (response.data.code === 200) {
@@ -101,57 +120,140 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
           setContent('');
         }
       });
-  }, [
-    content,
-    csrfToken,
-    dispatch,
-    route.params.parentCommentId,
-    route.params.postId,
-  ]);
+  }, [content, csrfToken, dispatch, route.params._id, route.params.postId]);
+
+  const deleteCallback = useCallback(
+    (comment: IComment) => {
+      if (!session) {
+        SheetManager.show('loginSheet', {payload: {closable: true}}).then();
+      } else if (comment && comment.author._id === session._id) {
+        dispatch(removeComment(comment._id));
+        apiInstance
+          .post('/api/comment/delete', {
+            commentId: comment._id,
+            _csrf: csrfToken,
+          })
+          .then(response => {
+            if (response.data.code !== 200) {
+              dispatch(commentAdded(comment));
+            }
+          })
+          .catch(err => {
+            console.log('error', err);
+            dispatch(commentAdded(comment));
+          });
+      }
+    },
+    [csrfToken, dispatch, session],
+  );
+  const likeCallback = useCallback(
+    (comment: IComment) => {
+      if (!session) {
+        console.log('session', session);
+        SheetManager.show('loginSheet', {payload: {closable: true}}).then();
+      } else if (comment) {
+        dispatch(
+          updateComment({
+            id: comment._id,
+            changes: {
+              likeStatus: !comment.likeStatus,
+              likeCounter: !comment.likeStatus
+                ? comment.likeCounter + 1
+                : comment.likeCounter - 1,
+            },
+          }),
+        );
+        apiInstance
+          .post('/api/like/comment/' + comment._id, {
+            likeStatus: !comment.likeStatus,
+            _csrf: csrfToken,
+          })
+          .then(response => {
+            if (response.data.code !== 200) {
+              dispatch(
+                updateComment({
+                  id: comment._id,
+                  changes: {
+                    likeStatus: comment.likeStatus,
+                    likeCounter:
+                      comment.likeCounter + (comment.likeStatus ? +1 : -1),
+                  },
+                }),
+              );
+            }
+          })
+          .catch(() => {
+            dispatch(
+              updateComment({
+                id: comment._id,
+                changes: {
+                  likeStatus: comment.likeStatus,
+                  likeCounter:
+                    comment.likeCounter + (comment.likeStatus ? +1 : -1),
+                },
+              }),
+            );
+          });
+      }
+    },
+    [csrfToken, dispatch, session],
+  );
+  const renderItem = useMemo(
+    () => {
+      const render: ListRenderItem<IComment> = props => {
+        return (
+          <Comment
+            navigation={navigation}
+            session={session}
+            isMine={session?._id === props.item.author._id}
+            likeCallback={likeCallback}
+            deleteCallback={deleteCallback}
+            item={props.item}
+          />
+        );
+      };
+      return render;
+    }, // props => <Comment {...props} />,
+    [deleteCallback, likeCallback, navigation, session],
+  );
   return (
-    <SafeAreaView style={{flex: 1}}>
-      {/*<View style={styles.header}>*/}
-      {/*  <Text style={styles.headerText}>댓글</Text>*/}
-      {/*</View>*/}
-      <View style={{flex: 1, paddingHorizontal: 15}}>
-        <FlatList
-          scrollEnabled={true}
+    <SafeAreaView style={{flex: 1}} edges={['left', 'right', 'bottom']}>
+      <View style={{flex: 1}}>
+        <FlatList<IComment>
           data={comments}
-          renderItem={Comment}
-          inverted={true}
+          contentContainerStyle={{flexGrow: 1}}
+          ListHeaderComponent={() => (
+            <Comment
+              navigation={navigation}
+              session={session}
+              isMine={session?._id === route.params.author._id}
+              likeCallback={likeCallback}
+              deleteCallback={deleteCallback}
+              item={route.params}
+            />
+          )}
+          ListEmptyComponent={() =>
+            fetching ? (
+              <Spinner />
+            ) : (
+              <ListEmptyComponent>빈 콜렉션입니다.</ListEmptyComponent>
+            )
+          }
+          renderItem={renderItem}
           onEndReached={onEndReached}
           onRefresh={onRefresh}
           refreshing={refreshing}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={'white'}
-              titleColor={'white'}
-            />
-          }
         />
       </View>
       <KeyboardAvoidingView
+        // keyboardVerticalOffset={insets.bottom}
+        keyboardVerticalOffset={headerHeight}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={insets.bottom}
-        style={{
-          // flex: 0,
-          width: '100%',
-          // position: 'absolute',
-          // top: 0,
-          // bottom: 0,
-          // left: 0,
-          // right: 0,
-          // width: 300,
-          // height: 300,
-        }}>
+        // behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
         <View
           style={{
             flexDirection: 'row',
-            paddingBottom: insets.bottom,
-            justifyContent: 'center',
-            alignItems: 'center',
           }}>
           <View
             style={{
@@ -160,6 +262,7 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
               flex: 1,
               borderRadius: 20,
               overflow: 'hidden',
+              marginVertical: 5,
             }}>
             <TextInput
               style={{
@@ -171,10 +274,10 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
               // style={styles.textInput}
               placeholder={'댓글 입력'}
               placeholderTextColor={'#606060'}
-              inputContainerStyle={{borderBottomWidth: 0}}
-              renderErrorMessage={false}
-              containerStyle={{paddingLeft: 10, flex: 1}}
-              inputStyle={{margin: 0}}
+              // inputContainerStyle={{borderBottomWidth: 0}}
+              // renderErrorMessage={false}
+              // containerStyle={{paddingLeft: 10}}
+              // inputStyle={{margin: 0}}
               value={content}
               textAlignVertical={'center'}
               // textAlign={'center'}

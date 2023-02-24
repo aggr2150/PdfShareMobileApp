@@ -42,6 +42,7 @@ import BoxIcon from '@assets/icon/box.svg';
 import {getSession} from '@redux/reducer/authReducer';
 import TagText from '@components/TagText';
 import reactStringReplace from 'react-string-replace';
+import {humanizeDate} from '@utils/Humanize';
 
 type ViewerProps = StackScreenProps<RootStackParamList, 'Viewer'>;
 const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
@@ -340,6 +341,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                 style={[
                   styles.titleContainer,
                   {
+                    paddingBottom: insets.bottom,
                     // alignSelf: 'center',
                     //   paddingBottom:
                     //     insets.bottom + styles.titleContainer.paddingHorizontal,
@@ -460,12 +462,15 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
             <Separator style={{marginVertical: 15}} />
             <View style={{alignSelf: 'flex-start'}}>
               <Text style={styles.contentText}>제목 : {post.title}</Text>
-              <Text style={styles.contentText}>날짜 : 219023912380</Text>
+              <Text style={styles.contentText}>
+                날짜 :{' '}
+                {humanizeDate(new Date(post.updatedAt || post.createdAt))}
+              </Text>
               <Text style={styles.contentText}>
                 설명 :{' '}
                 {reactStringReplace(
                   reactStringReplace(
-                    `https://naver.com#ddd #ddmk dsanjkadnjknjksda`,
+                    post.content,
                     // post.content,
                     // /#(\w+)/g,
                     /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi,

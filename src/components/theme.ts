@@ -4,6 +4,10 @@ export default createTheme({
   components: {
     Button: {
       color: 'secondary',
+      titleStyle: {
+        fontFamily: 'Apple SD Gothic Neo',
+        fontSize: 15,
+      },
     },
     Text: {
       style: {
@@ -15,7 +19,7 @@ export default createTheme({
     sheetsBackground: '#99c729',
     black: '#fff',
     white: '#262626',
-    separator: '#fff',
+    separator: '#393939',
     primary: '#99c729',
     background: '#000',
     secondary: '#1ba639',

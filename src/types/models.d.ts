@@ -76,7 +76,7 @@ declare interface IComment {
   updatedAt?: Date;
   likeCounter: number;
   replyCounter?: number;
-  likeStatus: number;
+  likeStatus: boolean;
   isDeleted: boolean;
 }
 type TSettlement = {

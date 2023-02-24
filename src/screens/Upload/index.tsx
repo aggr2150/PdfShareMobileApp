@@ -252,9 +252,10 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 20,
   },
   contentInput: {
+    minHeight: 200,
     // backgroundColor: '#fff',
     color: 'white',
-    paddingHorizontal: 0,
+    // paddingHorizontal: 5,
     fontSize: 13,
     fontFamily: 'Apple SD Gothic Neo',
   },
@@ -264,6 +265,7 @@ const useStyles = makeStyles(theme => ({
     paddingHorizontal: 0,
     fontSize: 22,
     fontFamily: 'Apple SD Gothic Neo',
+    paddingBottom: 9,
   },
   label: {
     marginTop: 3,

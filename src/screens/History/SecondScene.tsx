@@ -1,15 +1,23 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {FlatList, Pressable, useWindowDimensions, View} from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import {SheetManager} from 'react-native-actions-sheet';
 import Separator from '@components/Seperator';
-import PlusButton from '@components/buttons/PlusButton';
+import PlusButton from '@components/buttons/PlusButton2';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
 import {apiInstance} from '@utils/Networking';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {collectionSetMany, selectAll} from '@redux/reducer/collectionsReducer';
+import Spinner from '@components/Spinner';
+import ListEmptyComponent from '@components/ListEmptyComponent';
 
 const SecondScene: React.FC = () => {
   const styles = useStyles();
@@ -32,6 +40,9 @@ const SecondScene: React.FC = () => {
           dispatch(collectionSetMany(response.data.data));
           setFetching(false);
         }
+      })
+      .finally(() => {
+        setFetching(false);
       });
   }, [dispatch]);
 
@@ -42,30 +53,42 @@ const SecondScene: React.FC = () => {
       .then(response => {
         if (response.data.data.length !== 0) {
           dispatch(collectionSetMany(response.data.data));
-          setFetching(false);
-          setRefreshing(false);
         }
+      })
+      .finally(() => {
+        setFetching(false);
+        setRefreshing(false);
       });
   }, [dispatch]);
   const collections = useAppSelector(state => selectAll(state.collections));
+  console.log('ref', refreshing);
   return (
     <View style={{flex: 1}}>
       <FlatList<ICollection>
         data={collections}
         onRefresh={onRefresh}
         refreshing={refreshing}
-        // style={{width: '100%'}}
-        contentContainerStyle={{
-          paddingTop: (insets.top || 24) + 46 + 12,
-          minHeight: dimensions.height - tabBarHeight + 46 + 24,
-        }}
+        contentContainerStyle={
+          collections.length === 0
+            ? {flexGrow: 1}
+            : {
+                paddingTop: (insets.top || 24) + 46 + 12,
+                minHeight: dimensions.height - tabBarHeight + 46 + 24,
+              }
+        }
+        // contentContainerStyle={{flexGrow: 1}}
         ItemSeparatorComponent={Separator}
+        ListEmptyComponent={() =>
+          fetching ? (
+            <Spinner />
+          ) : (
+            <ListEmptyComponent>아직 콜렉션이 없습니다.</ListEmptyComponent>
+          )
+        }
         renderItem={({item}) => (
-          <Pressable
-            onPress={() => {
-              navigation.navigate('Collection', {_id: item._id});
-              // SheetManager.show('collectionSheet').then(r => console.log(r));
-            }}
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('Collection', {_id: item._id})}
             style={{
               backgroundColor: '#282828',
               paddingHorizontal: 42,
@@ -73,12 +96,18 @@ const SecondScene: React.FC = () => {
               justifyContent: 'center',
             }}>
             <Text style={{fontSize: 14}}>{item.title}</Text>
-          </Pressable>
+          </TouchableOpacity>
         )}
       />
 
-      <View style={styles.container}>
-        <View style={{position: 'absolute', bottom: 20, zIndex: 1}}>
+      <View>
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 20,
+            alignSelf: 'center',
+            zIndex: 1,
+          }}>
           <PlusButton
             onPress={() =>
               SheetManager.show('collectionSheet').then(r => console.log(r))
