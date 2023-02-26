@@ -66,6 +66,10 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
           dispatch(commentSetMany(response.data.data));
           setData(response.data.data);
         }
+      })
+      .finally(() => {
+        setFetching(false);
+        setRefreshing(false);
       });
   }, [dispatch, route.params.postId]);
   const session = useAppSelector(state => getSession(state));
@@ -218,6 +222,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
     <SafeAreaView style={{flex: 1}} edges={['left', 'right', 'bottom']}>
       <View style={{flex: 1}}>
         <FlatList<IComment>
+          contentContainerStyle={{flexGrow: 1}}
           data={comments}
           // renderItem={props => <Comment item={props.item} />}
           renderItem={renderItem}
@@ -229,7 +234,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
             fetching ? (
               <Spinner />
             ) : (
-              <ListEmptyComponent>빈 콜렉션입니다.</ListEmptyComponent>
+              <ListEmptyComponent>댓글이 없습니다.</ListEmptyComponent>
             )
           }
         />
@@ -250,7 +255,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
               marginLeft: 15,
               backgroundColor: 'white',
               flex: 1,
-              borderRadius: 20,
+              borderRadius: 50,
               overflow: 'hidden',
               marginVertical: 5,
             }}>

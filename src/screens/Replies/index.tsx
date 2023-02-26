@@ -236,7 +236,7 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
             fetching ? (
               <Spinner />
             ) : (
-              <ListEmptyComponent>빈 콜렉션입니다.</ListEmptyComponent>
+              <ListEmptyComponent>답글이 없습니다.</ListEmptyComponent>
             )
           }
           renderItem={renderItem}
@@ -260,7 +260,7 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
               marginLeft: 15,
               backgroundColor: 'white',
               flex: 1,
-              borderRadius: 20,
+              borderRadius: 50,
               overflow: 'hidden',
               marginVertical: 5,
             }}>
