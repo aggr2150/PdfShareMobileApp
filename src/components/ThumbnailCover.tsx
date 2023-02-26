@@ -4,31 +4,27 @@ import React, {useState} from 'react';
 import FastImage from 'react-native-fast-image';
 import {Image} from 'react-native-image-crop-picker';
 
-interface BookProps {
+interface ThumbnailCoverProps {
   title: string;
   author: IAuthor;
   thumbnail?: IFile;
-  documentThumbnail: IFile;
-  document?: IFile;
   source?: Image;
 }
-const Book: React.FC<BookProps> = ({
+const ThumbnailCover: React.FC<ThumbnailCoverProps> = ({
   title,
   author,
   thumbnail,
-  documentThumbnail,
-  document,
   source,
 }) => {
   const [dimension, setDimension] = useState<{width: number; height: number}>({
     width: 0,
     height: 0,
   });
-  return source ? (
+  return source || thumbnail ? (
     <FastImage
       resizeMode={'cover'}
       style={{width: '100%', height: '100%', aspectRatio: 1 / Math.sqrt(2)}}
-      source={{uri: source.path}}
+      source={{uri: source?.path || thumbnail?.filepath}}
     />
   ) : (
     <View
@@ -59,4 +55,4 @@ const Book: React.FC<BookProps> = ({
   );
 };
 
-export default Book;
+export default ThumbnailCover;

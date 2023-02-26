@@ -44,6 +44,7 @@ declare type RootStackParamList = {
   Settings: undefined;
   // CollectionList: undefined;
   Upload: undefined;
+  EditPost: IPost;
 
   ResetPassword: undefined;
 

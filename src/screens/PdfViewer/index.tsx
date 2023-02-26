@@ -22,7 +22,7 @@ import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {makeStyles, Text} from '@rneui/themed';
 import Avatar from '@components/Avatar';
-import {StackActions} from '@react-navigation/native';
+import {StackActions, useFocusEffect} from '@react-navigation/native';
 import HeartIcon from '@assets/icon/heart.svg';
 import HeartOutLineIcon from '@assets/icon/heart-outline.svg';
 import CommentIcon from '@assets/icon/comment.svg';
@@ -76,17 +76,19 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   const styles = useStyles();
   const dimensions = useWindowDimensions();
   const dispatch = useAppDispatch();
-  useEffect(() => {
-    getCsrfToken.then(token => setCsrfToken(token));
-    apiInstance
-      .post<response<IPost>>('/api/post/' + route.params._id)
-      .then(response => {
-        if (response.data.data) {
-          console.log('response.data.data', response.data.data);
-          dispatch(postSetOne(response.data.data));
-        }
-      });
-  }, [session, dispatch, route.params._id]);
+  useFocusEffect(
+    useCallback(() => {
+      getCsrfToken.then(token => setCsrfToken(token));
+      apiInstance
+        .post<response<IPost>>('/api/post/' + route.params._id)
+        .then(response => {
+          if (response.data.data) {
+            console.log('response.data.data', response.data.data);
+            dispatch(postSetOne(response.data.data));
+          }
+        });
+    }, [dispatch, route.params._id]),
+  );
   const likeCallback = useCallback(() => {
     if (!session) {
       console.log('session', session);
@@ -418,7 +420,12 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
           <Pressable style={{paddingVertical: 10}}>
             <Text>콘텐츠 차단</Text>
           </Pressable>
-          <Pressable style={{paddingVertical: 10}}>
+          <Pressable
+            style={{paddingVertical: 10}}
+            onPress={() => {
+              actionSheetRef.current?.hide();
+              navigation.navigate('EditPost', post);
+            }}>
             <Text>콘텐츠 수정</Text>
           </Pressable>
           <Pressable

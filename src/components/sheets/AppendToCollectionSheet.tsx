@@ -1,19 +1,10 @@
-import {
-  FlatList,
-  Pressable,
-  TextInput,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import {FlatList, Pressable, TouchableOpacity, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import ActionSheet, {
   SheetManager,
   SheetProps,
 } from 'react-native-actions-sheet';
 import React, {useCallback, useEffect, useState} from 'react';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
 import Separator from '@components/Seperator';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import Toast from 'react-native-toast-message';
@@ -33,7 +24,6 @@ const AppendToCollectionSheet: React.FC<
 > = props => {
   const styles = useStyles(props);
   const [csrfToken, setCsrfToken] = useState<string>();
-  const [title, setTitle] = useState<string>('');
   const dispatch = useAppDispatch();
   // const [checked, setChecked] = useState<boolean[]>([]);
   // const [checked, setChecked] = useState<boolean>(false);
@@ -85,7 +75,7 @@ const AppendToCollectionSheet: React.FC<
           });
         }
       });
-  }, [checked, csrfToken]);
+  }, [checked, csrfToken, props.payload?.postId]);
   const renderItem = ({item, index}) => {
     //id가 selectedId라면 배경색상 변경
 

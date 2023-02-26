@@ -12,6 +12,7 @@ import ResetPassword from '@screens/ResetPassword';
 import ResetPasswordConfirm from '@screens/ResetPassword/ResetPasswordConfirm';
 import Settings from '@screens/Settings';
 import Replies from '@screens/Replies';
+import EditPost from '@screens/Upload/EditPost';
 
 const RootStack = createStackNavigator<RootStackParamList>();
 
@@ -83,13 +84,22 @@ const RootStackNavigator = () => {
           headerShown: false,
         }}
       />
-      <RootStack.Screen
-        name="Upload"
-        component={Upload}
-        options={{
-          headerShown: false,
-        }}
-      />
+      <RootStack.Group>
+        <RootStack.Screen
+          name="Upload"
+          component={Upload}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <RootStack.Screen
+          name="EditPost"
+          component={EditPost}
+          options={{
+            headerShown: false,
+          }}
+        />
+      </RootStack.Group>
       <RootStack.Screen
         name="Settings"
         component={Settings}
