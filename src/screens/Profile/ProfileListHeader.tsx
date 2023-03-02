@@ -1,5 +1,5 @@
 import React, {Dispatch, useCallback, useEffect, useState} from 'react';
-import {Pressable, TouchableOpacity, View} from 'react-native';
+import {Alert, Pressable, TouchableOpacity, View} from 'react-native';
 import {Button, ButtonGroup, makeStyles, Text} from '@rneui/themed';
 import {
   CommonActions,
@@ -22,6 +22,14 @@ import {getSession, signOut} from '@redux/reducer/authReducer';
 import {selectById, updateManyUser} from '@redux/reducer/usersReducer';
 import {SheetManager} from 'react-native-actions-sheet';
 import Separator from '@components/Seperator';
+import {deletePost} from '@utils/models/post';
+import {postRemoveOne} from '@redux/reducer/postsReducer';
+import {
+  blockUserAdded,
+  blockUserRemoveOne,
+  selectAll,
+  selectById as selectBlockUserById,
+} from '@redux/reducer/blocksReducer';
 
 interface ProfileListHeaderProps {
   selectedIndex: number;
@@ -41,6 +49,11 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
   const route =
     useRoute<RouteProp<ProfileStackScreenParams, 'Profile' | 'My'>>();
   const [visible, setVisible] = React.useState(false);
+
+  const blockList = useAppSelector(state => selectAll(state.blocks));
+  const block = useAppSelector(state =>
+    selectBlockUserById(state.blocks, user?._id || ''),
+  );
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
   const dispatch = useAppDispatch();
@@ -255,6 +268,66 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
                   onPress={() => {}}
                   title={<Text style={styles.menuText}>신고하기</Text>}
                 />
+                <Menu.Item
+                  dense={true}
+                  onPress={() => {
+                    if (!session) {
+                      SheetManager.show('loginSheet', {
+                        payload: {closable: true},
+                      }).then();
+                    } else {
+                      Alert.alert(
+                        block ? '차단해제하시겠습니까?' : '차단하시겠습니까?',
+                        undefined,
+                        [
+                          {
+                            text: '취소',
+                            onPress: () => console.log('Ask me later pressed'),
+                          },
+                          {
+                            text: block ? '해제' : '차단',
+                            onPress: () => {
+                              closeMenu();
+                              if (block) {
+                                apiInstance
+                                  .post('/api/account/block/delete', {
+                                    userId: user?._id,
+                                  })
+                                  .then(response => {
+                                    if (response.data.code === 200) {
+                                      dispatch(blockUserRemoveOne(user._id));
+                                    }
+                                  });
+                              } else {
+                                apiInstance
+                                  .post('/api/account/block/append', {
+                                    userId: user?._id,
+                                  })
+                                  .then(response => {
+                                    if (response.data.code === 200) {
+                                      dispatch(
+                                        blockUserAdded({
+                                          _id: user._id,
+                                          id: user.id,
+                                          nickname: user.nickname,
+                                        }),
+                                      );
+                                    }
+                                  });
+                              }
+                            },
+                            style: 'destructive',
+                          },
+                        ],
+                      );
+                    }
+                  }}
+                  title={
+                    <Text style={styles.menuText}>
+                      {block ? '차단해제' : '차단하기'}
+                    </Text>
+                  }
+                />
               </>
             )}
 
@@ -283,7 +356,7 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
           <Text style={styles.nicknameText}>{user?.nickname}</Text>
         </View>
         {user && (
-          <View style={{flexDirection: 'row'}}>
+          <View style={{flexDirection: 'row', marginBottom: 15}}>
             <View style={{marginHorizontal: 20}}>
               <Text style={styles.counterText}>
                 구독자 {user?.subscriberCounter}명
@@ -312,7 +385,12 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
       {user?.description && (
         <View style={{flex: 1}}>
           <Text
-            style={{width: '100%', padding: 15, textAlign: 'center'}}
+            style={{
+              width: '100%',
+              paddingHorizontal: 15,
+              marginBottom: 15,
+              textAlign: 'center',
+            }}
             numberOfLines={1}>
             {user?.description}
           </Text>

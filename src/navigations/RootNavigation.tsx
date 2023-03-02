@@ -14,6 +14,7 @@ import Settings from '@screens/Settings';
 import Replies from '@screens/Replies';
 import EditPost from '@screens/Upload/EditPost';
 import ChangePassword from '@screens/ChangePassword';
+import BlockList from '@screens/BlockList';
 
 const RootStack = createStackNavigator<RootStackParamList>();
 
@@ -118,6 +119,13 @@ const RootStackNavigator = () => {
           component={Settings}
           options={{
             title: '설정',
+          }}
+        />
+        <RootStack.Screen
+          name="BlockList"
+          component={BlockList}
+          options={{
+            title: '차단관리',
           }}
         />
       </RootStack.Group>

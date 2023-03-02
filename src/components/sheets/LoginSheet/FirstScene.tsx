@@ -10,6 +10,7 @@ import {SheetManager} from 'react-native-actions-sheet';
 import {useAppDispatch} from '@redux/store/RootStore';
 import {signIn} from '@redux/reducer/authReducer';
 import Toast from 'react-native-toast-message';
+import {blockUserSetAll} from '@redux/reducer/blocksReducer';
 
 const FirstScene = props => {
   const styles = useStyles(props);
@@ -38,6 +39,13 @@ const FirstScene = props => {
               console.log(r),
             );
             props.setClosable(true);
+            apiInstance.post('/api/account/block/list').then(result => {
+              if (result.data.code === 200) {
+                if (result.data.data) {
+                  dispatch(blockUserSetAll(result.data.data));
+                }
+              }
+            });
             SheetManager.hide('loginSheet').then(() => {
               navigation.dispatch(
                 CommonActions.reset({

@@ -42,6 +42,7 @@ declare type RootStackParamList = {
   My: undefined;
   // Profile: IUser | {id: string};
   Settings: undefined;
+  BlockList: undefined;
   // CollectionList: undefined;
   Upload: undefined;
   EditPost: IPost;

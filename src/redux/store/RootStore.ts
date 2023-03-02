@@ -6,6 +6,7 @@ import UsersReducer from '@redux/reducer/usersReducer';
 import likesReducer from '@redux/reducer/likesReducer';
 import collectionsReducer from '@redux/reducer/collectionsReducer';
 import commentsReducer from '@redux/reducer/commentsReducer';
+import blocksReducer from '@redux/reducer/blocksReducer';
 
 export const RootStore = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const RootStore = configureStore({
     likes: likesReducer,
     collections: collectionsReducer,
     comments: commentsReducer,
+    blocks: blocksReducer,
   },
 });
 

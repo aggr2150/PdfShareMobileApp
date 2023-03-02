@@ -52,6 +52,11 @@ declare interface ISession {
   nickname?: string;
   email: string;
 }
+declare interface IBlockUser {
+  _id: string;
+  id: string;
+  nickname: string;
+}
 
 declare interface IUser extends ISession {
   _id: string;

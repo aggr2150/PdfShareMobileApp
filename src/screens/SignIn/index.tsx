@@ -16,6 +16,7 @@ import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {initialized} from '@redux/reducer/authReducer';
 import Keychain from 'react-native-keychain';
 import {useAppDispatch} from '@redux/store/RootStore';
+import {blockUserSetAll} from '@redux/reducer/blocksReducer';
 
 const SignIn: React.FC = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -30,45 +31,6 @@ const SignIn: React.FC = () => {
   const showSheet = useCallback(async () => {
     await SheetManager.show('loginSheet', {payload: {closable: false}});
   }, []);
-  // useEffect(() => {
-  //   Keychain.getGenericPassword()
-  //     .then(credentials => {
-  //       if (credentials) {
-  //         getCsrfToken.then(token => {
-  //           apiInstance
-  //             .post<response<ISession>>('/api/auth/signIn', {
-  //               _csrf: token,
-  //               id: credentials.username,
-  //               password: credentials.password,
-  //             })
-  //             .then(response => {
-  //               if (response.data.code !== 200) {
-  //                 dispatch(initialized(null));
-  //                 showSheet().then(r => console.log(r));
-  //               } else {
-  //                 dispatch(initialized(response.data.data));
-  //                 navigation.dispatch(
-  //                   CommonActions.reset({
-  //                     // stale: false,
-  //                     // stale: false,
-  //                     routes: [{name: 'Tabs'}],
-  //                   }),
-  //                 );
-  //                 // navigation.reset({stale: false, routes: [{name: 'Tabs'}]});
-  //               }
-  //               // aa().then(() => {});
-  //             })
-  //             .catch(error => console.log(error));
-  //         });
-  //       } else {
-  //         dispatch(initialized(null));
-  //         showSheet().then(r => console.log(r));
-  //       }
-  //     })
-  //     .finally(() => {
-  //       console.log('fine');
-  //     });
-  // }, [dispatch, navigation, showSheet]);
   const initializeCallback = useCallback(() => {
     Keychain.getGenericPassword()
       .then(credentials => {
@@ -86,6 +48,14 @@ const SignIn: React.FC = () => {
                   showSheet().then(r => console.log(r));
                 } else {
                   dispatch(initialized(response.data.data));
+                  apiInstance.post('/api/account/block/list').then(result => {
+                    if (result.data.code === 200) {
+                      if (result.data.data) {
+                        console.log('block', result.data.data);
+                        dispatch(blockUserSetAll(result.data.data));
+                      }
+                    }
+                  });
                   navigation.dispatch(
                     CommonActions.reset({
                       // stale: false,

@@ -7,7 +7,7 @@ import Animated, {FadeIn} from 'react-native-reanimated';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {StackScreenProps} from '@react-navigation/stack';
 import {
-  selectById,
+  selectById as selectUserById,
   setOneUser,
   updateManyUser,
   userSetMany,
@@ -23,6 +23,7 @@ import _ from 'underscore';
 import {throttle} from 'lodash';
 import ListEmptyComponent from '@components/ListEmptyComponent';
 import {Button} from '@rneui/themed';
+import {selectById as selectBlockUserById} from '@redux/reducer/blocksReducer';
 
 enum ETabIndex {
   'PDF',
@@ -41,9 +42,12 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
   const [selectedIndex, setSelectedIndex] = useState<ETabIndex>(ETabIndex.PDF);
   const session = useAppSelector(state => getSession(state));
-  const user = useAppSelector(
-    state => selectById(state.users, route.params?.id || session?.id || ''),
-    // selectById(state.users, ''),
+  const user = useAppSelector(state =>
+    selectUserById(state.users, route.params?.id || session?.id || ''),
+  );
+
+  const block = useAppSelector(state =>
+    user ? selectBlockUserById(state.blocks, user._id) : null,
   );
   const [fetching, setFetching] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -74,7 +78,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   });
 
   const sessionUser = useAppSelector(state =>
-    selectById(state.users, session?.id || ''),
+    selectUserById(state.users, session?.id || ''),
   );
   const FollowData = useAppSelector(state => {
     return tabData[selectedIndex].map(

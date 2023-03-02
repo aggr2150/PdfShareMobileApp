@@ -42,7 +42,10 @@ const Settings = ({navigation}) => {
                 onPress: () => navigation.navigate('ChangePassword'),
               },
               {labelText: '1:1 문의'},
-              {labelText: '차단 관리'},
+              {
+                labelText: '차단 관리',
+                onPress: () => navigation.navigate('BlockList'),
+              },
             ],
             // renderItem: ListItem,
           },
