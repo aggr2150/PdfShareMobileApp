@@ -1,6 +1,7 @@
 declare type BottomTabParamList = {
   HomeTab: undefined;
   SearchTab: import('@react-navigation/native').NavigatorScreenParams<SearchStackScreenParams>;
+  UploadTab: undefined;
   HistoryTab: import('@react-navigation/native').NavigatorScreenParams<HistoryStackScreenParams>;
   ProfileTab: import('@react-navigation/native').NavigatorScreenParams<ProfileStackScreenParams>;
 };
@@ -45,6 +46,7 @@ declare type RootStackParamList = {
   BlockList: undefined;
   // CollectionList: undefined;
   Upload: undefined;
+  // UploadTab: undefined;
   EditPost: IPost;
 
   ResetPassword: undefined;

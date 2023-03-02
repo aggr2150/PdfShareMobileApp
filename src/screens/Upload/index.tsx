@@ -21,8 +21,12 @@ import BackButton from '@components/BackButton';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import BookCover from '@components/BookCover';
 import CheckButton from '@components/CheckButton';
+import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 
-type UploadProps = StackScreenProps<RootStackParamList, 'Upload'>;
+type UploadProps = BottomTabScreenProps<BottomTabParamList, 'UploadTab'>;
+// | StackScreenProps<RootStackParamList, 'Upload'>
+// | BottomTabScreenProps<BottomTabParamList, 'UploadTab'>;
+type UploadTabProps = BottomTabScreenProps<BottomTabParamList, 'UploadTab'>;
 const Upload: React.FC<UploadProps> = ({navigation, route}) => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();

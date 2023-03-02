@@ -20,13 +20,17 @@ import Search from '@screens/Search';
 import {useAppSelector} from '@redux/store/RootStore';
 import {EAuthState, getAuthState, getSession} from '@redux/reducer/authReducer';
 import SearchStackNavigation from '@navigations/SearchStackNavigation';
+import Upload from '@screens/Upload';
+import PlusIcon from '@assets/icon/plus1.svg';
+import {StackScreenProps} from '@react-navigation/stack';
 // import {BottomTab} from '@react-navigation/bottom-tabs';
 // import BottomTabBarItem from '@react-navigation/bottom-tabs/lib/typescript/src/views/BottomTabItem';
 // import {tab} from '@react-navigation/bottom-tabs';
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<BottomTabParamList>();
 
-export default ({navigation}) => {
+type TabsProps = StackScreenProps<RootStackParamList, 'Tabs'>;
+const Tabs: React.FC<TabsProps> = ({navigation}) => {
   const styles = useStyles();
   const authState = useAppSelector(state => getAuthState(state));
   return (
@@ -65,6 +69,28 @@ export default ({navigation}) => {
               fill={color}
             />
           ),
+        }}
+      />
+      <Tab.Screen
+        name="UploadTab"
+        component={Upload}
+        options={{
+          unmountOnBlur: true,
+          tabBarIcon: ({size, color}) => (
+            <PlusIcon fill={color} width={size * 1.2} height={size * 1.2} />
+          ),
+        }}
+        listeners={{
+          tabPress: e => {
+            if (authState !== EAuthState.AUTHORIZED) {
+              SheetManager.show('loginSheet', {
+                payload: {closable: true},
+              }).then();
+            } else {
+              navigation.navigate('Upload');
+            }
+            e.preventDefault();
+          },
         }}
       />
       <Tab.Screen
@@ -116,3 +142,4 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.colors.background,
   },
 }));
+export default Tabs;

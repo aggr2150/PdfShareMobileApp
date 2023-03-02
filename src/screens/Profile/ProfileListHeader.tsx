@@ -173,21 +173,14 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
             width: '100%',
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             // marginHorizontal: 15,
             // paddingTop: 10,
             paddingRight: insets.right || 15,
             paddingLeft: insets.left || 15,
           }}>
-          {route.params?.id !== undefined ? (
+          {route.params?.id !== undefined && (
             <BackButton onPress={() => navigation.goBack()} color={'white'} />
-          ) : (
-            <Pressable
-              onPress={() => {
-                navigation.navigate('Upload');
-              }}>
-              <PlusIcon fill={'white'} width={32} height={32} />
-            </Pressable>
           )}
           <Menu
             anchorPosition={'bottom'}
