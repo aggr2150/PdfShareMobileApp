@@ -12,7 +12,6 @@ const adUnitId = __DEV__
   : 'ca-app-pub-9881103194147827/1836752279';
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   requestNonPersonalizedAdsOnly: true,
-  keywords: ['fashion', 'clothing'],
 });
 interstitial.load();
 export default class InterstitialAdsController {

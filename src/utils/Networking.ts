@@ -20,7 +20,7 @@ export const getCsrfToken = apiInstance
     console.log(response.data);
     return response.data.data._csrf;
   });
-// .catch(() => void);
+
 // export const confirmIdToken = async (user: FirebaseAuthTypes.User) => {
 //   return apiInstance
 //     .post(

@@ -36,6 +36,7 @@ const postsSlice = createSlice({
     setAll: postAdapter.setAll,
     postSetMany: postAdapter.setMany,
     updatePost: postAdapter.updateOne,
+    postRemoveOne: postAdapter.removeOne,
   },
 });
 
@@ -47,6 +48,7 @@ export const {
   setAll,
   updatePost,
   postSetMany,
+  postRemoveOne,
 } = postsSlice.actions;
 
 export const postSelectors = postAdapter.getSelectors<RootState>(

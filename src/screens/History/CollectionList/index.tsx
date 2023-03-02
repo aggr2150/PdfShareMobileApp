@@ -114,15 +114,16 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
                   justifyContent: 'space-between',
                   flex: 1,
                 }}>
-                <View style={{flex: 1}}>
+                <View style={{flex: 0, paddingRight: 21}}>
                   <Book
                     author={item.author}
                     title={item.title}
                     thumbnail={item.thumbnail}
                   />
                 </View>
-                <View style={{justifyContent: 'space-between'}}>
+                <View style={{justifyContent: 'space-between', flex: 1}}>
                   <Text
+                    numberOfLines={2}
                     style={{
                       fontSize: 22,
                       textAlign: 'right',

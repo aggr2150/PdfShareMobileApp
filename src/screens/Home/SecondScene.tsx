@@ -4,7 +4,6 @@ import BookCard from '@components/BookCard';
 import {FlatList, useWindowDimensions} from 'react-native';
 import {apiInstance} from '@utils/Networking';
 import _ from 'lodash';
-import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {postSetMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
@@ -28,13 +27,16 @@ const SecondScene: React.FC = () => {
           setData(prevState => [...prevState, ...response.data.data]);
           dispatch(postSetMany(response.data.data));
         }
+      })
+      .finally(() => {
+        setFetching(false);
       });
   }, [dispatch]);
   const throttleEventCallback = useMemo(
     () =>
       _.throttle((pagingKey, initial?) => {
         apiInstance
-          .post<response<IPost[]>>('/api/feeds/subscribe')
+          .post<response<IPost[]>>('/api/feeds/subscribe', {pagingKey})
           .then(response => {
             if (response.data.code === 200 && response.data.data.length !== 0) {
               if (initial) {
@@ -54,6 +56,7 @@ const SecondScene: React.FC = () => {
   );
   const onEndReached = useCallback(() => {
     if (!fetching) {
+      console.log(data[data.length - 1]?._id, data);
       throttleEventCallback(data[data.length - 1]?._id);
     }
   }, [data, fetching, throttleEventCallback]);

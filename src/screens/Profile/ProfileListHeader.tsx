@@ -309,9 +309,13 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
           />
         )}
       </View>
-      {user && (
+      {user?.description && (
         <View style={{flex: 1}}>
-          <Text style={{width: '100%', padding: 15}}>{user?.description}</Text>
+          <Text
+            style={{width: '100%', padding: 15, textAlign: 'center'}}
+            numberOfLines={1}>
+            {user?.description}
+          </Text>
         </View>
       )}
       {isMine && (

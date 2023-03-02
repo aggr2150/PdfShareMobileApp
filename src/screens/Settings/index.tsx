@@ -39,7 +39,7 @@ const Settings = ({navigation}) => {
               },
               {
                 labelText: '비밀번호 변경',
-                onPress: () => navigation.navigate('PasswordReset'),
+                onPress: () => navigation.navigate('ChangePassword'),
               },
               {labelText: '1:1 문의'},
               {labelText: '차단 관리'},

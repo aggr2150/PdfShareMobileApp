@@ -3,34 +3,29 @@ import {
   KeyboardAvoidingView,
   ListRenderItem,
   Platform,
-  RefreshControl,
   TextInput,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from 'react-native';
-import {Input, makeStyles} from '@rneui/themed';
+import {makeStyles} from '@rneui/themed';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Comment from '@components/Comment';
 import SendIcon from '@assets/icon/send.svg';
 import {StackScreenProps} from '@react-navigation/stack';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {
   commentAdded,
-  commentAddedMany,
   commentSetMany,
   removeComment,
   updateComment,
 } from '@redux/reducer/commentsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import _ from 'lodash';
-import {postAddedMany, updatePost} from '@redux/reducer/postsReducer';
-// import {useHeaderHeight} from 'react-native-screens/native-stack';
 import {useHeaderHeight} from '@react-navigation/elements';
 import {getSession} from '@redux/reducer/authReducer';
 import {SheetManager} from 'react-native-actions-sheet';
-import {likeAdded, likeRemoved} from '@redux/reducer/likesReducer';
-import {updateManyUser} from '@redux/reducer/usersReducer';
 import Spinner from '@components/Spinner';
 import ListEmptyComponent from '@components/ListEmptyComponent';
 
@@ -38,6 +33,8 @@ type CommentsProps = StackScreenProps<RootStackParamList, 'Comments'>;
 const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
+  const dimensions = useWindowDimensions();
+  const [viewHeight, setViewHeight] = useState(0);
   const [csrfToken, setCsrfToken] = useState<string>();
   const [data, setData] = useState<IComment[]>([]);
   const [fetching, setFetching] = useState(true);
@@ -218,8 +215,14 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
     }, // props => <Comment {...props} />,
     [deleteCallback, likeCallback, navigation, session],
   );
+
   return (
-    <SafeAreaView style={{flex: 1}} edges={['left', 'right', 'bottom']}>
+    <View
+      style={{flex: 1}}
+      onLayout={event => {
+        const {x, y, width, height} = event.nativeEvent.layout;
+        setViewHeight(height);
+      }}>
       <View style={{flex: 1}}>
         <FlatList<IComment>
           contentContainerStyle={{flexGrow: 1}}
@@ -241,8 +244,24 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
       </View>
 
       <KeyboardAvoidingView
+        style={{
+          marginBottom: insets.bottom,
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+        }}
         // keyboardVerticalOffset={insets.bottom}
-        keyboardVerticalOffset={headerHeight}
+        // keyboardVerticalOffset={headerHeight}
+        keyboardVerticalOffset={dimensions.height - viewHeight}
+        // keyboardVerticalOffset={getDefaultHeaderHeight(
+        //   {
+        //     width: dimensions.width,
+        //     height: dimensions.height,
+        //   },
+        //   true,
+        //   getStatusBarHeight(),
+        // )}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         // behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
@@ -260,27 +279,13 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
               marginVertical: 5,
             }}>
             <TextInput
-              style={{
-                backgroundColor: 'white',
-                paddingTop: 10,
-                paddingBottom: 10,
-                paddingHorizontal: 20,
-              }}
-              // style={styles.textInput}
+              style={styles.textInput}
               placeholder={'댓글 입력'}
               placeholderTextColor={'#606060'}
-              // inputContainerStyle={{borderBottomWidth: 0}}
-              // renderErrorMessage={false}
-              // containerStyle={{paddingLeft: 10}}
-              // inputStyle={{margin: 0}}
               value={content}
               textAlignVertical={'center'}
-              // textAlign={'center'}
-              // autoCorrect={false}
-              // onSubmitEditing={submit}
               onChangeText={setContent}
               multiline
-              // returnKeyType={'send'}
             />
           </View>
           <TouchableOpacity
@@ -294,7 +299,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 const useStyles = makeStyles(theme => ({
@@ -315,28 +320,10 @@ const useStyles = makeStyles(theme => ({
     borderColor: '#fff',
   },
   textInput: {
-    flex: 1,
-    width: '100%',
-    height: 300,
-    // flex: 1,
-    // flex: 0.5,
-    textAlignVertical: 'center',
-    // marginVertical: 7,
-    backgroundColor: theme.colors.black,
-    color: theme.colors.white,
-    // paddingTop: 0,
-    // paddingBottom: 0,
-    // alignSelf: 'stretch',
-    textAlign: 'left',
-    borderRadius: 20,
-    // paddingVertical: 5,
-    // paddingHorizontal: 20,
-    fontSize: 14,
-    alignItems: 'center',
-    alignSelf: 'center',
-    alignContent: 'center',
-    justifyContent: 'center',
-    // color: theme.colors.white,
+    backgroundColor: 'white',
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingHorizontal: 20,
   },
   headerText: {
     fontSize: 17,

@@ -57,9 +57,9 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
     getCsrfToken.then(token => setCsrfToken(token));
   }, []);
   const PDFData = useAppSelector(state => {
-    return tabData[selectedIndex].map(
-      item => state.posts.entities[item._id] || item,
-    );
+    return tabData[0]
+      .filter(item => !!state.posts.entities[item._id])
+      .map(item => state.posts.entities[item._id]);
   });
   // const LikesData = useAppSelector(state => {
   //   // state.likes

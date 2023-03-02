@@ -24,5 +24,6 @@ export default createTheme({
     background: '#000',
     secondary: '#1ba639',
     tertiary: '#60b630',
+    grey0: '#4c4c4c',
   },
 });

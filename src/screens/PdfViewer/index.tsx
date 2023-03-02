@@ -34,7 +34,12 @@ import ActionSheet, {
 import Separator from '@components/Seperator';
 import {StackScreenProps} from '@react-navigation/stack';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
-import {postSetOne, selectById, updatePost} from '@redux/reducer/postsReducer';
+import {
+  postRemoveOne,
+  postSetOne,
+  selectById,
+  updatePost,
+} from '@redux/reducer/postsReducer';
 import Spinner from '@components/Spinner';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {likeAdded, likeRemoved} from '@redux/reducer/likesReducer';
@@ -43,6 +48,8 @@ import {getSession} from '@redux/reducer/authReducer';
 import TagText from '@components/TagText';
 import reactStringReplace from 'react-string-replace';
 import {humanizeDate} from '@utils/Humanize';
+import {deletePost} from '@utils/models/post';
+import Toast from 'react-native-toast-message';
 
 type ViewerProps = StackScreenProps<RootStackParamList, 'Viewer'>;
 const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
@@ -56,7 +63,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  const [csrfToken, setCsrfToken] = useState<string>();
+  const [csrfToken, setCsrfToken] = useState<string>('');
 
   // route.params.document.filepath
   const source: Source = {
@@ -82,6 +89,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
       apiInstance
         .post<response<IPost>>('/api/post/' + route.params._id)
         .then(response => {
+          console.log(response.data);
           if (response.data.data) {
             console.log('response.data.data', response.data.data);
             dispatch(postSetOne(response.data.data));
@@ -392,6 +400,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                   }}>
                   <View style={{flex: 1, justifyContent: 'center'}}>
                     <Text
+                      numberOfLines={1}
                       style={
                         {
                           // flex: 1,
@@ -414,37 +423,70 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
         containerStyle={styles.sheetContainer}
         useBottomSafeAreaPadding={true}>
         <View style={{marginTop: 40}}>
-          <Pressable style={{paddingVertical: 10}}>
-            <Text>콘텐츠 신고</Text>
-          </Pressable>
-          <Pressable style={{paddingVertical: 10}}>
-            <Text>콘텐츠 차단</Text>
-          </Pressable>
-          <Pressable
-            style={{paddingVertical: 10}}
-            onPress={() => {
-              actionSheetRef.current?.hide();
-              navigation.navigate('EditPost', post);
-            }}>
-            <Text>콘텐츠 수정</Text>
-          </Pressable>
-          <Pressable
-            style={{paddingVertical: 10}}
-            onPress={() => {
-              Alert.alert('삭제하시겠습니까?', undefined, [
-                {
-                  text: '취소',
-                  onPress: () => console.log('Ask me later pressed'),
-                },
-                {
-                  text: '삭제',
-                  onPress: () => console.log('Ask me later pressed'),
-                  style: 'destructive',
-                },
-              ]);
-            }}>
-            <Text>콘텐츠 삭제</Text>
-          </Pressable>
+          {session._id === post.author._id ? (
+            <>
+              <Pressable
+                style={{paddingVertical: 10}}
+                onPress={() => {
+                  actionSheetRef.current?.hide();
+                  navigation.navigate('EditPost', post);
+                }}>
+                <Text>콘텐츠 수정</Text>
+              </Pressable>
+              <Pressable
+                style={{paddingVertical: 10}}
+                onPress={() => {
+                  Alert.alert('삭제하시겠습니까?', undefined, [
+                    {
+                      text: '취소',
+                      onPress: () => console.log('Ask me later pressed'),
+                    },
+                    {
+                      text: '삭제',
+                      onPress: () =>
+                        deletePost({
+                          csrfToken,
+                          post,
+                          callback: response => {
+                            actionSheetRef.current?.hide();
+                            if (response.data.code === 200) {
+                              dispatch(postRemoveOne(post._id));
+                              navigation.goBack();
+                            } else {
+                              Toast.show({
+                                type: 'error',
+                                text1: 'Unknown Error Occurred!',
+                                position: 'bottom',
+                              });
+                            }
+                          },
+                          errorHandle: error => {
+                            actionSheetRef.current?.hide();
+                            console.log(error);
+                            Toast.show({
+                              type: 'error',
+                              text1: 'Unknown Error Occurred!',
+                              position: 'bottom',
+                            });
+                          },
+                        }),
+                      style: 'destructive',
+                    },
+                  ]);
+                }}>
+                <Text>콘텐츠 삭제</Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <Pressable style={{paddingVertical: 10}}>
+                <Text>콘텐츠 신고</Text>
+              </Pressable>
+              <Pressable style={{paddingVertical: 10}}>
+                <Text>유저 차단</Text>
+              </Pressable>
+            </>
+          )}
         </View>
       </ActionSheet>
       <ActionSheet

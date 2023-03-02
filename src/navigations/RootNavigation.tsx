@@ -13,6 +13,7 @@ import ResetPasswordConfirm from '@screens/ResetPassword/ResetPasswordConfirm';
 import Settings from '@screens/Settings';
 import Replies from '@screens/Replies';
 import EditPost from '@screens/Upload/EditPost';
+import ChangePassword from '@screens/ChangePassword';
 
 const RootStack = createStackNavigator<RootStackParamList>();
 
@@ -41,6 +42,7 @@ const RootStackNavigator = () => {
           name="Comments"
           component={Comments}
           options={{
+            title: '댓글',
             headerTintColor: 'white',
             headerStyle: {
               backgroundColor: '#000',
@@ -48,10 +50,9 @@ const RootStackNavigator = () => {
             headerTitleStyle: {
               color: '#fff',
             },
+            headerLeftLabelVisible: false,
             presentation: 'modal',
-            // headerShown: false,
-            // header: ViewerHeader,
-            // header: ViewerHeader,
+            headerMode: 'screen',
           }}
         />
         <RootStack.Screen
@@ -66,9 +67,7 @@ const RootStackNavigator = () => {
               color: '#fff',
             },
             presentation: 'modal',
-            // headerShown: false,
-            // header: ViewerHeader,
-            // header: ViewerHeader,
+            headerLeftLabelVisible: false,
           }}
         />
       </RootStack.Group>
@@ -100,11 +99,8 @@ const RootStackNavigator = () => {
           }}
         />
       </RootStack.Group>
-      <RootStack.Screen
-        name="Settings"
-        component={Settings}
-        options={{
-          title: '설정',
+      <RootStack.Group
+        screenOptions={{
           headerTintColor: 'white',
           headerStyle: {
             backgroundColor: '#000',
@@ -116,11 +112,23 @@ const RootStackNavigator = () => {
             color: '#fff',
           },
           headerLeftLabelVisible: false,
-          // headerShown: false,
-        }}
-      />
+        }}>
+        <RootStack.Screen
+          name="Settings"
+          component={Settings}
+          options={{
+            title: '설정',
+          }}
+        />
+      </RootStack.Group>
+
       <RootStack.Group
         screenOptions={{headerShown: false, cardStyle: styles.primaryCard}}>
+        <RootStack.Screen
+          name="ChangePassword"
+          component={ChangePassword}
+          options={{cardStyle: styles.defaultCard}}
+        />
         <RootStack.Screen name="ResetPassword" component={ResetPassword} />
         <RootStack.Screen
           name="ResetPasswordConfirm"
@@ -134,6 +142,9 @@ const RootStackNavigator = () => {
 const useStyles = makeStyles(theme => ({
   primaryCard: {
     backgroundColor: theme.colors.primary,
+  },
+  defaultCard: {
+    backgroundColor: theme.colors.background,
   },
 }));
 export default RootStackNavigator;

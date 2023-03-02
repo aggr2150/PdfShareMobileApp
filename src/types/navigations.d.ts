@@ -47,10 +47,10 @@ declare type RootStackParamList = {
   EditPost: IPost;
 
   ResetPassword: undefined;
-
   ResetPasswordConfirm: {
     email: string;
     verificationCode: string;
   };
+  ChangePassword: undefined;
   Home: undefined;
 };

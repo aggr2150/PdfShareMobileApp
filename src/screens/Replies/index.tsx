@@ -5,11 +5,11 @@ import {
   Platform,
   TextInput,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import {makeStyles} from '@rneui/themed';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Comment from '@components/Comment';
 import SendIcon from '@assets/icon/send.svg';
 import {StackScreenProps} from '@react-navigation/stack';
@@ -24,21 +24,22 @@ import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import _ from 'lodash';
 import {SheetManager} from 'react-native-actions-sheet';
 import {getSession} from '@redux/reducer/authReducer';
-import {useHeaderHeight} from '@react-navigation/elements';
 import ListEmptyComponent from '@components/ListEmptyComponent';
 import Spinner from '@components/Spinner';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 type ReplyProps = StackScreenProps<RootStackParamList, 'Replies'>;
 const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
+  const dimensions = useWindowDimensions();
   const [csrfToken, setCsrfToken] = useState<string>();
   const [data, setData] = useState<IComment[]>([]);
   const [fetching, setFetching] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const dispatch = useAppDispatch();
   const [content, setContent] = useState('');
-  const headerHeight = useHeaderHeight();
+  const [viewHeight, setViewHeight] = useState(0);
   const comments = useAppSelector(state => {
     return data.reduce<IComment[]>((previousValue, currentValue) => {
       currentValue &&
@@ -217,7 +218,12 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
     [deleteCallback, likeCallback, navigation, session],
   );
   return (
-    <SafeAreaView style={{flex: 1}} edges={['left', 'right', 'bottom']}>
+    <View
+      style={{flex: 1}}
+      onLayout={event => {
+        const {x, y, width, height} = event.nativeEvent.layout;
+        setViewHeight(height);
+      }}>
       <View style={{flex: 1}}>
         <FlatList<IComment>
           data={comments}
@@ -246,11 +252,15 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
         />
       </View>
       <KeyboardAvoidingView
-        // keyboardVerticalOffset={insets.bottom}
-        keyboardVerticalOffset={headerHeight}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        // behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
+        style={{
+          marginBottom: insets.bottom,
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+        }}
+        keyboardVerticalOffset={dimensions.height - viewHeight}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <View
           style={{
             flexDirection: 'row',
@@ -299,7 +309,7 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 const useStyles = makeStyles(theme => ({
