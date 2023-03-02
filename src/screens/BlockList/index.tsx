@@ -15,6 +15,7 @@ import {apiInstance} from '@utils/Networking';
 import {useFocusEffect} from '@react-navigation/native';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {
+  blockUserAdded,
   blockUserRemoveOne,
   blockUserSetAll,
   selectAll,
@@ -38,16 +39,32 @@ const BlockList = () => {
       }
     });
   }, [dispatch]);
-  const callback = useCallback((targetUser: IBlockUser) => {
-    apiInstance
-      .post('/api/account/block/delete', {
-        userId: targetUser?._id,
-      })
-      .then(response => {
-        dispatch(blockUserRemoveOne(targetUser._id));
-        console.log(response.data);
-      });
-  }, []);
+  const callback = useCallback(
+    (targetUser: IBlockUser) => {
+      Alert.alert('차단해제하시겠습니까?', undefined, [
+        {
+          text: '취소',
+          onPress: () => console.log('Ask me later pressed'),
+        },
+        {
+          text: '해제',
+          onPress: () => {
+            apiInstance
+              .post('/api/account/block/delete', {
+                userId: targetUser?._id,
+              })
+              .then(response => {
+                if (response.data.code === 200) {
+                  dispatch(blockUserRemoveOne(targetUser._id));
+                }
+              });
+          },
+          style: 'destructive',
+        },
+      ]);
+    },
+    [dispatch],
+  );
   return (
     <View style={{flex: 1}}>
       <FlatList<IBlockUser>

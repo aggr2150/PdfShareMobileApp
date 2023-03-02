@@ -24,19 +24,11 @@ const BlockUserRow: React.FC<BlockUserRowProps> = ({item, callback}) => {
   return (
     <Pressable
       onPress={() => {
-        // if (isLoaded) {
-        //   show();
-        // } else {
-        //   load();
-        // }
         navigation.navigate('Profile', {id: user?.id});
       }}
       style={{
-        // aspectRatio: 16 / 9,
-        // backgroundColor: getBackgroundColor(index),
         width: '100%',
         flexDirection: 'row',
-        // justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 15,
         paddingVertical: 12,
@@ -52,7 +44,7 @@ const BlockUserRow: React.FC<BlockUserRowProps> = ({item, callback}) => {
           paddingBottom: 8,
           paddingHorizontal: 20,
         }}>
-        {user?.subscribeStatus ? '취소' : '구독'}
+        {'차단해제'}
       </Button>
     </Pressable>
   );
