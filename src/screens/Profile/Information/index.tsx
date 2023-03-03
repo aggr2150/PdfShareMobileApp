@@ -32,11 +32,6 @@ const Information: React.FC<ProfileProps> = ({navigation, route}) => {
   const user = useAppSelector(state =>
     selectUserById(state.users, route.params?.id || session?.id || ''),
   );
-  const [showBlockUser, setShowBlockUser] = useState(false);
-
-  const block = useAppSelector(state =>
-    user ? selectBlockUserById(state.blocks, user._id) : null,
-  );
   const [fetching, setFetching] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [csrfToken, setCsrfToken] = useState<string>();
