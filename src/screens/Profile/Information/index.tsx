@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {ScrollView, View} from 'react-native';
+import {RefreshControl, ScrollView, View} from 'react-native';
 import Spinner from '@components/Spinner';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {StackScreenProps} from '@react-navigation/stack';
@@ -17,7 +17,6 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {SheetManager} from 'react-native-actions-sheet';
 import ListEmptyComponent from '@components/ListEmptyComponent';
 import {Button, makeStyles, Text} from '@rneui/themed';
-import {selectById as selectBlockUserById} from '@redux/reducer/blocksReducer';
 import ScrollHeader from '@screens/Profile/Information/ScrollHeader';
 import reactStringReplace from 'react-string-replace';
 import TagText from '@components/TagText';
@@ -244,7 +243,11 @@ const Information: React.FC<ProfileProps> = ({navigation, route}) => {
           아직 프로필이 없습니다. 로그인을 해 주세요!
         </ListEmptyComponent>
       ) : (
-        <ScrollView style={{paddingHorizontal: 24}}>
+        <ScrollView
+          style={{paddingHorizontal: 24}}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
           <ScrollHeader user={user} isMine={true} />
           <View style={{alignSelf: 'flex-start'}}>
             <Text style={styles.contentText}>채널명 : {user?.nickname}</Text>

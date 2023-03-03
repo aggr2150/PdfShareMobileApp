@@ -1,5 +1,8 @@
 import React from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
+import {
+  CardStyleInterpolators,
+  createStackNavigator,
+} from '@react-navigation/stack';
 import Profile from '@screens/Profile';
 import Revenue from '@screens/Profile/Revenue';
 import ProfileHeaderRight from '@screens/Profile/ProfileHeaderRight';
@@ -41,7 +44,9 @@ const ProfileStackNavigation = () => {
         <ProfileStack.Screen
           name="Information"
           component={Information}
-          // options={{headerShown: false}}
+          options={{
+            cardStyleInterpolator: CardStyleInterpolators.forFadeFromCenter,
+          }}
         />
       </ProfileStack.Group>
       <ProfileStack.Screen
