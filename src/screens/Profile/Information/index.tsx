@@ -1,5 +1,5 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {ScrollView, TouchableOpacity, View} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {ScrollView, View} from 'react-native';
 import Spinner from '@components/Spinner';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {StackScreenProps} from '@react-navigation/stack';
@@ -11,16 +11,13 @@ import {
 } from '@redux/reducer/usersReducer';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {postSetMany} from '@redux/reducer/postsReducer';
-import {likeSetMany, selectAll, setAllLike} from '@redux/reducer/likesReducer';
+import {setAllLike} from '@redux/reducer/likesReducer';
 import {getSession} from '@redux/reducer/authReducer';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {SheetManager} from 'react-native-actions-sheet';
-import _ from 'underscore';
-import {throttle} from 'lodash';
 import ListEmptyComponent from '@components/ListEmptyComponent';
 import {Button, makeStyles, Text} from '@rneui/themed';
 import {selectById as selectBlockUserById} from '@redux/reducer/blocksReducer';
-import ProfileListHeader from '@screens/Profile/ProfileListHeader';
 import ScrollHeader from '@screens/Profile/Information/ScrollHeader';
 import reactStringReplace from 'react-string-replace';
 import TagText from '@components/TagText';
@@ -296,7 +293,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
 };
 const useStyles = makeStyles(theme => ({
   contentText: {
-    fontFamily: 'Apple SD Gothic Neo',
+    fontFamily: theme.fontFamily,
     fontSize: 13,
   },
 }));
