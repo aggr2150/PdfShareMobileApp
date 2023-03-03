@@ -152,161 +152,163 @@ const ProfileListHeader: React.FC = () => {
     }
   }, [session, csrfToken, dispatch, sessionUser, user]);
   return (
-    <Menu
-      anchorPosition={'bottom'}
-      visible={visible}
-      onDismiss={closeMenu}
-      contentStyle={{backgroundColor: 'black'}}
-      anchor={
-        <TouchableOpacity
-          onPress={openMenu}
-          style={{
-            marginHorizontal: 11,
-            width: 32,
-            height: 32,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <DotIcon fill={'white'} width={24} height={24} />
-        </TouchableOpacity>
-      }>
-      {session?._id === user?._id && user ? (
-        <>
-          <Menu.Item
-            dense={true}
-            onPress={() => {
-              navigation.navigate('EditProfile', {
-                // id: '123',
-                // nickname: '123',
-                avatar: user?.avatar,
-                link: user?.link,
-                description: user?.description,
-                id: user?.id,
-                nickname: user?.nickname,
-              });
-              closeMenu();
-            }}
-            title={<Text style={styles.menuText}>프로필 수정</Text>}
-          />
-          <Menu.Item
-            dense={true}
-            onPress={() => {
-              navigation.navigate('Revenue');
-              closeMenu();
-            }}
-            title={<Text style={styles.menuText}>광고 수익</Text>}
-          />
-          <Separator />
-          {/*<Divider />*/}
-          <Menu.Item
-            dense={true}
-            onPress={() => {
-              navigation.navigate('Settings');
-              closeMenu();
-            }}
-            title={<Text style={styles.menuText}>설정</Text>}
-          />
-          <Menu.Item
-            dense={true}
-            onPress={() => {
-              apiInstance.post('/api/auth/signOut').then();
-              Keychain.resetGenericPassword().then();
-              dispatch(signOut());
-              closeMenu();
-              navigation.dispatch(
-                CommonActions.reset({
-                  // stale: true,
-                  // stale: false,
-                  // index: 0,
-                  routes: [{name: 'SignIn'}],
-                }),
-              );
-            }}
-            title={<Text style={styles.menuText}>로그아웃</Text>}
-          />
-        </>
-      ) : (
-        <>
-          <Menu.Item
-            dense={true}
-            onPress={() => {}}
-            title={<Text style={styles.menuText}>신고하기</Text>}
-          />
-          <Menu.Item
-            dense={true}
-            onPress={() => {
-              if (!session) {
-                SheetManager.show('loginSheet', {
-                  payload: {closable: true},
-                }).then();
-              } else {
-                Alert.alert(
-                  block ? '차단해제하시겠습니까?' : '차단하시겠습니까?',
-                  undefined,
-                  [
-                    {
-                      text: '취소',
-                      onPress: () => console.log('Ask me later pressed'),
-                    },
-                    {
-                      text: block ? '해제' : '차단',
-                      onPress: () => {
-                        closeMenu();
-                        if (block) {
-                          apiInstance
-                            .post('/api/account/block/delete', {
-                              userId: user?._id,
-                            })
-                            .then(response => {
-                              if (response.data.code === 200) {
-                                dispatch(blockUserRemoveOne(user._id));
-                              }
-                            });
-                        } else {
-                          apiInstance
-                            .post('/api/account/block/append', {
-                              userId: user?._id,
-                            })
-                            .then(response => {
-                              if (response.data.code === 200) {
-                                dispatch(
-                                  blockUserAdded({
-                                    _id: user._id,
-                                    id: user.id,
-                                    nickname: user.nickname,
-                                  }),
-                                );
-                              }
-                            });
-                        }
-                      },
-                      style: 'destructive',
-                    },
-                  ],
+    user && (
+      <Menu
+        anchorPosition={'bottom'}
+        visible={visible}
+        onDismiss={closeMenu}
+        contentStyle={{backgroundColor: 'black'}}
+        anchor={
+          <TouchableOpacity
+            onPress={openMenu}
+            style={{
+              marginHorizontal: 11,
+              width: 32,
+              height: 32,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <DotIcon fill={'white'} width={24} height={24} />
+          </TouchableOpacity>
+        }>
+        {session?._id === user?._id ? (
+          <>
+            <Menu.Item
+              dense={true}
+              onPress={() => {
+                navigation.navigate('EditProfile', {
+                  // id: '123',
+                  // nickname: '123',
+                  avatar: user.avatar,
+                  link: user.link,
+                  description: user.description,
+                  id: user.id,
+                  nickname: user.nickname,
+                });
+                closeMenu();
+              }}
+              title={<Text style={styles.menuText}>프로필 수정</Text>}
+            />
+            <Menu.Item
+              dense={true}
+              onPress={() => {
+                navigation.navigate('Revenue');
+                closeMenu();
+              }}
+              title={<Text style={styles.menuText}>광고 수익</Text>}
+            />
+            <Separator />
+            {/*<Divider />*/}
+            <Menu.Item
+              dense={true}
+              onPress={() => {
+                navigation.navigate('Settings');
+                closeMenu();
+              }}
+              title={<Text style={styles.menuText}>설정</Text>}
+            />
+            <Menu.Item
+              dense={true}
+              onPress={() => {
+                apiInstance.post('/api/auth/signOut').then();
+                Keychain.resetGenericPassword().then();
+                dispatch(signOut());
+                closeMenu();
+                navigation.dispatch(
+                  CommonActions.reset({
+                    // stale: true,
+                    // stale: false,
+                    // index: 0,
+                    routes: [{name: 'SignIn'}],
+                  }),
                 );
+              }}
+              title={<Text style={styles.menuText}>로그아웃</Text>}
+            />
+          </>
+        ) : (
+          <>
+            <Menu.Item
+              dense={true}
+              onPress={() => {}}
+              title={<Text style={styles.menuText}>신고하기</Text>}
+            />
+            <Menu.Item
+              dense={true}
+              onPress={() => {
+                if (!session) {
+                  SheetManager.show('loginSheet', {
+                    payload: {closable: true},
+                  }).then();
+                } else {
+                  Alert.alert(
+                    block ? '차단해제하시겠습니까?' : '차단하시겠습니까?',
+                    undefined,
+                    [
+                      {
+                        text: '취소',
+                        onPress: () => console.log('Ask me later pressed'),
+                      },
+                      {
+                        text: block ? '해제' : '차단',
+                        onPress: () => {
+                          closeMenu();
+                          if (block) {
+                            apiInstance
+                              .post('/api/account/block/delete', {
+                                userId: user?._id,
+                              })
+                              .then(response => {
+                                if (response.data.code === 200) {
+                                  dispatch(blockUserRemoveOne(user._id));
+                                }
+                              });
+                          } else {
+                            apiInstance
+                              .post('/api/account/block/append', {
+                                userId: user?._id,
+                              })
+                              .then(response => {
+                                if (response.data.code === 200) {
+                                  dispatch(
+                                    blockUserAdded({
+                                      _id: user._id,
+                                      id: user.id,
+                                      nickname: user.nickname,
+                                    }),
+                                  );
+                                }
+                              });
+                          }
+                        },
+                        style: 'destructive',
+                      },
+                    ],
+                  );
+                }
+              }}
+              title={
+                <Text style={styles.menuText}>
+                  {block ? '차단해제' : '차단하기'}
+                </Text>
               }
-            }}
-            title={
-              <Text style={styles.menuText}>
-                {block ? '차단해제' : '차단하기'}
-              </Text>
-            }
-          />
-        </>
-      )}
+            />
+          </>
+        )}
 
-      <Menu.Item
-        dense={true}
-        onPress={() => {
-          Toast.show({
-            type: 'error',
-            text1: '만료된 인증번호 입니다.',
-            position: 'bottom',
-          });
-        }}
-        title={<Text style={styles.menuText}>테스트</Text>}
-      />
-    </Menu>
+        <Menu.Item
+          dense={true}
+          onPress={() => {
+            Toast.show({
+              type: 'error',
+              text1: '만료된 인증번호 입니다.',
+              position: 'bottom',
+            });
+          }}
+          title={<Text style={styles.menuText}>테스트</Text>}
+        />
+      </Menu>
+    )
   );
 };
 
