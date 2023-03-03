@@ -1,6 +1,6 @@
-import React, {Dispatch, useCallback, useEffect, useState} from 'react';
-import {Alert, Pressable, TouchableOpacity, View} from 'react-native';
-import {Button, ButtonGroup, makeStyles, Text} from '@rneui/themed';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Alert, TouchableOpacity} from 'react-native';
+import {makeStyles, Text} from '@rneui/themed';
 import {
   CommonActions,
   NavigationProp,
@@ -8,12 +8,9 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import Avatar from '@components/Avatar';
 import DotIcon from '@assets/icon/dot.svg';
-import {Divider, Menu} from 'react-native-paper';
+import {Menu} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import PlusIcon from '@assets/icon/plus1.svg';
-import BackButton from '@components/BackButton';
 import Keychain from 'react-native-keychain';
 import Toast from 'react-native-toast-message';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
@@ -26,28 +23,25 @@ import {
 } from '@redux/reducer/usersReducer';
 import {SheetManager} from 'react-native-actions-sheet';
 import Separator from '@components/Seperator';
-import {deletePost} from '@utils/models/post';
-import {postRemoveOne} from '@redux/reducer/postsReducer';
 import {
   blockUserAdded,
   blockUserRemoveOne,
-  selectAll,
   selectById as selectBlockUserById,
 } from '@redux/reducer/blocksReducer';
 
-const ProfileListHeader: React.FC = () => {
+const ProfileHeaderRight = () => {
   const styles = useStyles();
   const navigation =
     useNavigation<NavigationProp<RootStackParamList, 'ProfileTab'>>();
   const route =
     useRoute<RouteProp<ProfileStackScreenParams, 'Profile' | 'My'>>();
   const [visible, setVisible] = React.useState(false);
-  const block = useAppSelector(state =>
-    selectBlockUserById(state.blocks, user?._id || ''),
-  );
   const session = useAppSelector(state => getSession(state));
   const user = useAppSelector(state =>
     selectUserById(state.users, route.params?.id || session?.id || ''),
+  );
+  const block = useAppSelector(state =>
+    selectBlockUserById(state.blocks, user?._id || ''),
   );
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
@@ -247,7 +241,7 @@ const ProfileListHeader: React.FC = () => {
                     [
                       {
                         text: '취소',
-                        onPress: () => console.log('Ask me later pressed'),
+                        onPress: () => console.log('Ask me later pressed111'),
                       },
                       {
                         text: block ? '해제' : '차단',
@@ -351,4 +345,4 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
   },
 }));
-export default ProfileListHeader;
+export default ProfileHeaderRight;

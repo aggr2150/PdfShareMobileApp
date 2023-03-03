@@ -3,7 +3,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Profile from '@screens/Profile';
 import Revenue from '@screens/Profile/Revenue';
 import Spinner from '@components/Spinner';
-import HeaderRight from '@screens/Profile/HeaderRight';
+import ProfileHeaderRight from '@screens/Profile/ProfileHeaderRight';
 import {makeStyles} from '@rneui/themed';
 
 const ProfileStack = createStackNavigator<ProfileStackScreenParams>();
@@ -22,7 +22,7 @@ const ProfileStackNavigation = () => {
       })}>
       <ProfileStack.Group
         screenOptions={{
-          headerRight: () => <HeaderRight />,
+          headerRight: ProfileHeaderRight,
         }}>
         <ProfileStack.Screen
           name="My"

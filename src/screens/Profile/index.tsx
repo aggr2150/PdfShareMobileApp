@@ -45,6 +45,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   const user = useAppSelector(state =>
     selectUserById(state.users, route.params?.id || session?.id || ''),
   );
+  const [showBlockUser, setShowBlockUser] = useState(false);
 
   const block = useAppSelector(state =>
     user ? selectBlockUserById(state.blocks, user._id) : null,
@@ -480,6 +481,18 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
             />
           }>
           아직 프로필이 없습니다. 로그인을 해 주세요!
+        </ListEmptyComponent>
+      ) : block && !showBlockUser ? (
+        <ListEmptyComponent
+          ExtraComponent={
+            <Button
+              style={{marginTop: 24}}
+              color="grey1"
+              title={'보기'}
+              onPress={() => setShowBlockUser(true)}
+            />
+          }>
+          차단된 유저입니다.
         </ListEmptyComponent>
       ) : (
         <FlatList<IPost | IUser>

@@ -26,5 +26,6 @@ export default createTheme({
     secondary: '#1ba639',
     tertiary: '#60b630',
     grey0: '#4c4c4c',
+    grey1: '#3a3a3a',
   },
 });
