@@ -486,7 +486,14 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
         <ListEmptyComponent
           ExtraComponent={
             <Button
-              style={{marginTop: 24}}
+              // containerStyle={{}}
+              containerStyle={{marginTop: 24}}
+              buttonStyle={{
+                paddingHorizontal: 32,
+                paddingVertical: 12,
+                borderRadius: 500,
+              }}
+              titleStyle={{fontSize: 12}}
               color="grey1"
               title={'보기'}
               onPress={() => setShowBlockUser(true)}
