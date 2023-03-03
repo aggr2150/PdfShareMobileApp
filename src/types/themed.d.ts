@@ -8,4 +8,7 @@ declare module '@rneui/themed' {
     sheetsBackground: string;
     separator: string;
   }
+  export interface Theme {
+    fontFamily: string;
+  }
 }

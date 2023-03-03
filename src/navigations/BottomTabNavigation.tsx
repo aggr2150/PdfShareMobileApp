@@ -23,6 +23,7 @@ import SearchStackNavigation from '@navigations/SearchStackNavigation';
 import Upload from '@screens/Upload';
 import PlusIcon from '@assets/icon/plus1.svg';
 import {StackScreenProps} from '@react-navigation/stack';
+import Spinner from '@components/Spinner';
 // import {BottomTab} from '@react-navigation/bottom-tabs';
 // import BottomTabBarItem from '@react-navigation/bottom-tabs/lib/typescript/src/views/BottomTabItem';
 // import {tab} from '@react-navigation/bottom-tabs';
@@ -73,7 +74,7 @@ const Tabs: React.FC<TabsProps> = ({navigation}) => {
       />
       <Tab.Screen
         name="UploadTab"
-        component={Upload}
+        component={Spinner}
         options={{
           unmountOnBlur: true,
           tabBarIcon: ({size, color}) => (

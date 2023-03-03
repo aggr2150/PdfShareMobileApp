@@ -32,21 +32,7 @@ const RevenueListHeader: React.FC<RevenueListHeaderProps> = ({
         }}>
         <View
           style={{
-            height: 32,
-            // alignSelf: '',
-            width: '100%',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            // marginHorizontal: 15,
-            // paddingTop: 10,
-            paddingRight: insets.right || 15,
-            paddingLeft: insets.left || 15,
-          }}>
-          <BackButton onPress={() => navigation.goBack()} color={'white'} />
-        </View>
-        <View
-          style={{
+            marginTop: 6,
             marginBottom: 12,
             flexDirection: 'row',
             justifyContent: 'center',

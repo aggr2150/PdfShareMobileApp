@@ -458,7 +458,6 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   return (
     <View
       style={{
-        paddingTop: insets.top || 5,
         paddingBottom: 0,
         paddingRight: insets.right,
         paddingLeft: insets.left,

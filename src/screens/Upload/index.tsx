@@ -1,16 +1,8 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {
-  Pressable,
-  ScrollView,
-  TextInput,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import {Pressable, TextInput, useWindowDimensions, View} from 'react-native';
 import {Button, makeStyles, Text} from '@rneui/themed';
 import {StackScreenProps} from '@react-navigation/stack';
-import {HeaderBackButton} from '@react-navigation/elements';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Book from '@components/Book';
 import ProgressModal from '@screens/Upload/ProgressModal';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import DocumentPicker, {
@@ -21,13 +13,10 @@ import BackButton from '@components/BackButton';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import BookCover from '@components/BookCover';
 import CheckButton from '@components/CheckButton';
-import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 
-type UploadProps = BottomTabScreenProps<BottomTabParamList, 'UploadTab'>;
-// | StackScreenProps<RootStackParamList, 'Upload'>
+type UploadProps = StackScreenProps<RootStackParamList, 'Upload'>;
 // | BottomTabScreenProps<BottomTabParamList, 'UploadTab'>;
-type UploadTabProps = BottomTabScreenProps<BottomTabParamList, 'UploadTab'>;
-const Upload: React.FC<UploadProps> = ({navigation, route}) => {
+const Upload: React.FC<UploadProps> = ({navigation}) => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
   const dimensions = useWindowDimensions();

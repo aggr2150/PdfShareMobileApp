@@ -15,6 +15,7 @@ export default createTheme({
       },
     },
   },
+  fontFamily: 'Apple SD Gothic Neo',
   lightColors: {
     sheetsBackground: '#99c729',
     black: '#fff',
