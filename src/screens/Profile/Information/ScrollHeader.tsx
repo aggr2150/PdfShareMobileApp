@@ -32,20 +32,16 @@ import {
 } from '@redux/reducer/blocksReducer';
 
 interface ProfileListHeaderProps {
-  selectedIndex?: number;
-  setSelectedIndex?: Dispatch<number>;
   user?: IUser;
   isMine: boolean;
 }
 const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
-  selectedIndex,
-  setSelectedIndex,
   user,
   isMine,
 }) => {
   const styles = useStyles();
   const navigation =
-    useNavigation<NavigationProp<ProfileStackScreenParams, 'Profile' | 'My'>>();
+    useNavigation<NavigationProp<RootStackParamList, 'ProfileTab'>>();
   const route =
     useRoute<RouteProp<ProfileStackScreenParams, 'Profile' | 'My'>>();
   const [visible, setVisible] = React.useState(false);
@@ -205,40 +201,6 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
           />
         )}
       </View>
-      {user?.description && (
-        <TouchableOpacity
-          style={{flex: 1}}
-          onPress={() => navigation.navigate('Information', user)}>
-          <Text
-            style={{
-              width: '100%',
-              paddingHorizontal: 15,
-              marginBottom: 15,
-              textAlign: 'center',
-            }}
-            numberOfLines={1}>
-            {user?.description}
-          </Text>
-        </TouchableOpacity>
-      )}
-      {isMine && setSelectedIndex && (
-        <ButtonGroup
-          buttons={['내 PDF', '좋아요', '구독중']}
-          selectedIndex={selectedIndex}
-          onPress={value => {
-            setSelectedIndex(value);
-          }}
-          buttonContainerStyle={{margin: 0}}
-          innerBorderStyle={{width: 0}}
-          containerStyle={{
-            borderWidth: 0,
-            marginHorizontal: 0,
-            marginVertical: 0,
-            borderRadius: 0,
-          }}
-          buttonStyle={{backgroundColor: '#000'}}
-        />
-      )}
     </View>
     // </Provider>
   );

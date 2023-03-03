@@ -9,6 +9,7 @@ declare type ProfileStackScreenParams = {
   My: undefined;
   Revenue: undefined;
   Profile: IUser | {id: string};
+  Information: IUser;
 };
 declare type HistoryStackScreenParams = {
   History: undefined;

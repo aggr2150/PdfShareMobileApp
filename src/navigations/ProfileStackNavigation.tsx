@@ -2,21 +2,24 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import Profile from '@screens/Profile';
 import Revenue from '@screens/Profile/Revenue';
-import Spinner from '@components/Spinner';
 import ProfileHeaderRight from '@screens/Profile/ProfileHeaderRight';
 import {makeStyles} from '@rneui/themed';
+import {useAppSelector} from '@redux/store/RootStore';
+import {getSession} from '@redux/reducer/authReducer';
+import Information from '@screens/Profile/Information';
 
 const ProfileStack = createStackNavigator<ProfileStackScreenParams>();
 
 const ProfileStackNavigation = () => {
   const styles = useStyles();
+  const session = useAppSelector(state => getSession(state));
   return (
     <ProfileStack.Navigator
       screenOptions={({navigation, route}) => ({
         cardStyle: styles.card,
         headerStyle: styles.header,
         headerTitleStyle: styles.headerTitle,
-        headerTitle: route.params?.id || '',
+        headerTitle: route.params?.id || session?.id || '',
         headerTintColor: 'white',
         headerPressColor: 'white',
       })}>
@@ -33,6 +36,11 @@ const ProfileStackNavigation = () => {
         <ProfileStack.Screen
           name="Profile"
           component={Profile}
+          // options={{headerShown: false}}
+        />
+        <ProfileStack.Screen
+          name="Information"
+          component={Information}
           // options={{headerShown: false}}
         />
       </ProfileStack.Group>
