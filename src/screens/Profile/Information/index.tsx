@@ -23,7 +23,7 @@ import reactStringReplace from 'react-string-replace';
 import TagText from '@components/TagText';
 
 type ProfileProps = StackScreenProps<ProfileStackScreenParams, 'Information'>;
-const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
+const Information: React.FC<ProfileProps> = ({navigation, route}) => {
   // const navigation = useNavigation();
   // const route = useRoute();
   // route.params.id
@@ -298,4 +298,4 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default Profile;
+export default Information;
