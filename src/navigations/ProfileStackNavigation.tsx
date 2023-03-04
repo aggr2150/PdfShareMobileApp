@@ -26,6 +26,7 @@ const ProfileStackNavigation = () => {
         headerTintColor: 'white',
         headerPressColor: 'white',
         headerLeftLabelVisible: false,
+        headerTitleAlign: 'left',
       })}>
       <ProfileStack.Group
         screenOptions={{
@@ -69,6 +70,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.colors.background,
     borderBottomWidth: 0,
     shadowOpacity: 0,
+    elevation: 0,
   },
   card: {backgroundColor: theme.colors.background},
 }));
