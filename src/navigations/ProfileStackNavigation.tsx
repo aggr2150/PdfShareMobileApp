@@ -25,6 +25,7 @@ const ProfileStackNavigation = () => {
         headerTitle: route.params?.id || session?.id || '',
         headerTintColor: 'white',
         headerPressColor: 'white',
+        headerLeftLabelVisible: false,
       })}>
       <ProfileStack.Group
         screenOptions={{
@@ -64,7 +65,11 @@ const useStyles = makeStyles(theme => ({
     fontFamily: theme.fontFamily,
     fontWeight: 'bold',
   },
-  header: {backgroundColor: theme.colors.background},
+  header: {
+    backgroundColor: theme.colors.background,
+    borderBottomWidth: 0,
+    shadowOpacity: 0,
+  },
   card: {backgroundColor: theme.colors.background},
 }));
 export default ProfileStackNavigation;

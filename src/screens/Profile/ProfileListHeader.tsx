@@ -49,7 +49,6 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
   const route =
     useRoute<RouteProp<ProfileStackScreenParams, 'Profile' | 'My'>>();
   const [visible, setVisible] = React.useState(false);
-
   const blockList = useAppSelector(state => selectAll(state.blocks));
   const block = useAppSelector(state =>
     selectBlockUserById(state.blocks, user?._id || ''),
@@ -158,7 +157,6 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
     }
   }, [session, csrfToken, dispatch, sessionUser, user]);
   return (
-    // <Provider>
     <View>
       <View
         style={{
@@ -208,6 +206,7 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
       {user?.description && (
         <TouchableOpacity
           style={{flex: 1}}
+          activeOpacity={0.7}
           onPress={() => navigation.navigate('Information', user)}>
           <Text
             style={{
@@ -216,7 +215,8 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
               marginBottom: 15,
               textAlign: 'center',
             }}
-            numberOfLines={1}>
+            numberOfLines={1}
+            ellipsizeMode={'tail'}>
             {user?.description}
           </Text>
         </TouchableOpacity>
@@ -240,7 +240,6 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
         />
       )}
     </View>
-    // </Provider>
   );
 };
 
@@ -265,18 +264,6 @@ const useStyles = makeStyles(theme => ({
   menuText: {
     fontSize: 12,
     color: theme.colors.black,
-  },
-  textInput: {
-    marginBottom: 7,
-    backgroundColor: theme.colors.white,
-    color: theme.colors.black,
-    // alignSelf: 'stretch',
-    textAlign: 'left',
-    borderRadius: 20,
-    paddingVertical: 5,
-    paddingHorizontal: 20,
-    fontSize: 14,
-    // color: theme.colors.white,
   },
   headerText: {
     fontSize: 17,
