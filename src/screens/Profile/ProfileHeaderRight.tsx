@@ -28,6 +28,7 @@ import {
   blockUserRemoveOne,
   selectById as selectBlockUserById,
 } from '@redux/reducer/blocksReducer';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 const ProfileHeaderRight = () => {
   const styles = useStyles();
@@ -165,6 +166,13 @@ const ProfileHeaderRight = () => {
             <DotIcon fill={'white'} width={24} height={24} />
           </TouchableOpacity>
         }>
+        <Menu.Item
+          dense={true}
+          onPress={() => {
+            Clipboard.setString(`https://everypdf.cc/u/${user.id}`);
+          }}
+          title={<Text style={styles.menuText}>링크 복사</Text>}
+        />
         {session?._id === user?._id ? (
           <>
             <Menu.Item
@@ -289,18 +297,6 @@ const ProfileHeaderRight = () => {
             />
           </>
         )}
-
-        <Menu.Item
-          dense={true}
-          onPress={() => {
-            Toast.show({
-              type: 'error',
-              text1: '만료된 인증번호 입니다.',
-              position: 'bottom',
-            });
-          }}
-          title={<Text style={styles.menuText}>테스트</Text>}
-        />
       </Menu>
     )
   );

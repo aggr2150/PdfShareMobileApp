@@ -21,11 +21,34 @@ declare type SearchStackScreenParams = {
   SearchResult: {keyword: string};
 };
 
+interface IID {
+  id: string;
+}
+type Viewer = IID | IPost;
+
 declare type RootStackParamList = {
   Tabs: import('@react-navigation/native').NavigatorScreenParams<BottomTabParamList>;
   ProfileTab: undefined;
   Collection: {_id: string};
-  Viewer: IPost;
+  Viewer:
+    | {
+        _id: string;
+        author: IAuthor;
+        title: string;
+        content: string;
+        tag: string[];
+        thumbnail?: IFile;
+        documentThumbnail: IFile;
+        document: IFile;
+        viewCounter: number;
+        likeCounter: number;
+        commentCounter: number;
+        isDeleted: boolean;
+        createdAt: Date;
+        updatedAt?: Date;
+        likeStatus: boolean;
+      }
+    | {id: string};
   SignIn: undefined;
   Comments: {postId: string};
   Replies: IComment;

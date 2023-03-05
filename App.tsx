@@ -9,9 +9,12 @@
  */
 
 import React from 'react';
-import {useColorScheme} from 'react-native';
 
-import {NavigationContainer} from '@react-navigation/native';
+import {
+  getStateFromPath,
+  LinkingOptions,
+  NavigationContainer,
+} from '@react-navigation/native';
 import RootNavigation from './src/navigations/RootNavigation';
 import {ThemeProvider} from '@rneui/themed';
 import theme from './src/components/theme';
@@ -23,17 +26,66 @@ import Toast from 'react-native-toast-message';
 import {RootStore} from '@redux/store/RootStore';
 import {Provider} from 'react-redux';
 import {Provider as PaperProvider} from 'react-native-paper';
-
+const linking: LinkingOptions<RootStackParamList> = {
+  prefixes: ['everyPdf://', 'https://everypdf.cc'],
+  config: {
+    initialRouteName: 'Tabs',
+    screens: {
+      Viewer: {
+        path: 'post/:_id',
+        // parse: {
+        //   _id: value => value,
+        // },
+        // params: {id: 'jane'},
+        // screens: {
+        //   Comments: {
+        //     path: ':postId/comment',
+        //   },
+        // },
+      },
+      Tabs: {
+        screens: {
+          ProfileTab: {
+            screens: {
+              Profile: {
+                path: 'u/:id',
+                exact: true,
+              },
+            },
+          },
+        },
+      },
+      // Profile: 'user',
+    },
+    /* configuration for matching screens with paths */
+  },
+  // getStateFromPath: (path, options) => {
+  //   const state = getStateFromPath(path, options);
+  //   const newState = {
+  //     ...state,
+  //     routes: state.routes.map(route => {
+  //       if (route.name === 'Chat') {
+  //         // modify your params however you like here!
+  //         return {
+  //           ...route,
+  //           params: {userObject: route.params},
+  //         };
+  //       } else {
+  //         return route;
+  //       }
+  //     }),
+  //   };
+  //   return newState;
+  // },
+};
 const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
   return (
     <>
       <ThemeProvider theme={theme}>
         <PaperProvider>
           <SafeAreaProvider>
             <Provider store={RootStore}>
-              <NavigationContainer>
+              <NavigationContainer linking={linking}>
                 <SheetProvider>
                   <RootNavigation />
                 </SheetProvider>

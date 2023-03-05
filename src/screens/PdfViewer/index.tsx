@@ -53,9 +53,10 @@ import Toast from 'react-native-toast-message';
 
 type ViewerProps = StackScreenProps<RootStackParamList, 'Viewer'>;
 const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
+  console.log('params', route.params, route.params?.id || route.params._id);
   const isDarkMode = useColorScheme() === 'dark';
   const post = useAppSelector(state =>
-    selectById(state.posts, route.params._id),
+    selectById(state.posts, route.params._id || route.params?.id),
   );
   const session = useAppSelector(state => getSession(state));
   const backgroundStyle = {
@@ -67,7 +68,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
 
   // route.params.document.filepath
   const source: Source = {
-    uri: route?.params?.document.filepath,
+    uri: post?.document.filepath,
     // uri: 'http://samples.leanpub.com/thereactnativebook-sample.pdf',
     // uri: 'ile://src/assets/테스트.pdf',
     cache: true,
@@ -86,8 +87,12 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   useFocusEffect(
     useCallback(() => {
       getCsrfToken.then(token => setCsrfToken(token));
+      // if (route.params?._id) {
+      // }
       apiInstance
-        .post<response<IPost>>('/api/post/' + route.params._id)
+        .post<response<IPost>>(
+          '/api/post/' + route.params?.id || route.params._id,
+        )
         .then(response => {
           console.log(response.data);
           if (response.data.data) {
@@ -131,7 +136,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
         });
     }
   }, [csrfToken, dispatch, post, session]);
-
+  console.log('pppp', post);
   return !post ? (
     <Spinner />
   ) : (
@@ -423,7 +428,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
         containerStyle={styles.sheetContainer}
         useBottomSafeAreaPadding={true}>
         <View style={{marginTop: 40}}>
-          {session._id === post.author._id ? (
+          {session?._id === post.author._id ? (
             <>
               <Pressable
                 style={{paddingVertical: 10}}

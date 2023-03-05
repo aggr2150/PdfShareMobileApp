@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {RefreshControl, ScrollView, View} from 'react-native';
+import {Linking, RefreshControl, ScrollView, View} from 'react-native';
 import Spinner from '@components/Spinner';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {StackScreenProps} from '@react-navigation/stack';
@@ -264,7 +264,11 @@ const Information: React.FC<ProfileProps> = ({navigation, route}) => {
                         color: 'blue',
                         fontSize: 13,
                       }}
-                      onPress={() => {}}>
+                      onPress={async () => {
+                        if (await Linking.canOpenURL(link)) {
+                          await Linking.openURL(link);
+                        }
+                      }}>
                       {link}
                     </TagText>
                   ),

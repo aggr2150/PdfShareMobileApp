@@ -54,6 +54,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
   });
   useEffect(() => {
     getCsrfToken.then(token => setCsrfToken(token));
+    console.log('ccc', route.params);
     apiInstance
       .post<response<IComment[]>>('/api/comment/list', {
         postId: route.params.postId,

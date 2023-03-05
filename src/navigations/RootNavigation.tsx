@@ -30,15 +30,15 @@ const RootStackNavigator = () => {
         component={SignIn}
         options={{headerShown: false}}
       />
-      <RootStack.Screen
-        name="Viewer"
-        component={PdfViewer}
-        options={{
-          headerShown: false,
-          // header: ViewerHeader,
-        }}
-      />
       <RootStack.Group>
+        <RootStack.Screen
+          name="Viewer"
+          component={PdfViewer}
+          options={{
+            headerShown: false,
+            // header: ViewerHeader,
+          }}
+        />
         <RootStack.Screen
           name="Comments"
           component={Comments}

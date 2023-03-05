@@ -18,6 +18,7 @@ import {
   commentAdded,
   commentAddedMany,
   removeComment,
+  selectById,
   updateComment,
 } from '@redux/reducer/commentsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
@@ -40,6 +41,9 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
   const dispatch = useAppDispatch();
   const [content, setContent] = useState('');
   const [viewHeight, setViewHeight] = useState(0);
+  const parentComment = useAppSelector(state =>
+    selectById(state.comments, route.params._id),
+  );
   const comments = useAppSelector(state => {
     return data.reduce<IComment[]>((previousValue, currentValue) => {
       currentValue &&
@@ -232,10 +236,10 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
             <Comment
               navigation={navigation}
               session={session}
-              isMine={session?._id === route.params.author._id}
+              isMine={session?._id === parentComment?.author._id}
               likeCallback={likeCallback}
               deleteCallback={deleteCallback}
-              item={route.params}
+              item={parentComment}
             />
           )}
           ListEmptyComponent={() =>
