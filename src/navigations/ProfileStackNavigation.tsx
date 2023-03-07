@@ -18,6 +18,7 @@ const ProfileStackNavigation = () => {
   const session = useAppSelector(state => getSession(state));
   return (
     <ProfileStack.Navigator
+      initialRouteName={'My'}
       screenOptions={({navigation, route}) => ({
         cardStyle: styles.card,
         headerStyle: styles.header,

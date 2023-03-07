@@ -15,7 +15,7 @@ import {
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {postSetMany} from '@redux/reducer/postsReducer';
 import {likeSetMany, selectAll, setAllLike} from '@redux/reducer/likesReducer';
-import {getSession} from '@redux/reducer/authReducer';
+import {EAuthState, getAuthState, getSession} from '@redux/reducer/authReducer';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import SubscribingRow from '@components/SubscribingRow';
 import {SheetManager} from 'react-native-actions-sheet';
@@ -24,6 +24,7 @@ import {throttle} from 'lodash';
 import ListEmptyComponent from '@components/ListEmptyComponent';
 import {Button} from '@rneui/themed';
 import {selectById as selectBlockUserById} from '@redux/reducer/blocksReducer';
+import SplashScreen from 'react-native-splash-screen';
 
 enum ETabIndex {
   'PDF',
@@ -42,6 +43,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
   const [selectedIndex, setSelectedIndex] = useState<ETabIndex>(ETabIndex.PDF);
   const session = useAppSelector(state => getSession(state));
+  const authState = useAppSelector(state => getAuthState(state));
   const user = useAppSelector(state =>
     selectUserById(state.users, route.params?.id || session?.id || ''),
   );
@@ -88,40 +90,42 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   }, _.isEqual);
   const dispatch = useAppDispatch();
   useEffect(() => {
-    apiInstance
-      .post<
-        response<{
-          user?: IUser;
-          feeds: IPost[];
-          likes: ILikePost[];
-          subscribing: IUser[];
-        }>
-      >('/api/user', {
-        id: route.params?.id,
-      })
-      .then(response => {
-        if (response.data.code === 200 && response.data.data.user) {
-          dispatch(setOneUser(response.data.data.user));
-          dispatch(postSetMany(response.data.data.feeds));
-          if (response.data.data.likes) {
-            dispatch(postSetMany(response.data.data.likes));
-            dispatch(setAllLike(response.data.data.likes));
+    if (authState !== EAuthState.INIT) {
+      apiInstance
+        .post<
+          response<{
+            user?: IUser;
+            feeds: IPost[];
+            likes: ILikePost[];
+            subscribing: IUser[];
+          }>
+        >('/api/user', {
+          id: route.params?.id,
+        })
+        .then(response => {
+          if (response.data.code === 200 && response.data.data.user) {
+            dispatch(setOneUser(response.data.data.user));
+            dispatch(postSetMany(response.data.data.feeds));
+            if (response.data.data.likes) {
+              dispatch(postSetMany(response.data.data.likes));
+              dispatch(setAllLike(response.data.data.likes));
+            }
+            if (response.data.data.subscribing) {
+              dispatch(userSetMany(response.data.data.subscribing));
+            }
+            setTabData([
+              response.data.data.feeds,
+              response.data.data.likes || [],
+              response.data.data.subscribing || [],
+            ]);
           }
-          if (response.data.data.subscribing) {
-            dispatch(userSetMany(response.data.data.subscribing));
-          }
-          setTabData([
-            response.data.data.feeds,
-            response.data.data.likes || [],
-            response.data.data.subscribing || [],
-          ]);
-        }
-      })
-      .finally(() => {
-        setFetching(false);
-        setRefreshing(false);
-      });
-  }, [dispatch, route.params?.id]);
+        })
+        .finally(() => {
+          setFetching(false);
+          setRefreshing(false);
+        });
+    }
+  }, [authState, dispatch, route.params?.id]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);

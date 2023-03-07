@@ -20,6 +20,8 @@ import {Button, makeStyles, Text} from '@rneui/themed';
 import ScrollHeader from '@screens/Profile/Information/ScrollHeader';
 import reactStringReplace from 'react-string-replace';
 import TagText from '@components/TagText';
+import {useLinkTo} from '@react-navigation/native';
+import UrlPattern from 'url-pattern';
 
 type ProfileProps = StackScreenProps<ProfileStackScreenParams, 'Information'>;
 const Information: React.FC<ProfileProps> = ({navigation, route}) => {
@@ -47,6 +49,7 @@ const Information: React.FC<ProfileProps> = ({navigation, route}) => {
   const sessionUser = useAppSelector(state =>
     selectUserById(state.users, session?.id || ''),
   );
+  const linkTo = useLinkTo();
   const dispatch = useAppDispatch();
   useEffect(() => {
     apiInstance
@@ -266,7 +269,19 @@ const Information: React.FC<ProfileProps> = ({navigation, route}) => {
                       }}
                       onPress={async () => {
                         if (await Linking.canOpenURL(link)) {
-                          await Linking.openURL(link);
+                          // const url = new URL(link);
+
+                          // new URL('https://naver.com');
+                          // let url = new URL(
+                          //   'https://developer.mozilla.org/ko/docs/Web/API/URL/host',
+                          // );
+                          // const url = new URL(link);
+                          // new UrlPattern('/post/:_id');
+                          // console.log(url.host, url.pathname);
+
+                          // linkTo(link);
+                          // linkTo('https://www.naver.com');
+                          // await Linking.openURL(link);
                         }
                       }}>
                       {link}

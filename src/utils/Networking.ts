@@ -17,7 +17,6 @@ export const apiInstance: AxiosInstance = axios.create({
 export const getCsrfToken = apiInstance
   .post<CsrfTokenResponse>('/api/csrfToken')
   .then(response => {
-    console.log(response.data);
     return response.data.data._csrf;
   });
 

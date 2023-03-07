@@ -13,9 +13,13 @@ import {CommonActions, useNavigation} from '@react-navigation/native';
 import {SheetManager} from 'react-native-actions-sheet';
 import AppLogo from '@assets/logo/appLogoWithText.svg';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
-import {initialized} from '@redux/reducer/authReducer';
+import {
+  EAuthState,
+  getAuthState,
+  initialized,
+} from '@redux/reducer/authReducer';
 import Keychain from 'react-native-keychain';
-import {useAppDispatch} from '@redux/store/RootStore';
+import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {blockUserSetAll} from '@redux/reducer/blocksReducer';
 
 const SignIn: React.FC = () => {
@@ -31,59 +35,74 @@ const SignIn: React.FC = () => {
   const showSheet = useCallback(async () => {
     await SheetManager.show('loginSheet', {payload: {closable: false}});
   }, []);
-  const initializeCallback = useCallback(() => {
-    Keychain.getGenericPassword()
-      .then(credentials => {
-        if (credentials) {
-          getCsrfToken.then(token => {
-            apiInstance
-              .post<response<ISession>>('/api/auth/signIn', {
-                _csrf: token,
-                id: credentials.username,
-                password: credentials.password,
-              })
-              .then(response => {
-                if (response.data.code !== 200) {
-                  dispatch(initialized(null));
-                  showSheet().then(r => console.log(r));
-                } else {
-                  dispatch(initialized(response.data.data));
-                  apiInstance.post('/api/account/block/list').then(result => {
-                    if (result.data.code === 200) {
-                      if (result.data.data) {
-                        console.log('block', result.data.data);
-                        dispatch(blockUserSetAll(result.data.data));
-                      }
-                    }
-                  });
-                  navigation.dispatch(
-                    CommonActions.reset({
-                      // stale: false,
-                      // stale: false,
-                      routes: [{name: 'Tabs'}],
-                    }),
-                  );
-                  // navigation.reset({stale: false, routes: [{name: 'Tabs'}]});
-                }
-                // aa().then(() => {});
-              })
-              .catch(error => console.log(error));
-          });
-        } else {
-          dispatch(initialized(null));
-          showSheet().then(r => console.log(r));
-        }
-      })
-      .finally(() => {
-        console.log('fine');
-      });
-  }, [dispatch, navigation, showSheet]);
-  React.useEffect(() => {
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return navigation.addListener('focus', () => {
-      initializeCallback();
-    });
-  }, [initializeCallback, navigation]);
+  const authState = useAppSelector(state => getAuthState(state));
+  useEffect(() => {
+    if (authState === EAuthState.NONE) {
+      showSheet().then(r => console.log(r));
+    } else if (authState === EAuthState.AUTHORIZED) {
+      navigation.dispatch(
+        CommonActions.reset({
+          // stale: false,
+          // stale: false,
+          routes: [{name: 'Tabs'}],
+        }),
+      );
+    }
+  }, [authState, navigation, showSheet]);
+
+  // const initializeCallback = useCallback(() => {
+  //   Keychain.getGenericPassword()
+  //     .then(credentials => {
+  //       if (credentials) {
+  //         getCsrfToken.then(token => {
+  //           apiInstance
+  //             .post<response<ISession>>('/api/auth/signIn', {
+  //               _csrf: token,
+  //               id: credentials.username,
+  //               password: credentials.password,
+  //             })
+  //             .then(response => {
+  //               if (response.data.code !== 200) {
+  //                 dispatch(initialized(null));
+  //                 showSheet().then(r => console.log(r));
+  //               } else {
+  //                 dispatch(initialized(response.data.data));
+  //                 apiInstance.post('/api/account/block/list').then(result => {
+  //                   if (result.data.code === 200) {
+  //                     if (result.data.data) {
+  //                       console.log('block', result.data.data);
+  //                       dispatch(blockUserSetAll(result.data.data));
+  //                     }
+  //                   }
+  //                 });
+  //                 navigation.dispatch(
+  //                   CommonActions.reset({
+  //                     // stale: false,
+  //                     // stale: false,
+  //                     routes: [{name: 'Tabs'}],
+  //                   }),
+  //                 );
+  //                 // navigation.reset({stale: false, routes: [{name: 'Tabs'}]});
+  //               }
+  //               // aa().then(() => {});
+  //             })
+  //             .catch(error => console.log(error));
+  //         });
+  //       } else {
+  //         dispatch(initialized(null));
+  //         showSheet().then(r => console.log(r));
+  //       }
+  //     })
+  //     .finally(() => {
+  //       console.log('fine');
+  //     });
+  // }, [dispatch, navigation, showSheet]);
+  // React.useEffect(() => {
+  //   // Return the function to unsubscribe from the event so it gets removed on unmount
+  //   return navigation.addListener('focus', () => {
+  //     initializeCallback();
+  //   });
+  // }, [initializeCallback, navigation]);
   const dimensions = useWindowDimensions();
   const styles = useStyles();
   return (

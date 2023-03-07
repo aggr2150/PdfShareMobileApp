@@ -44,12 +44,13 @@ import Spinner from '@components/Spinner';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {likeAdded, likeRemoved} from '@redux/reducer/likesReducer';
 import BoxIcon from '@assets/icon/box.svg';
-import {getSession} from '@redux/reducer/authReducer';
+import {EAuthState, getAuthState, getSession} from '@redux/reducer/authReducer';
 import TagText from '@components/TagText';
 import reactStringReplace from 'react-string-replace';
 import {humanizeDate} from '@utils/Humanize';
 import {deletePost} from '@utils/models/post';
 import Toast from 'react-native-toast-message';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 type ViewerProps = StackScreenProps<RootStackParamList, 'Viewer'>;
 const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
@@ -58,6 +59,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   const post = useAppSelector(state =>
     selectById(state.posts, route.params._id || route.params?.id),
   );
+  const authState = useAppSelector(state => getAuthState(state));
   const session = useAppSelector(state => getSession(state));
   const backgroundStyle = {
     flex: 1,
@@ -86,21 +88,23 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   const dispatch = useAppDispatch();
   useFocusEffect(
     useCallback(() => {
-      getCsrfToken.then(token => setCsrfToken(token));
-      // if (route.params?._id) {
-      // }
-      apiInstance
-        .post<response<IPost>>(
-          '/api/post/' + route.params?.id || route.params._id,
-        )
-        .then(response => {
-          console.log(response.data);
-          if (response.data.data) {
-            console.log('response.data.data', response.data.data);
-            dispatch(postSetOne(response.data.data));
-          }
-        });
-    }, [dispatch, route.params._id]),
+      if (authState !== EAuthState.INIT) {
+        getCsrfToken.then(token => setCsrfToken(token));
+        // if (route.params?._id) {
+        // }
+        apiInstance
+          .post<response<IPost>>(
+            '/api/post/' + route.params?.id || route.params._id,
+          )
+          .then(response => {
+            console.log(response.data);
+            if (response.data.data) {
+              console.log('response.data.data', response.data.data);
+              dispatch(postSetOne(response.data.data));
+            }
+          });
+      }
+    }, [authState, dispatch, route.params._id, route.params?.id]),
   );
   const likeCallback = useCallback(() => {
     if (!session) {
@@ -428,6 +432,13 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
         containerStyle={styles.sheetContainer}
         useBottomSafeAreaPadding={true}>
         <View style={{marginTop: 40}}>
+          <Pressable
+            style={{paddingVertical: 10}}
+            onPress={() =>
+              Clipboard.setString(`https://everypdf.cc/post/${post._id}`)
+            }>
+            <Text>링크 복사</Text>
+          </Pressable>
           {session?._id === post.author._id ? (
             <>
               <Pressable

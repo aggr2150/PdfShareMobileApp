@@ -20,7 +20,6 @@ const FirstScene = () => {
   const dispatch = useAppDispatch();
   useEffect(() => {
     apiInstance.post<response<IPost[]>>('/api/feeds/recent').then(response => {
-      console.log(response.data);
       if (response.data.code === 200 && response.data.data?.length !== 0) {
         setData(response.data.data);
         dispatch(postSetMany(response.data.data));

@@ -46,6 +46,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       Tabs: {
         screens: {
           ProfileTab: {
+            initialRouteName: 'My',
             screens: {
               Profile: {
                 path: 'u/:id',
