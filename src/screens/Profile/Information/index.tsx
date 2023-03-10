@@ -281,7 +281,7 @@ const Information: React.FC<ProfileProps> = ({navigation, route}) => {
 
                           // linkTo(link);
                           // linkTo('https://www.naver.com');
-                          // await Linking.openURL(link);
+                          await Linking.openURL(link);
                         }
                       }}>
                       {link}
