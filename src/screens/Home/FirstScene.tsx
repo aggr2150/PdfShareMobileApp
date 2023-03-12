@@ -10,6 +10,12 @@ import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {TestIds, useInterstitialAd} from 'react-native-google-mobile-ads';
 
 const adUnitId = TestIds.INTERSTITIAL;
+// const BACKGROUND_COLORS = ['#1750dd', '#108e13', '#fc86b7'];
+const LIST_ITEM_COLORS = [
+  {background: '#1750dd', book: '#fc86b7'},
+  {background: '#108e13', book: '#1750dd'},
+  {background: '#fc86b7', book: '#108e13'},
+];
 const FirstScene = () => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
@@ -68,7 +74,6 @@ const FirstScene = () => {
     <FlatList<IPost>
       data={posts}
       contentContainerStyle={{
-        width: '100%',
         // paddingTop: (insets.top || 24) + 46,
         paddingTop: (insets.top || 24) + 46 + 12,
         minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
@@ -80,7 +85,7 @@ const FirstScene = () => {
       keyExtractor={item => item._id}
       renderItem={({item, index}) => (
         // <TouchableOpacity>
-        <BookCard item={item} index={index} />
+        <BookCard item={item} index={index} colors={LIST_ITEM_COLORS} />
         // </TouchableOpacity>
       )}
     />

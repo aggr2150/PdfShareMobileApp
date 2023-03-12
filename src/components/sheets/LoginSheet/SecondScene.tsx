@@ -137,25 +137,39 @@ const SecondScene = props => {
     <View>
       <View style={styles.inputContainer}>
         <View style={styles.inputField}>
-          <View style={{flexDirection: 'row'}}>
+          <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
             <View style={{flex: 1}}>
               <TextInput
                 onChangeText={setEmail}
                 label="이메일 주소"
-                dense={true}
+                // label={<Text>이메일 주소</Text>}
+                // dense={true}
+                theme={{
+                  colors: {
+                    onSurfaceVariant: '#99c729',
+                  },
+                }}
                 style={styles.textInput}
                 contentStyle={styles.textInputContent}
+                // style={{color: 'red'}}
                 activeUnderlineColor={'#99c729'}
+                underlineColor={'#99c729'}
                 autoCorrect={false}
                 autoCapitalize={'none'}
-                underlineColor={'#99c729'}
+                textColor={'white'}
               />
             </View>
-            <TouchableOpacity
-              style={{justifyContent: 'center'}}
+            {/*<TouchableOpacity*/}
+            {/*  style={{justifyContent: 'center'}}*/}
+            {/*  onPress={sendVerificationCode}>*/}
+            {/*  <Text style={{color: 'red'}}>전송</Text>*/}
+            {/*</TouchableOpacity>*/}
+            <Button
+              buttonStyle={{borderRadius: 50, paddingHorizontal: 15}}
+              titleStyle={styles.buttonLabel}
               onPress={sendVerificationCode}>
-              <Text style={{color: 'red'}}>전송</Text>
-            </TouchableOpacity>
+              전송
+            </Button>
           </View>
           <TextInput
             onChangeText={setVerificationCode}
@@ -187,6 +201,7 @@ const SecondScene = props => {
             dense={true}
             style={styles.textInput}
             contentStyle={styles.textInputContent}
+            placeholderTextColor={'#99c729'}
             activeUnderlineColor={'#99c729'}
             textColor={'#fff'}
             underlineColor={'#99c729'}
@@ -197,6 +212,7 @@ const SecondScene = props => {
       </View>
       <View>
         <Button
+          buttonStyle={{minHeight: 40}}
           containerStyle={styles.submitButton}
           onPress={submit}
           // onPress={async () => {
@@ -238,7 +254,7 @@ const SecondScene = props => {
           //   }
           // }}
         >
-          aaa
+          회원가입
         </Button>
       </View>
     </View>
@@ -279,6 +295,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: 13,
     minHeight: 37,
     height: 48,
+    color: theme.colors.secondary,
   },
   textInputContent: {
     backgroundColor: theme.colors.black,
@@ -295,6 +312,9 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.colors.primary,
     alignItems: 'center',
     marginBottom: 7,
+  },
+  buttonLabel: {
+    fontSize: 15,
   },
 }));
 export default SecondScene;

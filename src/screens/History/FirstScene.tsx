@@ -6,21 +6,25 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {makeStyles} from '@rneui/themed';
+import {makeStyles, Text} from '@rneui/themed';
 import ThrottleFlatList from '@components/ThrottleFlatlist';
 import BookCard from '@components/BookCard';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
   FlatList,
+  Pressable,
   RefreshControl,
   TouchableOpacity,
   useWindowDimensions,
+  View,
 } from 'react-native';
 import {apiInstance} from '@utils/Networking';
 import _ from 'lodash';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
 import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
+import Book from '@components/Book';
+import Separator from '@components/Seperator';
 
 const FirstScene = () => {
   const styles = useStyles();
@@ -109,7 +113,46 @@ const FirstScene = () => {
           titleColor="#fff"
         />
       }
-      renderItem={({item, index}) => <BookCard item={item} index={index} />}
+      ItemSeparatorComponent={Separator}
+      renderItem={({item, index}) => (
+        <Pressable
+          onPress={() => {
+            navigation.navigate('Viewer', item);
+          }}
+          style={{
+            backgroundColor: '#ef5518',
+            paddingHorizontal: 21,
+            paddingVertical: 21,
+            aspectRatio: 32 / 12,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            flex: 1,
+          }}>
+          <View style={{flex: 0, paddingRight: 21}}>
+            <Book
+              author={item.author}
+              title={item.title}
+              thumbnail={item.thumbnail}
+              color={'#603502'}
+            />
+          </View>
+          <View style={{justifyContent: 'space-between', flex: 1}}>
+            <Text
+              numberOfLines={2}
+              style={{
+                fontSize: 22,
+                textAlign: 'right',
+                marginBottom: 37,
+                color: '#603502',
+              }}>
+              {item.title}
+            </Text>
+            <Text style={{fontSize: 16, textAlign: 'right', color: '#603502'}}>
+              {item.author.nickname}
+            </Text>
+          </View>
+        </Pressable>
+      )}
     />
     // </SafeAreaView>
   );

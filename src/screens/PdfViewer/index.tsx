@@ -62,7 +62,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   const authState = useAppSelector(state => getAuthState(state));
   const session = useAppSelector(state => getSession(state));
   const backgroundStyle = {
-    flex: 1,
+    // flex: 1,
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
@@ -94,7 +94,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
         // }
         apiInstance
           .post<response<IPost>>(
-            '/api/post/' + route.params?.id || route.params._id,
+            '/api/post/' + (route.params?.id || route.params._id),
           )
           .then(response => {
             console.log(response.data);
@@ -161,7 +161,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
           },
         ]}>
         <Pdf
-          fitPolicy={0}
+          fitPolicy={2}
           trustAllCerts={false}
           source={source}
           onPageSingleTap={() => setUIVisible(prevState => !prevState)}
@@ -372,6 +372,8 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                     paddingLeft: 15,
                     paddingVertical: 8,
                     flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}
                   onPress={() => {
                     if (route.params?.author.id) {
@@ -396,7 +398,10 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                       }
                     }
                   }}>
-                  <Avatar style={{width: 20, height: 20, marginRight: 5}} />
+                  <Avatar
+                    style={{width: 20, height: 20, marginRight: 5}}
+                    avatar={post.author?.avatar}
+                  />
                   <Text>{post.author.nickname} 님의 </Text>
                 </Pressable>
                 <Pressable
@@ -404,6 +409,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                   style={{
                     flex: 1,
                     paddingRight: 15,
+                    height: 20,
                     // justifyContent: 'center',
                     // alignItems: 'center',
                   }}>
@@ -434,9 +440,14 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
         <View style={{marginTop: 40}}>
           <Pressable
             style={{paddingVertical: 10}}
-            onPress={() =>
-              Clipboard.setString(`https://everypdf.cc/post/${post._id}`)
-            }>
+            onPress={() => {
+              Clipboard.setString(`https://everypdf.cc/post/${post._id}`);
+              Toast.show({
+                text1: '클립보드에 복사되었습니다.',
+                position: 'bottom',
+              });
+              actionSheetRef.current?.hide();
+            }}>
             <Text>링크 복사</Text>
           </Pressable>
           {session?._id === post.author._id ? (

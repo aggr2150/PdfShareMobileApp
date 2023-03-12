@@ -3,6 +3,7 @@ import {
   KeyboardAvoidingView,
   ListRenderItem,
   Platform,
+  Pressable,
   TextInput,
   TouchableOpacity,
   useWindowDimensions,
@@ -28,6 +29,7 @@ import {getSession} from '@redux/reducer/authReducer';
 import ListEmptyComponent from '@components/ListEmptyComponent';
 import Spinner from '@components/Spinner';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import Separator from '@components/Seperator';
 
 type ReplyProps = StackScreenProps<RootStackParamList, 'Replies'>;
 const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
@@ -233,14 +235,17 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
           data={comments}
           contentContainerStyle={{flexGrow: 1}}
           ListHeaderComponent={() => (
-            <Comment
-              navigation={navigation}
-              session={session}
-              isMine={session?._id === parentComment?.author._id}
-              likeCallback={likeCallback}
-              deleteCallback={deleteCallback}
-              item={parentComment}
-            />
+            <>
+              <Comment
+                navigation={navigation}
+                session={session}
+                isMine={session?._id === parentComment?.author._id}
+                likeCallback={likeCallback}
+                deleteCallback={deleteCallback}
+                item={parentComment}
+              />
+              <Separator />
+            </>
           )}
           ListEmptyComponent={() =>
             fetching ? (
@@ -257,16 +262,21 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
       </View>
       <KeyboardAvoidingView
         style={{
-          marginBottom: insets.bottom,
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
+          backgroundColor: 'black',
         }}
         keyboardVerticalOffset={dimensions.height - viewHeight}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <View
+        <Pressable
+          pointerEvents={session ? 'box-none' : 'box-only'}
+          onPress={() => {
+            if (!session) {
+              SheetManager.show('loginSheet', {
+                payload: {closable: true},
+              }).then();
+            }
+          }}
           style={{
+            paddingBottom: insets.bottom,
             flexDirection: 'row',
           }}>
           <View
@@ -311,7 +321,7 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
             }}>
             <SendIcon width={36} height={36} fill={'#99c729'} />
           </TouchableOpacity>
-        </View>
+        </Pressable>
       </KeyboardAvoidingView>
     </View>
   );

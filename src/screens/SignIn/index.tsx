@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect} from 'react';
 import {
+  Image,
   Pressable,
   SafeAreaView,
   StatusBar,
@@ -9,9 +10,13 @@ import {
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {makeStyles} from '@rneui/themed';
-import {CommonActions, useNavigation} from '@react-navigation/native';
+import {
+  CommonActions,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import {SheetManager} from 'react-native-actions-sheet';
-import AppLogo from '@assets/logo/appLogoWithText.svg';
+import AppLogo from '@assets/logo/AppLogo.svg';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {
   EAuthState,
@@ -38,7 +43,7 @@ const SignIn: React.FC = () => {
   const authState = useAppSelector(state => getAuthState(state));
   useEffect(() => {
     if (authState === EAuthState.NONE) {
-      showSheet().then(r => console.log(r));
+      showSheet().then();
     } else if (authState === EAuthState.AUTHORIZED) {
       navigation.dispatch(
         CommonActions.reset({
@@ -49,6 +54,19 @@ const SignIn: React.FC = () => {
       );
     }
   }, [authState, navigation, showSheet]);
+  useFocusEffect(() => {
+    if (authState === EAuthState.NONE) {
+      showSheet().then(r => console.log(r));
+    } else if (authState === EAuthState.AUTHORIZED) {
+      navigation.dispatch(
+        CommonActions.reset({
+          // stale: false,
+          // stale: false,
+          routes: [{name: 'Tabs'}],
+        }),
+      );
+    }
+  });
 
   // const initializeCallback = useCallback(() => {
   //   Keychain.getGenericPassword()
@@ -111,7 +129,8 @@ const SignIn: React.FC = () => {
         barStyle={'light-content'}
         backgroundColor={styles.statusBar.backgroundColor}
       />
-      <Pressable
+      <View
+        // onPress={showSheet}
         style={[
           styles.container,
           {
@@ -119,11 +138,15 @@ const SignIn: React.FC = () => {
               dimensions.height >= 240 * 2 ? 'flex-end' : 'center',
           },
         ]} //onLayout={showSheet}
-        onPress={showSheet}>
+      >
         {/*<View style={{marginBottom: '50%'}}>*/}
         <AppLogo width={240} height={240} />
+        {/*<Image*/}
+        {/*  source={require('@assets/logo/logo240.png')}*/}
+        {/*  style={{width: 210, height: 210}}*/}
+        {/*/>*/}
         {/*</View>*/}
-      </Pressable>
+      </View>
       {dimensions.height >= 240 * 2 && <View style={{flex: 1}}></View>}
     </SafeAreaView>
   );

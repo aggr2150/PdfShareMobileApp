@@ -59,8 +59,8 @@ const Tabs: React.FC<TabsProps> = ({navigation}) => {
         }}
       />
       <Tab.Screen
-        name="SearchTab"
-        component={SearchStackNavigation}
+        name="Search"
+        component={Search}
         options={{
           tabBarIcon: ({size, color}) => (
             <SearchIcon

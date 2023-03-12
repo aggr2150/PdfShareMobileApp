@@ -20,7 +20,7 @@ const Upload: React.FC<UploadProps> = ({navigation}) => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
   const dimensions = useWindowDimensions();
-  const [progressModalVisible, setProgressModalVisible] = useState(true);
+  const [progressModalVisible, setProgressModalVisible] = useState(false);
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');

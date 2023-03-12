@@ -1,15 +1,20 @@
-import React, {useEffect} from 'react';
-import {Platform, Pressable, View} from 'react-native';
+import React from 'react';
+import {ColorValue, Pressable, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
 import Book from '@src/components/Book';
-import {TestIds, useInterstitialAd} from 'react-native-google-mobile-ads';
+import {TestIds} from 'react-native-google-mobile-ads';
 import {humanizeNumber} from '@utils/Humanize';
 import InterstitialAdsController from '@components/InterstitialAdsController';
 
+type BookColors = {
+  book: ColorValue;
+  background: ColorValue;
+};
 interface BookCardProps {
   item: IPost;
   index: number;
+  colors?: BookColors[];
 }
 // const adUnitId = __DEV__
 //   ? TestIds.INTERSTITIAL
@@ -24,18 +29,16 @@ const adUnitId = TestIds.INTERSTITIAL;
 //   // keywords: ['fashion', 'clothing'],
 // });
 
-const getBackgroundColor = (index: number) => {
-  switch (index % 3) {
-    case 0:
-      return '#1a3692';
-    case 1:
-      return '#e73f90';
-    case 2:
-      return '#e5c642';
-  }
-};
 // interstitial.load();
-const BookCard: React.FC<BookCardProps> = ({item, index, onPress}) => {
+const BookCard: React.FC<BookCardProps> = ({
+  item,
+  index,
+  colors = [
+    {background: '#1750dd', book: '#fc86b7'},
+    {background: '#108e13', book: '#1750dd'},
+    {background: '#fc86b7', book: '#108e13'},
+  ],
+}) => {
   const styles = useStyles();
   const navigation = useNavigation();
   return (
@@ -46,7 +49,7 @@ const BookCard: React.FC<BookCardProps> = ({item, index, onPress}) => {
       }}
       style={{
         aspectRatio: 16 / 9,
-        backgroundColor: getBackgroundColor(index),
+        backgroundColor: colors[index % 3].background,
         width: '100%',
       }}>
       <View
@@ -141,6 +144,7 @@ const BookCard: React.FC<BookCardProps> = ({item, index, onPress}) => {
               documentThumbnail={item?.documentThumbnail}
               thumbnail={item?.thumbnail}
               title={item?.title}
+              color={colors[index % 3].book}
             />
           </View>
         </View>

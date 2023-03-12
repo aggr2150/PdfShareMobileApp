@@ -30,11 +30,11 @@ const LoginSheet: React.FC<SheetProps<loginSheetPayload>> = props => {
   useEffect(() => {
     if (props.payload?.closable === false && closable) {
       sheetRef.current?.hide();
-      navigation.dispatch(
-        CommonActions.reset({
-          routes: [{name: 'Tabs'}],
-        }),
-      );
+      //   navigation.dispatch(
+      //     CommonActions.reset({
+      //       routes: [{name: 'Tabs'}],
+      //     }),
+      //   );
     }
   }, [closable, navigation, props.payload?.closable]);
 

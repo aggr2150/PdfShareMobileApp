@@ -1,5 +1,11 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {FlatList, Pressable, TextInput, View} from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  TextInput,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import Separator from '@components/Seperator';
 import ActionSheet, {ActionSheetRef} from 'react-native-actions-sheet';
@@ -9,13 +15,14 @@ import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {StackScreenProps} from '@react-navigation/stack';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {postSetMany} from '@redux/reducer/postsReducer';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import {Provider} from 'react-native-paper';
 import CollectionHeader from '@screens/History/CollectionList/CollectionHeader';
 import {collectionSetOne} from '@redux/reducer/collectionsReducer';
 import ListEmptyComponent from '@components/ListEmptyComponent';
 import Spinner from '@components/Spinner';
+import BackButton from '@components/BackButton';
 
 type CollectionProps = StackScreenProps<HistoryStackScreenParams, 'Collection'>;
 const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
@@ -34,6 +41,9 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
       )
       .then(response => {
         if (response.data.data.collection) {
+          navigation.setOptions({
+            headerTitle: response.data.data.collection.title,
+          });
           setTitle(response.data.data.collection.title);
           dispatch(postSetMany(response.data.data.feeds));
           setCollection(response.data.data.collection);
@@ -80,139 +90,183 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
       });
   }, [csrfToken, initialize, route.params._id, title]);
   const openSheet = () => renameSheetRef.current?.show();
+  const insets = useSafeAreaInsets();
+  const dimensions = useWindowDimensions();
   return (
-    <SafeAreaView style={styles.container}>
-      <Provider>
-        <CollectionHeader collection={collection} openSheet={openSheet} />
-        <FlatList<IPost>
-          contentContainerStyle={{flexGrow: 1}}
-          data={data}
-          // style={{width: '100%'}}
-          // ListHeaderComponent={() => (
-          //   <CollectionHeader collection={collection} openSheet={openSheet} />
-          // )}
-          ItemSeparatorComponent={Separator}
-          ListEmptyComponent={() =>
-            fetching ? (
-              <Spinner />
-            ) : (
-              <ListEmptyComponent>빈 콜렉션입니다.</ListEmptyComponent>
-            )
-          }
-          renderItem={({item}) => {
-            return (
-              <Pressable
-                onPress={() => {
-                  navigation.navigate('Viewer', item);
-                }}
-                style={{
-                  backgroundColor: '#282828',
-                  paddingHorizontal: 21,
-                  paddingVertical: 21,
-                  aspectRatio: 32 / 12,
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  flex: 1,
-                }}>
-                <View style={{flex: 0, paddingRight: 21}}>
-                  <Book
-                    author={item.author}
-                    title={item.title}
-                    thumbnail={item.thumbnail}
-                  />
-                </View>
-                <View style={{justifyContent: 'space-between', flex: 1}}>
-                  <Text
-                    numberOfLines={2}
-                    style={{
-                      fontSize: 22,
-                      textAlign: 'right',
-                      marginBottom: 37,
-                    }}>
-                    {item.title}
-                  </Text>
-                  {/*<Menu*/}
-                  {/*  visible={visible}*/}
-                  {/*  onDismiss={closeMenu}*/}
-                  {/*  style={{zIndex: 100}}*/}
-                  {/*  anchor={<Button onPress={openMenu}>Show menu</Button>}>*/}
-                  {/*  <Menu.Item onPress={() => {}} title="Item 1" />*/}
-                  {/*  <Menu.Item onPress={() => {}} title="Item 2" />*/}
-                  {/*  /!*<Divider />*!/*/}
-                  {/*  <Menu.Item onPress={() => {}} title="Item 3" />*/}
-                  {/*</Menu>*/}
-                  <Text style={{fontSize: 16, textAlign: 'right'}}>
-                    {item.author.nickname}
-                  </Text>
-                </View>
-              </Pressable>
-            );
-          }}
-        />
-        <ActionSheet
-          ref={renameSheetRef}
-          // closable={false}
-          // headerAlwaysVisible={false}
-          gestureEnabled={true}
-          CustomHeaderComponent={<></>}
-          statusBarTranslucent
-          overdrawSize={0}
-          isModal={true}
-          // indicatorStyle={{height: 100}}
-          drawUnderStatusBar={true}
-          useBottomSafeAreaPadding={true}
-          containerStyle={styles.sheetContainer}>
-          <View>
-            <View style={styles.header}>
-              <Text style={styles.headerText}>콜렉션 수정</Text>
-            </View>
-            <Separator style={{marginVertical: 10}} />
-            <View
+    <View style={styles.container}>
+      {/*<CollectionHeader collection={collection} openSheet={openSheet} />*/}
+
+      {/*<View*/}
+      {/*  style={{*/}
+      {/*    // zIndex: 0,*/}
+      {/*    position: 'absolute',*/}
+      {/*    top: insets.top,*/}
+      {/*    left: insets.left,*/}
+      {/*  }}>*/}
+      <View
+        style={{
+          marginHorizontal: 11,
+          top: insets.top || 15,
+          left: insets.left || 8,
+          position: 'absolute',
+          alignSelf: 'flex-start',
+          zIndex: 1,
+        }}>
+        <Pressable
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 36,
+            backgroundColor: 'white',
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 0,
+              height: 1,
+            },
+            shadowOpacity: 0.22,
+            shadowRadius: 2.22,
+            elevation: 3,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <BackButton onPress={() => navigation.goBack()} color={'black'} />
+        </Pressable>
+      </View>
+      {/*</View>*/}
+      <FlatList<IPost>
+        contentContainerStyle={{flexGrow: 1}}
+        data={data}
+        // style={{width: '100%'}}
+        // ListHeaderComponent={() => (
+        //   <CollectionHeader collection={collection} openSheet={openSheet} />
+        // )}
+        ItemSeparatorComponent={Separator}
+        ListEmptyComponent={() =>
+          fetching ? (
+            <Spinner />
+          ) : (
+            <ListEmptyComponent>빈 콜렉션입니다.</ListEmptyComponent>
+          )
+        }
+        contentContainerStyle={{
+          flexGrow: 1,
+          // paddingTop: (insets.top || 24) + 46,
+          paddingTop: (insets.top || 24) + 46 + 12,
+          minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
+        }}
+        renderItem={({item}) => {
+          return (
+            <Pressable
+              onPress={() => {
+                navigation.navigate('Viewer', item);
+              }}
               style={{
-                marginHorizontal: 32,
-                marginVertical: 35,
+                backgroundColor: '#282828',
+                paddingHorizontal: 21,
+                paddingVertical: 21,
+                aspectRatio: 32 / 12,
                 flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: '#4c4c4c',
-                borderRadius: 100,
-                overflow: 'hidden',
+                justifyContent: 'space-between',
+                flex: 1,
               }}>
-              <View
-                style={{
-                  padding: 20,
-                  paddingHorizontal: 32,
-                  flex: 1,
-                  backgroundColor: '#4c4c4c',
-                }}>
-                <TextInput
-                  style={{
-                    fontSize: 13,
-                    padding: 0,
-                    color: '#fff',
-                  }}
-                  onChangeText={setTitle}
-                  onSubmitEditing={submit}
-                  placeholderTextColor={'#fff'}
-                  placeholder={'콜렉션 이름을 입력하세요.'}
-                  value={title}
+              <View style={{flex: 0, paddingRight: 21}}>
+                <Book
+                  author={item.author}
+                  title={item.title}
+                  thumbnail={item.thumbnail}
                 />
               </View>
-              <Pressable
-                onPress={submit}
-                style={{
-                  paddingHorizontal: 28,
-                  backgroundColor: '#99c729',
-                  // flex: 1,
-                }}>
-                <View style={{flex: 1, justifyContent: 'center'}}>
-                  <Text>완료</Text>
-                </View>
-              </Pressable>
-            </View>
+              <View style={{justifyContent: 'space-between', flex: 1}}>
+                <Text
+                  numberOfLines={2}
+                  style={{
+                    fontSize: 22,
+                    textAlign: 'right',
+                    marginBottom: 37,
+                  }}>
+                  {item.title}
+                </Text>
+                {/*<Menu*/}
+                {/*  visible={visible}*/}
+                {/*  onDismiss={closeMenu}*/}
+                {/*  style={{zIndex: 100}}*/}
+                {/*  anchor={<Button onPress={openMenu}>Show menu</Button>}>*/}
+                {/*  <Menu.Item onPress={() => {}} title="Item 1" />*/}
+                {/*  <Menu.Item onPress={() => {}} title="Item 2" />*/}
+                {/*  /!*<Divider />*!/*/}
+                {/*  <Menu.Item onPress={() => {}} title="Item 3" />*/}
+                {/*</Menu>*/}
+                <Text style={{fontSize: 16, textAlign: 'right'}}>
+                  {item.author.nickname}
+                </Text>
+              </View>
+            </Pressable>
+          );
+        }}
+      />
+      <ActionSheet
+        ref={renameSheetRef}
+        // closable={false}
+        // headerAlwaysVisible={false}
+        gestureEnabled={true}
+        CustomHeaderComponent={<></>}
+        statusBarTranslucent
+        overdrawSize={0}
+        isModal={true}
+        // indicatorStyle={{height: 100}}
+        drawUnderStatusBar={true}
+        useBottomSafeAreaPadding={true}
+        containerStyle={styles.sheetContainer}>
+        <View>
+          <View style={styles.header}>
+            <Text style={styles.headerText}>콜렉션 수정</Text>
           </View>
-        </ActionSheet>
-      </Provider>
-    </SafeAreaView>
+          <Separator style={{marginVertical: 10}} />
+          <View
+            style={{
+              marginHorizontal: 32,
+              marginVertical: 35,
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: '#4c4c4c',
+              borderRadius: 100,
+              overflow: 'hidden',
+            }}>
+            <View
+              style={{
+                padding: 20,
+                paddingHorizontal: 32,
+                flex: 1,
+                backgroundColor: '#4c4c4c',
+              }}>
+              <TextInput
+                style={{
+                  fontSize: 13,
+                  padding: 0,
+                  color: '#fff',
+                }}
+                onChangeText={setTitle}
+                onSubmitEditing={submit}
+                placeholderTextColor={'#fff'}
+                placeholder={'콜렉션 이름을 입력하세요.'}
+                value={title}
+              />
+            </View>
+            <Pressable
+              onPress={submit}
+              style={{
+                paddingHorizontal: 28,
+                backgroundColor: '#99c729',
+                // flex: 1,
+              }}>
+              <View style={{flex: 1, justifyContent: 'center'}}>
+                <Text>완료</Text>
+              </View>
+            </Pressable>
+          </View>
+        </View>
+      </ActionSheet>
+    </View>
   );
 };
 

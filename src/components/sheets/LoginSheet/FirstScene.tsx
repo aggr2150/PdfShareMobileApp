@@ -79,7 +79,7 @@ const FirstScene = props => {
           onChangeText={setEmail}
           style={styles.textInput}
           placeholder={'이메일 주소'}
-          placeholderTextColor={'#99c729'}
+          placeholderTextColor={'#60b630'}
           inputContainerStyle={{borderBottomWidth: 0}}
           renderErrorMessage={false}
           containerStyle={{paddingHorizontal: 0}}
@@ -95,7 +95,7 @@ const FirstScene = props => {
           ref={passwordRef}
           style={styles.textInput}
           placeholder={'비밀번호'}
-          placeholderTextColor={'#99c729'}
+          placeholderTextColor={'#60b630'}
           inputContainerStyle={{borderBottomWidth: 0}}
           renderErrorMessage={false}
           containerStyle={{paddingHorizontal: 0, margin: 0}}
@@ -167,7 +167,7 @@ const useStyles = makeStyles(theme => ({
   textInput: {
     marginBottom: 7,
     backgroundColor: theme.colors.black,
-    color: theme.colors.white,
+    color: theme.colors.tertiary,
     // alignSelf: 'stretch',
     textAlign: 'left',
     borderRadius: 20,

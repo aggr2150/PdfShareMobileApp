@@ -170,6 +170,11 @@ const ProfileHeaderRight = () => {
           dense={true}
           onPress={() => {
             Clipboard.setString(`https://everypdf.cc/u/${user.id}`);
+            Toast.show({
+              text1: '클립보드에 복사되었습니다.',
+              position: 'bottom',
+            });
+            closeMenu();
           }}
           title={<Text style={styles.menuText}>링크 복사</Text>}
         />

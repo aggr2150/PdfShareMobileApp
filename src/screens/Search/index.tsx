@@ -1,7 +1,13 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {FlatList, StatusBar, useWindowDimensions, View} from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  StatusBar,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import {makeStyles, SearchBar, Text} from '@rneui/themed';
-import {useNavigation} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import BookCard from '@components/BookCard';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
@@ -11,7 +17,11 @@ import _ from 'lodash';
 import Spinner from '@components/Spinner';
 import queryString from 'query-string';
 import Book from '@components/Book';
-const Search = () => {
+import {StackScreenProps} from '@react-navigation/stack';
+import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
+const LIST_ITEM_COLORS = ['#108e13', '#fc86b7', '#1750dd'];
+type SearchProps = BottomTabScreenProps<BottomTabParamList, 'Search'>;
+const Search: React.FC<SearchProps> = ({navigation, route}) => {
   const styles = useStyles();
   const [keyword, setKeyword] = useState<string>('');
   const insets = useSafeAreaInsets();
@@ -23,6 +33,11 @@ const Search = () => {
   const [sample, setSample] = useState<IPost[]>([]);
   const dimensions = useWindowDimensions();
   const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (route.params?.keyword) {
+      setKeyword(route.params.keyword);
+    }
+  }, [route.params?.keyword]);
   useEffect(() => {
     apiInstance.post<response<IPost[]>>('/api/feeds/sample').then(response => {
       if (response.data.data.length !== 0) {
@@ -264,49 +279,55 @@ const Search = () => {
             onEndReached={onEndReached}
             onRefresh={onRefresh}
             refreshing={refreshing}
-            renderItem={({item, index}) => (
-              // <TouchableOpacity>
-              // <BookCard item={item} index={index} />
-              <View
-                style={{
-                  flex: 1 / 3,
-                }}>
-                <View
+            renderItem={({item, index}) => {
+              return (
+                // <TouchableOpacity>
+                // <BookCard item={item} index={index} />
+                <Pressable
+                  onPress={() =>
+                    navigation.dispatch(CommonActions.navigate('Viewer', item))
+                  }
                   style={{
-                    // backgroundColor: 'red',
-                    // height: 300,
-                    // width: 100,
-                    flex: 1,
-                    margin: 4,
-                    // padding: 10,
+                    flex: 1 / 3,
                   }}>
                   <View
                     style={{
-                      marginVertical: 5,
-                      // aspectRatio: 1 / Math.sqrt(2),
+                      // backgroundColor: 'red',
+                      // height: 300,
+                      // width: 100,
+                      flex: 1,
+                      margin: 4,
+                      // padding: 10,
                     }}>
                     <View
                       style={{
-                        // marginVertical: 5,
-                        aspectRatio: 1 / Math.sqrt(2),
+                        marginVertical: 5,
+                        // aspectRatio: 1 / Math.sqrt(2),
                       }}>
-                      <Book
-                        title={item.title}
-                        author={item.author}
-                        thumbnail={item.thumbnail}
-                      />
+                      <View
+                        style={{
+                          // marginVertical: 5,
+                          aspectRatio: 1 / Math.sqrt(2),
+                        }}>
+                        <Book
+                          title={item.title}
+                          author={item.author}
+                          thumbnail={item.thumbnail}
+                          color={LIST_ITEM_COLORS[(index / 3).toFixed(0) % 3]}
+                        />
+                      </View>
                     </View>
+                    <Text style={styles.titleLabel} numberOfLines={3}>
+                      {item.title}
+                    </Text>
+                    <Text style={styles.authorLabel} numberOfLines={2}>
+                      {item.author.nickname}
+                    </Text>
                   </View>
-                  <Text style={styles.titleLabel} numberOfLines={3}>
-                    {item.title}
-                  </Text>
-                  <Text style={styles.authorLabel} numberOfLines={2}>
-                    {item.author.nickname}
-                  </Text>
-                </View>
-              </View>
-              // </TouchableOpacity>
-            )}
+                </Pressable>
+                // </TouchableOpacity>
+              );
+            }}
           />
         )}
       </View>

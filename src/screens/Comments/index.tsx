@@ -3,6 +3,7 @@ import {
   KeyboardAvoidingView,
   ListRenderItem,
   Platform,
+  Pressable,
   TextInput,
   TouchableOpacity,
   useWindowDimensions,
@@ -243,14 +244,9 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
           }
         />
       </View>
-
       <KeyboardAvoidingView
         style={{
-          marginBottom: insets.bottom,
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
+          backgroundColor: 'black',
         }}
         // keyboardVerticalOffset={insets.bottom}
         // keyboardVerticalOffset={headerHeight}
@@ -266,8 +262,17 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         // behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View
+        <Pressable
+          pointerEvents={session ? 'box-none' : 'box-only'}
+          onPress={() => {
+            if (!session) {
+              SheetManager.show('loginSheet', {
+                payload: {closable: true},
+              }).then();
+            }
+          }}
           style={{
+            paddingBottom: insets.bottom,
             flexDirection: 'row',
           }}>
           <View
@@ -279,15 +284,25 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
               overflow: 'hidden',
               marginVertical: 5,
             }}>
-            <TextInput
-              style={styles.textInput}
-              placeholder={'댓글 입력'}
-              placeholderTextColor={'#606060'}
-              value={content}
-              textAlignVertical={'center'}
-              onChangeText={setContent}
-              multiline
-            />
+            <TouchableOpacity
+              onPress={() => {
+                if (!session) {
+                  SheetManager.show('loginSheet', {
+                    payload: {closable: true},
+                  }).then();
+                }
+              }}>
+              <TextInput
+                editable={!!session}
+                style={styles.textInput}
+                placeholder={'댓글 입력'}
+                placeholderTextColor={'#606060'}
+                value={content}
+                textAlignVertical={'center'}
+                onChangeText={setContent}
+                multiline
+              />
+            </TouchableOpacity>
           </View>
           <TouchableOpacity
             onPress={submit}
@@ -298,7 +313,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
             }}>
             <SendIcon width={36} height={36} fill={'#99c729'} />
           </TouchableOpacity>
-        </View>
+        </Pressable>
       </KeyboardAvoidingView>
     </View>
   );

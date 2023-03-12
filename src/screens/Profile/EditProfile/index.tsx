@@ -132,6 +132,9 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
             onPress={openImagePicker}
             style={{
               marginBottom: 12,
+              borderWidth: 1,
+              borderRadius: 100,
+              borderColor: '#cbe244',
             }}>
             <Avatar
               avatar={avatar ? {filepath: avatar.path} : route.params.avatar}
@@ -177,20 +180,6 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
               underlineColor={'#99c729'}
               onChangeText={setNickname}
               value={nickname}
-            />
-            <TextInput
-              label="채널 링크"
-              dense={true}
-              style={styles.textInput}
-              contentStyle={styles.textInputContent}
-              activeUnderlineColor={'#99c729'}
-              autoCapitalize={'none'}
-              keyboardType={'url'}
-              multiline={true}
-              textColor={'#fff'}
-              underlineColor={'#99c729'}
-              onChangeText={setLink}
-              value={link}
             />
             <TextInput
               label="내 소개"

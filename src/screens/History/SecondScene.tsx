@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
-  Pressable,
   TouchableOpacity,
   useWindowDimensions,
   View,
@@ -90,7 +89,7 @@ const SecondScene: React.FC = () => {
             activeOpacity={0.7}
             onPress={() => navigation.navigate('Collection', {_id: item._id})}
             style={{
-              backgroundColor: '#282828',
+              backgroundColor: '#3a3a3a',
               paddingHorizontal: 42,
               paddingVertical: 54,
               justifyContent: 'center',

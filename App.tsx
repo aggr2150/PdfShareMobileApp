@@ -25,7 +25,10 @@ import codePush from 'react-native-code-push';
 import Toast from 'react-native-toast-message';
 import {RootStore} from '@redux/store/RootStore';
 import {Provider} from 'react-redux';
-import {Provider as PaperProvider} from 'react-native-paper';
+import {
+  Provider as PaperProvider,
+  MD3LightTheme as DefaultTheme,
+} from 'react-native-paper';
 const linking: LinkingOptions<RootStackParamList> = {
   prefixes: ['everyPdf://', 'https://everypdf.cc'],
   config: {
@@ -83,7 +86,14 @@ const App = () => {
   return (
     <>
       <ThemeProvider theme={theme}>
-        <PaperProvider>
+        <PaperProvider
+          theme={{
+            ...DefaultTheme,
+            colors: {
+              ...DefaultTheme.colors,
+              onSurfaceVariant: '#99c729',
+            },
+          }}>
           <SafeAreaProvider>
             <Provider store={RootStore}>
               <NavigationContainer linking={linking}>

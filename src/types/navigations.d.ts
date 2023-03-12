@@ -1,6 +1,6 @@
 declare type BottomTabParamList = {
   HomeTab: undefined;
-  SearchTab: import('@react-navigation/native').NavigatorScreenParams<SearchStackScreenParams>;
+  Search: undefined | {keyword: string};
   UploadTab: undefined;
   HistoryTab: import('@react-navigation/native').NavigatorScreenParams<HistoryStackScreenParams>;
   ProfileTab: import('@react-navigation/native').NavigatorScreenParams<ProfileStackScreenParams>;
@@ -17,7 +17,7 @@ declare type HistoryStackScreenParams = {
 };
 
 declare type SearchStackScreenParams = {
-  Search: undefined;
+  Search: undefined | {keyword: string};
   SearchResult: {keyword: string};
 };
 

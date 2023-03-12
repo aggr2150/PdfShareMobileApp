@@ -1,5 +1,5 @@
 import {Text} from '@rneui/themed';
-import {View} from 'react-native';
+import {ColorValue, View} from 'react-native';
 import React, {useState} from 'react';
 import FastImage from 'react-native-fast-image';
 import {Image} from 'react-native-image-crop-picker';
@@ -8,8 +8,9 @@ interface BookProps {
   title: string;
   author: IAuthor;
   thumbnail?: IFile;
+  color?: ColorValue;
 }
-const Book: React.FC<BookProps> = ({title, author, thumbnail}) => {
+const Book: React.FC<BookProps> = ({title, author, thumbnail, color}) => {
   const [dimension, setDimension] = useState<{width: number; height: number}>({
     width: 0,
     height: 0,
@@ -43,7 +44,7 @@ const Book: React.FC<BookProps> = ({title, author, thumbnail}) => {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: 'brown',
+        backgroundColor: color || 'brown',
         padding: dimension.width * 0.1,
         paddingTop: dimension.height * 0.15,
         paddingBottom: dimension.height * 0.2,

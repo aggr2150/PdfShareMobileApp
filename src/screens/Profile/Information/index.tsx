@@ -20,7 +20,7 @@ import {Button, makeStyles, Text} from '@rneui/themed';
 import ScrollHeader from '@screens/Profile/Information/ScrollHeader';
 import reactStringReplace from 'react-string-replace';
 import TagText from '@components/TagText';
-import {useLinkTo} from '@react-navigation/native';
+import {CommonActions, useLinkTo} from '@react-navigation/native';
 import UrlPattern from 'url-pattern';
 
 type ProfileProps = StackScreenProps<ProfileStackScreenParams, 'Information'>;
@@ -264,7 +264,7 @@ const Information: React.FC<ProfileProps> = ({navigation, route}) => {
                   link => (
                     <TagText
                       style={{
-                        color: 'blue',
+                        color: '#99c729',
                         fontSize: 13,
                       }}
                       onPress={async () => {
@@ -293,10 +293,14 @@ const Information: React.FC<ProfileProps> = ({navigation, route}) => {
                 tag => (
                   <TagText
                     style={{
-                      color: 'yellow',
+                      color: '#99c729',
                       fontSize: 13,
                     }}
-                    onPress={() => {}}>
+                    onPress={() => {
+                      navigation.dispatch(
+                        CommonActions.navigate('Search', {keyword: `#${tag}`}),
+                      );
+                    }}>
                     #{tag}
                   </TagText>
                 ),

@@ -2,6 +2,7 @@ declare interface IAuthor {
   _id: string;
   id: string;
   nickname: string;
+  avatar?: IFile;
 }
 declare interface IFile {
   _id?: string;
