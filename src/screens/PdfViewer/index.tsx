@@ -148,8 +148,8 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
       style={[
         backgroundStyle,
         {
-          width: dimensions.width,
-          height: dimensions.height,
+          // width: dimensions.width,
+          // height: dimensions.height,
         },
       ]}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'#eee'} />
@@ -204,9 +204,9 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                   width: 0,
                   height: 1,
                 },
-                shadowOpacity: 0.22,
+                shadowOpacity: 0.1,
                 shadowRadius: 2.22,
-                elevation: 3,
+                elevation: 2,
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
@@ -349,11 +349,12 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
               entering={FadeIn.duration(100)}
               exiting={FadeOut.duration(100)}
               style={{
-                // position: 'absolute',
+                position: 'absolute',
                 left: 0,
                 right: 0,
                 bottom: 0,
                 width: '100%',
+                // paddingBottom: 2,
                 // alignSelf: 'center',
               }}>
               <View
