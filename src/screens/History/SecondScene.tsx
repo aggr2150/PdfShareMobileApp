@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
+  RefreshControl,
   TouchableOpacity,
   useWindowDimensions,
   View,
@@ -97,6 +98,13 @@ const SecondScene: React.FC = () => {
             <Text style={{fontSize: 14}}>{item.title}</Text>
           </TouchableOpacity>
         )}
+        refreshControl={
+          <RefreshControl
+            progressViewOffset={(insets.top || 24) + 46 + 12}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
       />
 
       <View>

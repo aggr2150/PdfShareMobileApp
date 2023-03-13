@@ -10,6 +10,7 @@ import {CommonActions, useNavigation} from '@react-navigation/native';
 import FirstScene from '@components/sheets/LoginSheet/FirstScene';
 import SecondScene from '@components/sheets/LoginSheet/SecondScene';
 import AnimatedPages from '@components/AnimatedPages';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 enum EnumSelectedIndex {
   '로그인',
@@ -57,7 +58,8 @@ const LoginSheet: React.FC<SheetProps<loginSheetPayload>> = props => {
       keyboardHandlerEnabled={true}
       useBottomSafeAreaPadding={true}
       containerStyle={{
-        ...styles.container, //, paddingBottom: insets.bottom
+        ...styles.container,
+        bottom: !closable ? 25 : 0,
       }}>
       <View
         style={{

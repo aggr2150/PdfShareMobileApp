@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {makeStyles} from '@rneui/themed';
 import BookCard from '@components/BookCard';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {FlatList, useWindowDimensions} from 'react-native';
+import {FlatList, RefreshControl, useWindowDimensions} from 'react-native';
 import {apiInstance} from '@utils/Networking';
 import _ from 'lodash';
 import {postSetMany} from '@redux/reducer/postsReducer';
@@ -78,16 +78,20 @@ const FirstScene = () => {
         paddingTop: (insets.top || 24) + 46 + 12,
         minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
       }}
-      // contentOffset={{y: (insets.top ? insets.top + 6 : 46 + 24) + 12, x: 0}}
       onEndReached={onEndReached}
       onRefresh={onRefresh}
       refreshing={refreshing}
       keyExtractor={item => item._id}
       renderItem={({item, index}) => (
-        // <TouchableOpacity>
         <BookCard item={item} index={index} colors={LIST_ITEM_COLORS} />
-        // </TouchableOpacity>
       )}
+      refreshControl={
+        <RefreshControl
+          progressViewOffset={(insets.top || 24) + 46 + 12}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      }
     />
   );
 };

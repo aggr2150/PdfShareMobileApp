@@ -6723,10 +6723,10 @@ react-is@^17.0.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-native-actions-sheet@^0.8.21:
-  version "0.8.28"
-  resolved "https://registry.npmjs.org/react-native-actions-sheet/-/react-native-actions-sheet-0.8.28.tgz"
-  integrity sha512-BNM/XtMLW3i4IAL4cpCKp0OuICo54p+IQMHndT8WDQhedFwFEXagHH151lhM42CiJTpdYXYG3hsfyDSk3Cl2Pg==
+react-native-actions-sheet@^0.8.29:
+  version "0.8.29"
+  resolved "https://registry.npmjs.org/react-native-actions-sheet/-/react-native-actions-sheet-0.8.29.tgz"
+  integrity sha512-5ybScHjE1abdJD+w3rHaxCD4ldKouagl6NdoE/oyxLtDzoVP6dSnO/VlMjWqn52xbfQXyElwpPA8Ur2ujWEGdQ==
 
 react-native-blob-util@^0.17.0:
   version "0.17.0"

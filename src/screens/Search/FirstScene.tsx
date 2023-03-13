@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {makeStyles} from '@rneui/themed';
 import BookCard from '@components/BookCard';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {FlatList, useWindowDimensions} from 'react-native';
+import {FlatList, RefreshControl, useWindowDimensions} from 'react-native';
 import {apiInstance} from '@utils/Networking';
 import _ from 'lodash';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
@@ -71,10 +71,9 @@ const FirstScene = () => {
       contentContainerStyle={{
         width: '100%',
         // paddingTop: (insets.top || 24) + 46,
-        paddingTop: (insets.top || 24) + 43 + 12,
+        paddingTop: (insets.top || 24) + 46 + 12,
         minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
       }}
-      contentOffset={{y: (insets.top ? insets.top + 6 : 43 + 24) + 12, x: 0}}
       onEndReached={onEndReached}
       onRefresh={onRefresh}
       refreshing={refreshing}
@@ -83,6 +82,13 @@ const FirstScene = () => {
         <BookCard item={item} index={index} />
         // </TouchableOpacity>
       )}
+      refreshControl={
+        <RefreshControl
+          progressViewOffset={(insets.top || 24) + 46 + 12}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      }
     />
   );
 };

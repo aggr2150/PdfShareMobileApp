@@ -102,17 +102,6 @@ const FirstScene = () => {
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      refreshControl={
-        <RefreshControl
-          // style={{top: insets.top + 46 + 24}}
-          style={{display: 'none'}}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          // title="Pull to refresh"
-          tintColor="#fff"
-          titleColor="#fff"
-        />
-      }
       ItemSeparatorComponent={Separator}
       renderItem={({item, index}) => (
         <Pressable
@@ -153,6 +142,13 @@ const FirstScene = () => {
           </View>
         </Pressable>
       )}
+      refreshControl={
+        <RefreshControl
+          progressViewOffset={(insets.top || 24) + 46 + 12}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      }
     />
     // </SafeAreaView>
   );

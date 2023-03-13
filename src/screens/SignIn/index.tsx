@@ -42,6 +42,7 @@ const SignIn: React.FC = () => {
   }, []);
   const authState = useAppSelector(state => getAuthState(state));
   useEffect(() => {
+    console.log('eff');
     if (authState === EAuthState.NONE) {
       showSheet().then();
     } else if (authState === EAuthState.AUTHORIZED) {
@@ -54,19 +55,21 @@ const SignIn: React.FC = () => {
       );
     }
   }, [authState, navigation, showSheet]);
-  useFocusEffect(() => {
-    if (authState === EAuthState.NONE) {
-      showSheet().then(r => console.log(r));
-    } else if (authState === EAuthState.AUTHORIZED) {
-      navigation.dispatch(
-        CommonActions.reset({
-          // stale: false,
-          // stale: false,
-          routes: [{name: 'Tabs'}],
-        }),
-      );
-    }
-  });
+  useFocusEffect(
+    useCallback(() => {
+      if (authState === EAuthState.NONE) {
+        showSheet().then(r => console.log(r));
+      } else if (authState === EAuthState.AUTHORIZED) {
+        navigation.dispatch(
+          CommonActions.reset({
+            // stale: false,
+            // stale: false,
+            routes: [{name: 'Tabs'}],
+          }),
+        );
+      }
+    }, [authState, navigation, showSheet]),
+  );
 
   // const initializeCallback = useCallback(() => {
   //   Keychain.getGenericPassword()

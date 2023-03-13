@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {makeStyles} from '@rneui/themed';
 import BookCard from '@components/BookCard';
-import {FlatList, useWindowDimensions} from 'react-native';
+import {FlatList, RefreshControl, useWindowDimensions} from 'react-native';
 import {apiInstance} from '@utils/Networking';
 import _ from 'lodash';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -78,6 +78,13 @@ const SecondScene: React.FC = () => {
       onRefresh={onRefresh}
       refreshing={refreshing}
       renderItem={({item, index}) => <BookCard item={item} index={index} />}
+      refreshControl={
+        <RefreshControl
+          progressViewOffset={(insets.top || 24) + 46 + 12}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      }
     />
   );
 };

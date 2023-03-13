@@ -475,8 +475,15 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
         <ListEmptyComponent
           ExtraComponent={
             <Button
-              style={{marginTop: 24}}
               title={'로그인'}
+              buttonStyle={{
+                paddingHorizontal: 32,
+                paddingVertical: 12,
+              }}
+              containerStyle={{
+                marginTop: 24,
+                borderRadius: 500,
+              }}
               onPress={() =>
                 SheetManager.show('loginSheet', {
                   payload: {closable: true},
@@ -490,11 +497,12 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
         <ListEmptyComponent
           ExtraComponent={
             <Button
-              // containerStyle={{}}
-              containerStyle={{marginTop: 24}}
               buttonStyle={{
                 paddingHorizontal: 32,
                 paddingVertical: 12,
+              }}
+              containerStyle={{
+                marginTop: 24,
                 borderRadius: 500,
               }}
               titleStyle={{fontSize: 12}}

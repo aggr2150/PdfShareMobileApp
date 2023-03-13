@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   FlatList,
   Pressable,
+  RefreshControl,
   StatusBar,
   useWindowDimensions,
   View,
@@ -269,7 +270,7 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
             contentContainerStyle={{
               // width: '100%',
               // paddingTop: (insets.top || 24) + 46,
-              paddingTop: (insets.top || 24) + 43 + 12,
+              paddingTop: (insets.top || 24) + 46 + 12,
               minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
             }}
             // contentOffset={{
@@ -328,6 +329,13 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
                 // </TouchableOpacity>
               );
             }}
+            refreshControl={
+              <RefreshControl
+                progressViewOffset={(insets.top || 24) + 46 + 12}
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              />
+            }
           />
         )}
       </View>
