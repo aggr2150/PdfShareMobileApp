@@ -10,7 +10,7 @@ const Separator: React.FC<{style?: ViewStyle}> = ({style}) => {
 const useStyles = makeStyles(theme => ({
   separator: {
     backgroundColor: theme.colors.separator,
-    height: 0.3,
+    height: 0.4,
     width: '100%',
     // marginVertical: 10,
   },

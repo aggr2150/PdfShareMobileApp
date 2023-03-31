@@ -100,7 +100,7 @@ const AppendToCollectionSheet: React.FC<
         {/*<View style={{width: 50, height: 50}}>*/}
         <Checkbox.Android
           status={item.checked ? 'checked' : 'unchecked'}
-          color={'#99C729'}
+          color={'#60B630'}
         />
         {/*<Text style={{fontSize: 13}}>{item.title}</Text>*/}
         {/*</View>*/}

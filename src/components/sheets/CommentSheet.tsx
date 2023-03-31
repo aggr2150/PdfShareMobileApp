@@ -75,7 +75,7 @@ const CommentSheet: React.FC<SheetProps> = props => {
           <Input
             style={styles.textInput}
             placeholder={'이메일 주소'}
-            placeholderTextColor={'#99c729'}
+            placeholderTextColor={'#60B630'}
             inputContainerStyle={{borderBottomWidth: 0}}
             renderErrorMessage={false}
             containerStyle={{paddingHorizontal: 0}}

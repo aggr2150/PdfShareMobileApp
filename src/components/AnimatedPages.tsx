@@ -1,5 +1,5 @@
 import React, {Dispatch, useEffect, useRef} from 'react';
-import {View} from 'react-native';
+import {useWindowDimensions, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import PagerView from 'react-native-pager-view';
 import Animated, {
@@ -24,6 +24,7 @@ const Pages: React.FC<PagesProps> = ({
   const styles = useStyles();
   const pagerRef = useRef<PagerView>(null);
   const containerHeight = useSharedValue(65);
+  const dimensions = useWindowDimensions();
   const animatedPagerStyles = useAnimatedStyle(() => {
     return {
       // width: '100%',
@@ -49,7 +50,8 @@ const Pages: React.FC<PagesProps> = ({
           viewRef.current[event.nativeEvent.position].measureLayout(
             parentViewRef.current[event.nativeEvent.position],
             (left, top, width, height) => {
-              containerHeight.value = height;
+              containerHeight.value =
+                dimensions.height > height ? height : dimensions.height;
               console.log('mmm', left, top, width, height);
             },
           );

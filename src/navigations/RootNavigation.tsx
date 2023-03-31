@@ -26,8 +26,11 @@ import {blockUserSetAll} from '@redux/reducer/blocksReducer';
 import {CommonActions} from '@react-navigation/native';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import SplashScreen from 'react-native-splash-screen';
+import Information from '@screens/Settings/Information';
+import InterstitialAdsController from '@components/InterstitialAdsController';
 const RootStack = createStackNavigator<RootStackParamList>();
 
+InterstitialAdsController.initialize();
 const RootStackNavigator = () => {
   const styles = useStyles();
   const authState = useAppSelector(state => getAuthState(state));
@@ -37,8 +40,6 @@ const RootStackNavigator = () => {
       SplashScreen.hide();
     }
   }, [authState]);
-
-  SplashScreen.hide();
   useEffect(() => {
     Keychain.getGenericPassword()
       .then(credentials => {
@@ -176,6 +177,13 @@ const RootStackNavigator = () => {
           component={Settings}
           options={{
             title: '설정',
+          }}
+        />
+        <RootStack.Screen
+          name="Information"
+          component={Information}
+          options={{
+            title: '정보',
           }}
         />
         <RootStack.Screen

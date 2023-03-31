@@ -40,7 +40,7 @@ const CollectionSheet: React.FC<SheetProps> = props => {
       .post('/api/collection/create', {title, _csrf: csrfToken})
       .then(response => {
         if (response.data.code === 200) {
-          SheetManager.hide('collectionSheet').then();
+          SheetManager.hide('collectionSheet', {payload: true}).then();
         } else {
           Toast.show({
             type: 'error',
@@ -102,7 +102,7 @@ const CollectionSheet: React.FC<SheetProps> = props => {
             onPress={submit}
             style={{
               paddingHorizontal: 28,
-              backgroundColor: '#99c729',
+              backgroundColor: '#60B630',
               // flex: 1,
             }}>
             <View style={{flex: 1, justifyContent: 'center'}}>

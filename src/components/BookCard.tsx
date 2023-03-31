@@ -3,7 +3,6 @@ import {ColorValue, Pressable, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
 import Book from '@src/components/Book';
-import {TestIds} from 'react-native-google-mobile-ads';
 import {humanizeNumber} from '@utils/Humanize';
 import InterstitialAdsController from '@components/InterstitialAdsController';
 
@@ -22,8 +21,6 @@ interface BookCardProps {
 //   ? 'ca-app-pub-9881103194147827~4317322839'
 //   : 'ca-app-pub-9881103194147827~1787346509';
 
-const adUnitId = TestIds.INTERSTITIAL;
-
 // const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
 //   requestNonPersonalizedAdsOnly: true,
 //   // keywords: ['fashion', 'clothing'],
@@ -35,8 +32,8 @@ const BookCard: React.FC<BookCardProps> = ({
   index,
   colors = [
     {background: '#1750dd', book: '#fc86b7'},
-    {background: '#108e13', book: '#1750dd'},
-    {background: '#fc86b7', book: '#108e13'},
+    {background: '#60B630', book: '#1750dd'},
+    {background: '#fc86b7', book: '#60B630'},
   ],
 }) => {
   const styles = useStyles();
@@ -70,7 +67,9 @@ const BookCard: React.FC<BookCardProps> = ({
             </Text>
           </View>
           <View>
-            <Text style={{marginTop: 5, fontSize: 12, alignSelf: 'flex-end'}}>
+            <Text
+              style={{marginTop: 5, fontSize: 12, alignSelf: 'flex-end'}}
+              numberOfLines={1}>
               {item?.author?.nickname}
             </Text>
             <Text style={{marginTop: 5, fontSize: 12, alignSelf: 'flex-start'}}>

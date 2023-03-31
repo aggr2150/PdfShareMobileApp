@@ -1,5 +1,6 @@
 import {
   Alert,
+  Linking,
   Pressable,
   SectionList,
   SectionListRenderItem,
@@ -8,6 +9,7 @@ import {
 import {Button, Text} from '@rneui/themed';
 import React from 'react';
 import Separator from '@components/Seperator';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 interface SectionItem {
   labelText: string;
@@ -15,8 +17,10 @@ interface SectionItem {
 }
 // const section = [{labelText: '회원탈퇴'}];
 const Settings = ({navigation}) => {
+  const insets = useSafeAreaInsets();
   return (
-    <View style={{flex: 1}}>
+    <View
+      style={{flex: 1, paddingLeft: insets.left, paddingRight: insets.right}}>
       <SectionList
         sections={[
           {
@@ -45,6 +49,10 @@ const Settings = ({navigation}) => {
               {
                 labelText: '차단 관리',
                 onPress: () => navigation.navigate('BlockList'),
+              },
+              {
+                labelText: '정보',
+                onPress: () => navigation.navigate('Information'),
               },
             ],
             // renderItem: ListItem,

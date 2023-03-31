@@ -9,7 +9,7 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import Avatar from '@components/Avatar';
-import DotIcon from '@assets/icon/dot.svg';
+import DotIcon from '@assets/icon/horizontalDots.svg';
 import {Divider, Menu} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import PlusIcon from '@assets/icon/plus1.svg';
@@ -189,11 +189,13 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
         {!isMine && user && (
           <Button
             buttonStyle={{
-              borderRadius: 24,
               paddingVertical: 15,
               paddingHorizontal: 60,
+              backgroundColor: user.subscribeStatus ? '#3a3a3a' : '#60B630',
+            }}
+            containerStyle={{
+              borderRadius: 24,
               marginVertical: 15,
-              backgroundColor: user.subscribeStatus ? '#3a3a3a' : '#99c729',
             }}
             onPress={subscribe}
             titleStyle={styles.subscribeButtonTitle}

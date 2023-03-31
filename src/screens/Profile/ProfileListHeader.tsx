@@ -141,6 +141,32 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
             flexDirection: 'row',
             justifyContent: 'center',
           }}>
+          {/*<LinearGradient*/}
+          {/*  colors={['red', 'green', 'blue']}*/}
+          {/*  start={{x: 0, y: 0}}*/}
+          {/*  end={{x: 1, y: 1}}*/}
+          {/*  locations={[0, 0.5, 1]}*/}
+          {/*  style={[*/}
+          {/*    // StyleSheet.absoluteFill,*/}
+          {/*    {*/}
+          {/*      borderRadius: 80,*/}
+          {/*      padding: 3,*/}
+          {/*      // width: 70,*/}
+          {/*      // height: 70,*/}
+          {/*    },*/}
+          {/*  ]}*/}
+          {/*  // pointerEvents="none"*/}
+          {/*>*/}
+          {/*  <View*/}
+          {/*    style={{*/}
+          {/*      backgroundColor: 'black',*/}
+          {/*      borderRadius: 80,*/}
+          {/*      padding: 3,*/}
+          {/*    }}>*/}
+          {/*    <Avatar avatar={user?.avatar} />*/}
+          {/*  </View>*/}
+          {/*</LinearGradient>*/}
+
           <Avatar avatar={user?.avatar} />
         </View>
         <View style={{marginBottom: 4}}>
@@ -161,11 +187,13 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
         {!isMine && user && (
           <Button
             buttonStyle={{
-              borderRadius: 24,
               paddingVertical: 15,
               paddingHorizontal: 60,
+              backgroundColor: user.subscribeStatus ? '#3a3a3a' : '#60B630',
+            }}
+            containerStyle={{
+              borderRadius: 24,
               marginVertical: 15,
-              backgroundColor: user.subscribeStatus ? '#3a3a3a' : '#99c729',
             }}
             onPress={subscribe}
             titleStyle={styles.subscribeButtonTitle}
@@ -177,7 +205,7 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
         <TouchableOpacity
           style={{flex: 1}}
           activeOpacity={0.7}
-          onPress={() => navigation.navigate('Information', user)}>
+          onPress={() => navigation.navigate('ProfileInformation', user)}>
           <Text
             style={{
               width: '100%',

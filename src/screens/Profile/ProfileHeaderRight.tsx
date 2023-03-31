@@ -8,12 +8,12 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import DotIcon from '@assets/icon/dot.svg';
+import DotIcon from '@assets/icon/horizontalDots.svg';
 import {Menu} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Keychain from 'react-native-keychain';
 import Toast from 'react-native-toast-message';
-import {apiInstance, getCsrfToken} from '@utils/Networking';
+import {apiInstance, getCsrfToken, reportCallback} from '@utils/Networking';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {getSession, signOut} from '@redux/reducer/authReducer';
 import {
@@ -29,6 +29,8 @@ import {
   selectById as selectBlockUserById,
 } from '@redux/reducer/blocksReducer';
 import Clipboard from '@react-native-clipboard/clipboard';
+import {deletePost} from '@utils/models/post';
+import {postRemoveOne} from '@redux/reducer/postsReducer';
 
 const ProfileHeaderRight = () => {
   const styles = useStyles();
@@ -237,7 +239,36 @@ const ProfileHeaderRight = () => {
           <>
             <Menu.Item
               dense={true}
-              onPress={() => {}}
+              onPress={() => {
+                closeMenu();
+                if (!session) {
+                  SheetManager.show('loginSheet', {
+                    payload: {closable: true},
+                  }).then();
+                } else {
+                  Alert.alert('신고하시겠습니까?', undefined, [
+                    {
+                      text: '취소',
+                    },
+                    {
+                      text: '신고하기',
+                      onPress: () => {
+                        reportCallback({
+                          csrfToken,
+                          targetType: 'user',
+                          targetId: user._id,
+                        }).then();
+                        Toast.show({
+                          type: 'success',
+                          text1: '신고가 접수되었습니다.',
+                          position: 'bottom',
+                        });
+                      },
+                      style: 'destructive',
+                    },
+                  ]);
+                }
+              }}
               title={<Text style={styles.menuText}>신고하기</Text>}
             />
             <Menu.Item

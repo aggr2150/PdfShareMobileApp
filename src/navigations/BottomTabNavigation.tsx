@@ -1,5 +1,5 @@
 import React from 'react';
-import {View} from 'react-native';
+import {Platform, View} from 'react-native';
 import {
   BottomTabBar,
   createBottomTabNavigator,
@@ -36,12 +36,23 @@ const Tabs: React.FC<TabsProps> = ({navigation}) => {
   const authState = useAppSelector(state => getAuthState(state));
   return (
     <Tab.Navigator
-      tabBar={props => <BottomTabBar {...props} />}
+      tabBar={props => (
+        <View
+          style={{
+            // backgroundColor: 'red',
+            flexDirection: 'row',
+            justifyContent: 'center',
+          }}>
+          <View style={{maxWidth: 600, flex: 1}}>
+            <BottomTabBar {...props} />
+          </View>
+        </View>
+      )}
       screenOptions={{
         tabBarStyle: styles.tabBarContainer,
         tabBarShowLabel: false,
         headerShown: false,
-        tabBarActiveTintColor: '#99c729',
+        tabBarActiveTintColor: '#fff',
         // tabBarButton: props => <Tab. {...props} />,
       }}>
       <Tab.Screen
@@ -139,6 +150,10 @@ const Tabs: React.FC<TabsProps> = ({navigation}) => {
 
 const useStyles = makeStyles(theme => ({
   tabBarContainer: {
+    // alignSelf: 'center',
+    // justifySelf: 'center',
+    // justifyContent: 'center',
+    // flexDirection: 'column',
     borderTopWidth: 0,
     backgroundColor: theme.colors.background,
   },

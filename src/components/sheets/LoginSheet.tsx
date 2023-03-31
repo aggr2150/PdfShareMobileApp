@@ -1,4 +1,4 @@
-import {View} from 'react-native';
+import {Platform, ScrollView, useWindowDimensions, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import ActionSheet, {
   ActionSheetRef,
@@ -28,6 +28,7 @@ const LoginSheet: React.FC<SheetProps<loginSheetPayload>> = props => {
   );
   const [closable, setClosable] = useState(!!props.payload?.closable);
 
+  const dimensions = useWindowDimensions();
   useEffect(() => {
     if (props.payload?.closable === false && closable) {
       sheetRef.current?.hide();
@@ -38,6 +39,7 @@ const LoginSheet: React.FC<SheetProps<loginSheetPayload>> = props => {
       //   );
     }
   }, [closable, navigation, props.payload?.closable]);
+  const insets = useSafeAreaInsets();
 
   const sheetRef = useRef<ActionSheetRef>(null);
   return (
@@ -46,7 +48,7 @@ const LoginSheet: React.FC<SheetProps<loginSheetPayload>> = props => {
       // closable={false}
       id={props.sheetId}
       // headerAlwaysVisible={false}
-      gestureEnabled={true}
+      // gestureEnabled={true}
       CustomHeaderComponent={<></>}
       statusBarTranslucent
       closable={closable}
@@ -56,14 +58,17 @@ const LoginSheet: React.FC<SheetProps<loginSheetPayload>> = props => {
       // indicatorStyle={{height: 100}}
       // drawUnderStatusBar={true}
       keyboardHandlerEnabled={true}
-      useBottomSafeAreaPadding={true}
+      useBottomSafeAreaPadding={Platform.OS === 'android'}
       containerStyle={{
         ...styles.container,
-        bottom: !closable ? 25 : 0,
+        bottom: !closable && Platform.OS === 'android' ? 25 : 0,
+        width: dimensions.width < 600 ? '100%' : 600,
+        // flexs: 1,
       }}>
-      <View
+      <ScrollView
+        showsVerticalScrollIndicator={false}
         style={{
-          // paddingBottom: 35,
+          paddingHorizontal: 35,
           maxHeight: '100%',
           flexGrow: 1,
         }}>
@@ -88,7 +93,7 @@ const LoginSheet: React.FC<SheetProps<loginSheetPayload>> = props => {
           SceneMap={[FirstScene, SecondScene]}
           setSelectedIndex={setSelectedIndex}
         />
-      </View>
+      </ScrollView>
     </ActionSheet>
   );
 };
@@ -98,7 +103,6 @@ const useStyles = makeStyles(theme => ({
   },
   container: {
     backgroundColor: theme.colors.sheetsBackground,
-    paddingHorizontal: 35,
     // justifyContent: 'center',
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,

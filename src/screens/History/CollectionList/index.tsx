@@ -3,12 +3,16 @@ import {
   FlatList,
   Pressable,
   TextInput,
+  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import Separator from '@components/Seperator';
-import ActionSheet, {ActionSheetRef} from 'react-native-actions-sheet';
+import ActionSheet, {
+  ActionSheetRef,
+  SheetManager,
+} from 'react-native-actions-sheet';
 import ThrottleFlatList from '@components/ThrottleFlatlist';
 import Book from '@components/Book';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
@@ -19,10 +23,18 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import {Provider} from 'react-native-paper';
 import CollectionHeader from '@screens/History/CollectionList/CollectionHeader';
-import {collectionSetOne} from '@redux/reducer/collectionsReducer';
+import {
+  collectionAddedMany,
+  collectionSetOne,
+  collectionUpdate,
+} from '@redux/reducer/collectionsReducer';
 import ListEmptyComponent from '@components/ListEmptyComponent';
 import Spinner from '@components/Spinner';
 import BackButton from '@components/BackButton';
+import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
+import {SwipeListView} from 'react-native-swipe-list-view';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Feather from 'react-native-vector-icons/Feather';
 
 type CollectionProps = StackScreenProps<HistoryStackScreenParams, 'Collection'>;
 const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
@@ -92,6 +104,18 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
   const openSheet = () => renameSheetRef.current?.show();
   const insets = useSafeAreaInsets();
   const dimensions = useWindowDimensions();
+  const tabBarHeight = useBottomTabBarHeight();
+  const deductCallback = useCallback(
+    (postId: string, collectionId: string) => {
+      return apiInstance.post('/api/collection/deduct', {
+        _csrf: csrfToken,
+        postId: postId,
+        collectionId: collectionId,
+      });
+      // .then(response => {});
+    },
+    [csrfToken],
+  );
   return (
     <View style={styles.container}>
       {/*<CollectionHeader collection={collection} openSheet={openSheet} />*/}
@@ -133,14 +157,69 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
         </Pressable>
       </View>
       {/*</View>*/}
-      <FlatList<IPost>
-        contentContainerStyle={{flexGrow: 1}}
+      <SwipeListView<IPost>
         data={data}
-        // style={{width: '100%'}}
+        disableRightSwipe
+        bounces={false}
         // ListHeaderComponent={() => (
         //   <CollectionHeader collection={collection} openSheet={openSheet} />
         // )}
         ItemSeparatorComponent={Separator}
+        // swipeToOpenPercent={2}
+        rightOpenValue={-80}
+        keyExtractor={item => item._id}
+        // rightActionValue={-30}
+        tension={0}
+        renderHiddenItem={(rowData, rowMap) => (
+          <View
+            style={{
+              justifyContent: 'flex-end',
+              flex: 1,
+              flexDirection: 'row',
+              backgroundColor: '#FF1E46',
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+              onPress={() => {
+                rowMap[rowData.item._id].closeRow();
+                if (collection?.posts) {
+                  const posts = [...collection.posts];
+                  posts.splice(rowData.index, 1);
+                  deductCallback(rowData.item._id, collection._id).then(
+                    response => {
+                      if (response.data.code === 200) {
+                        setCollection(
+                          prevState =>
+                            prevState && {
+                              ...prevState,
+                              posts: posts,
+                            },
+                        );
+                        dispatch(
+                          collectionUpdate({
+                            id: collection._id,
+                            changes: {
+                              posts: posts,
+                            },
+                          }),
+                        );
+                      }
+                    },
+                  );
+                }
+              }}>
+              <Feather
+                style={{margin: 15}}
+                name={'trash-2'}
+                color={'white'}
+                size={50}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
         ListEmptyComponent={() =>
           fetching ? (
             <Spinner />
@@ -150,9 +229,9 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
         }
         contentContainerStyle={{
           flexGrow: 1,
-          // paddingTop: (insets.top || 24) + 46,
-          paddingTop: (insets.top || 24) + 46 + 12,
-          minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
+          paddingTop:
+            !fetching && data?.length !== 0 ? (insets.top || 24) + 46 + 12 : 0,
+          minHeight: '100%',
         }}
         renderItem={({item}) => {
           return (
@@ -256,7 +335,7 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
               onPress={submit}
               style={{
                 paddingHorizontal: 28,
-                backgroundColor: '#99c729',
+                backgroundColor: '#60B630',
                 // flex: 1,
               }}>
               <View style={{flex: 1, justifyContent: 'center'}}>

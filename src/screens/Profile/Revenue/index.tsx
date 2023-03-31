@@ -16,6 +16,7 @@ import Book from '@components/Book';
 import {Text} from '@rneui/themed';
 import Separator from '@components/Seperator';
 import _ from 'lodash';
+import Orientation from 'react-native-orientation-locker';
 
 type RevenueProps = StackScreenProps<ProfileStackScreenParams, 'Revenue'>;
 // type TSettlement = {
@@ -30,6 +31,10 @@ const Revenue: React.FC<RevenueProps> = ({navigation, route}) => {
   const [settlement, setSettlement] = useState<TSettlement>();
   const [feeds, setFeeds] = useState<IPost[]>([]);
   const [fetching, setFetching] = useState(true);
+  useEffect(() => {
+    Orientation.lockToPortrait();
+  }, []);
+
   // const LikesData = useAppSelector(state => {
   //   // state.likes
   //   return tabData[selectedIndex].map(
@@ -141,8 +146,8 @@ const Revenue: React.FC<RevenueProps> = ({navigation, route}) => {
               <Text style={{fontSize: 16}}>예상 수익</Text>
               <View style={{flex: 1}}>
                 <Text
-                  style={{fontSize: 20, textAlign: 'right', color: '#99c729'}}>
-                  ₩ {(item.viewCounter * 0.24).toFixed(2)}
+                  style={{fontSize: 20, textAlign: 'right', color: '#60B630'}}>
+                  ₩ {Math.floor(item.viewCounter * 0.24)}
                 </Text>
               </View>
             </View>

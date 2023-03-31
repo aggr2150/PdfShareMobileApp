@@ -22,11 +22,15 @@ import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {makeStyles, Text} from '@rneui/themed';
 import Avatar from '@components/Avatar';
-import {StackActions, useFocusEffect} from '@react-navigation/native';
+import {
+  StackActions,
+  useFocusEffect,
+  useLinkTo,
+} from '@react-navigation/native';
 import HeartIcon from '@assets/icon/heart.svg';
 import HeartOutLineIcon from '@assets/icon/heart-outline.svg';
 import CommentIcon from '@assets/icon/comment.svg';
-import DotIcon from '@assets/icon/dot.svg';
+import DotIcon from '@assets/icon/horizontalDots.svg';
 import ActionSheet, {
   ActionSheetRef,
   SheetManager,
@@ -41,7 +45,7 @@ import {
   updatePost,
 } from '@redux/reducer/postsReducer';
 import Spinner from '@components/Spinner';
-import {apiInstance, getCsrfToken} from '@utils/Networking';
+import {apiInstance, getCsrfToken, reportCallback} from '@utils/Networking';
 import {likeAdded, likeRemoved} from '@redux/reducer/likesReducer';
 import BoxIcon from '@assets/icon/box.svg';
 import {EAuthState, getAuthState, getSession} from '@redux/reducer/authReducer';
@@ -51,10 +55,14 @@ import {humanizeDate} from '@utils/Humanize';
 import {deletePost} from '@utils/models/post';
 import Toast from 'react-native-toast-message';
 import Clipboard from '@react-native-clipboard/clipboard';
+import {
+  blockUserAdded,
+  blockUserRemoveOne,
+  selectById as selectBlockUserById,
+} from '@redux/reducer/blocksReducer';
 
 type ViewerProps = StackScreenProps<RootStackParamList, 'Viewer'>;
 const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
-  console.log('params', route.params, route.params?.id || route.params._id);
   const isDarkMode = useColorScheme() === 'dark';
   const post = useAppSelector(state =>
     selectById(state.posts, route.params._id || route.params?.id),
@@ -86,6 +94,11 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   const styles = useStyles();
   const dimensions = useWindowDimensions();
   const dispatch = useAppDispatch();
+  const linkTo = useLinkTo();
+
+  const block = useAppSelector(state =>
+    selectBlockUserById(state.blocks, post?.author._id || ''),
+  );
   useFocusEffect(
     useCallback(() => {
       if (authState !== EAuthState.INIT) {
@@ -140,7 +153,6 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
         });
     }
   }, [csrfToken, dispatch, post, session]);
-  console.log('pppp', post);
   return !post ? (
     <Spinner />
   ) : (
@@ -234,120 +246,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
             <Animated.View
               entering={FadeIn.duration(100)}
               exiting={FadeOut.duration(100)}
-              style={{
-                marginRight: insets.right || 15,
-                alignSelf: 'flex-end',
-              }}>
-              <TouchableOpacity
-                onPress={() => {
-                  if (!session) {
-                    SheetManager.show('loginSheet', {
-                      payload: {closable: true},
-                    }).then();
-                  } else {
-                    SheetManager.show('appendToCollectionSheet', {
-                      payload: {
-                        postId: post._id,
-                      },
-                    }).then();
-                  }
-                }}
-                style={{
-                  width: 34,
-                  height: 34,
-                  marginBottom: 15,
-                  backgroundColor: 'white',
-                  // backgroundColor: '#99c729',
-                  borderRadius: 34,
-                  shadowColor: '#000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.22,
-                  shadowRadius: 2.22,
-                  elevation: 3,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <BoxIcon fill={'#99c729'} width={24} height={24} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={likeCallback}
-                style={{
-                  width: 34,
-                  height: 34,
-                  marginBottom: 15,
-                  backgroundColor: 'white',
-                  // backgroundColor: '#99c729',
-                  borderRadius: 34,
-                  shadowColor: '#000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.22,
-                  shadowRadius: 2.22,
-                  elevation: 3,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                {post.likeStatus ? (
-                  <HeartIcon fill={'#99c729'} width={32} height={32} />
-                ) : (
-                  <HeartOutLineIcon fill={'#99c729'} width={32} height={32} />
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate('Comments', {postId: post._id})
-                }
-                style={{
-                  width: 34,
-                  height: 34,
-                  marginBottom: 15,
-                  backgroundColor: 'white',
-                  // backgroundColor: '#99c729',
-                  borderRadius: 34,
-                  shadowColor: '#000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.22,
-                  shadowRadius: 2.22,
-                  elevation: 3,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <CommentIcon fill={'#99c729'} width={32} height={32} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => actionSheetRef.current?.show()}
-                style={{
-                  width: 34,
-                  height: 34,
-                  marginBottom: 15,
-                  backgroundColor: 'white',
-                  // backgroundColor: '#99c729',
-                  borderRadius: 34,
-                  shadowColor: '#000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.22,
-                  shadowRadius: 2.22,
-                  elevation: 3,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <DotIcon fill={'black'} width={24} height={24} />
-              </TouchableOpacity>
-            </Animated.View>
-            <Animated.View
-              entering={FadeIn.duration(100)}
-              exiting={FadeOut.duration(100)}
+              pointerEvents={'box-none'}
               style={{
                 position: 'absolute',
                 left: 0,
@@ -357,6 +256,120 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                 // paddingBottom: 2,
                 // alignSelf: 'center',
               }}>
+              <Animated.View
+                entering={FadeIn.duration(100)}
+                exiting={FadeOut.duration(100)}
+                style={{
+                  marginRight: insets.right || 15,
+                  alignSelf: 'flex-end',
+                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (!session) {
+                      SheetManager.show('loginSheet', {
+                        payload: {closable: true},
+                      }).then();
+                    } else {
+                      SheetManager.show('appendToCollectionSheet', {
+                        payload: {
+                          postId: post._id,
+                        },
+                      }).then();
+                    }
+                  }}
+                  style={{
+                    width: 34,
+                    height: 34,
+                    marginBottom: 15,
+                    backgroundColor: 'white',
+                    // backgroundColor: '#60B630',
+                    borderRadius: 34,
+                    shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.22,
+                    shadowRadius: 2.22,
+                    elevation: 3,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <BoxIcon fill={'#60B630'} width={24} height={24} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={likeCallback}
+                  style={{
+                    width: 34,
+                    height: 34,
+                    marginBottom: 15,
+                    backgroundColor: 'white',
+                    // backgroundColor: '#60B630',
+                    borderRadius: 34,
+                    shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.22,
+                    shadowRadius: 2.22,
+                    elevation: 3,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  {post.likeStatus ? (
+                    <HeartIcon fill={'#60B630'} width={32} height={32} />
+                  ) : (
+                    <HeartOutLineIcon fill={'#60B630'} width={32} height={32} />
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('Comments', {postId: post._id})
+                  }
+                  style={{
+                    width: 34,
+                    height: 34,
+                    marginBottom: 15,
+                    backgroundColor: 'white',
+                    // backgroundColor: '#60B630',
+                    borderRadius: 34,
+                    shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.22,
+                    shadowRadius: 2.22,
+                    elevation: 3,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <CommentIcon fill={'#60B630'} width={32} height={32} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => actionSheetRef.current?.show()}
+                  style={{
+                    width: 34,
+                    height: 34,
+                    marginBottom: 15,
+                    backgroundColor: 'white',
+                    // backgroundColor: '#60B630',
+                    borderRadius: 34,
+                    shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.22,
+                    shadowRadius: 2.22,
+                    elevation: 3,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <DotIcon fill={'black'} width={24} height={24} />
+                </TouchableOpacity>
+              </Animated.View>
               <View
                 style={[
                   styles.titleContainer,
@@ -366,8 +379,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                     //   paddingBottom:
                     //     insets.bottom + styles.titleContainer.paddingHorizontal,
                   },
-                ]}
-                onPress={() => detailsActionSheetRef.current?.show()}>
+                ]}>
                 <Pressable
                   style={{
                     paddingLeft: 15,
@@ -377,7 +389,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                     alignItems: 'center',
                   }}
                   onPress={() => {
-                    if (route.params?.author.id) {
+                    if (post.author.id) {
                       if (!navigation.getState().routes[0].state) {
                         navigation.navigate('Tabs', {
                           screen: 'ProfileTab',
@@ -479,6 +491,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                             actionSheetRef.current?.hide();
                             if (response.data.code === 200) {
                               dispatch(postRemoveOne(post._id));
+                              dispatch(likeRemoved(post._id));
                               navigation.goBack();
                             } else {
                               Toast.show({
@@ -507,10 +520,96 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
             </>
           ) : (
             <>
-              <Pressable style={{paddingVertical: 10}}>
+              <Pressable
+                style={{paddingVertical: 10}}
+                onPress={() => {
+                  actionSheetRef.current?.hide();
+                  if (!session) {
+                    SheetManager.show('loginSheet', {
+                      payload: {closable: true},
+                    }).then();
+                  } else {
+                    Alert.alert('신고하시겠습니까?', undefined, [
+                      {
+                        text: '취소',
+                      },
+                      {
+                        text: '신고하기',
+                        onPress: () => {
+                          reportCallback({
+                            csrfToken,
+                            targetType: 'post',
+                            targetId: post._id,
+                          }).then();
+                          Toast.show({
+                            type: 'success',
+                            text1: '신고가 접수되었습니다.',
+                            position: 'bottom',
+                          });
+                        },
+                        style: 'destructive',
+                      },
+                    ]);
+                  }
+                }}>
                 <Text>콘텐츠 신고</Text>
               </Pressable>
-              <Pressable style={{paddingVertical: 10}}>
+              <Pressable
+                style={{paddingVertical: 10}}
+                onPress={() => {
+                  if (!session) {
+                    SheetManager.show('loginSheet', {
+                      payload: {closable: true},
+                    }).then();
+                  } else {
+                    actionSheetRef.current?.hide();
+                    Alert.alert(
+                      block ? '차단해제하시겠습니까?' : '차단하시겠습니까?',
+                      undefined,
+                      [
+                        {
+                          text: '취소',
+                          onPress: () => console.log('Ask me later pressed111'),
+                        },
+                        {
+                          text: block ? '해제' : '차단',
+                          onPress: () => {
+                            if (block) {
+                              apiInstance
+                                .post('/api/account/block/delete', {
+                                  userId: post.author._id,
+                                })
+                                .then(response => {
+                                  if (response.data.code === 200) {
+                                    dispatch(
+                                      blockUserRemoveOne(post.author._id),
+                                    );
+                                  }
+                                });
+                            } else {
+                              apiInstance
+                                .post('/api/account/block/append', {
+                                  userId: post.author._id,
+                                })
+                                .then(response => {
+                                  if (response.data.code === 200) {
+                                    dispatch(
+                                      blockUserAdded({
+                                        _id: post.author._id,
+                                        id: post.author.id,
+                                        nickname: post.author.nickname,
+                                      }),
+                                    );
+                                  }
+                                });
+                            }
+                          },
+                          style: 'destructive',
+                        },
+                      ],
+                    );
+                  }
+                }}>
                 <Text>유저 차단</Text>
               </Pressable>
             </>
@@ -548,39 +647,29 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                 {reactStringReplace(
                   reactStringReplace(
                     post.content,
-                    // post.content,
-                    // /#(\w+)/g,
                     /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi,
                     link => (
                       <TagText
                         style={{
-                          color: 'blue',
-                          fontSize: 13,
+                          color: '#60a4e6',
                         }}
-                        onPress={() => {
-                          console.log('def');
-                          // if (!navigation.getState().routes[0].state) {
-                          //   navigation.navigate('Tabs', {
-                          //     screen: 'SearchTab',
-                          //     params: {
-                          //       screen: 'SearchResult',
-                          //       initial: false,
-                          //       params: {
-                          //         keyword: tag,
-                          //       },
-                          //     },
-                          //   });
-                          // } else {
-                          //   navigation.navigate('SearchTab');
-                          //   navigation.dispatch(
-                          //     StackActions.push('SearchResult', {
-                          //       keyword: tag,
-                          //     }),
-                          //   );
-                          //   navigation.navigate('SearchResult', {
-                          //     keyword: tag,
-                          //   });
-                          // }
+                        onPress={async () => {
+                          if (await Linking.canOpenURL(link)) {
+                            try {
+                              const url = link.replace(
+                                /^(https:\/\/everypdf.cc)/,
+                                '',
+                              );
+                              if (url.startsWith('/')) {
+                                linkTo(url);
+                              } else {
+                                await Linking.openURL(url);
+                              }
+                            } catch (e) {
+                              console.log('link', link);
+                              await Linking.openURL(link);
+                            }
+                          }
                         }}>
                         {link}
                       </TagText>
@@ -591,33 +680,21 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                   tag => (
                     <TagText
                       style={{
-                        color: 'yellow',
-                        fontSize: 13,
+                        color: '#60a4e6',
                       }}
                       onPress={() => {
-                        console.log('abc');
-                        // if (!navigation.getState().routes[0].state) {
-                        //   navigation.navigate('Tabs', {
-                        //     screen: 'SearchTab',
-                        //     params: {
-                        //       screen: 'SearchResult',
-                        //       initial: false,
-                        //       params: {
-                        //         keyword: link,
-                        //       },
-                        //     },
-                        //   });
-                        // } else {
-                        //   navigation.navigate('SearchTab');
-                        //   navigation.dispatch(
-                        //     StackActions.push('SearchResult', {
-                        //       keyword: link,
-                        //     }),
-                        //   );
-                        //   navigation.navigate('SearchResult', {
-                        //     keyword: tag,
-                        //   });
-                        // }
+                        if (!navigation.getState().routes[0].state) {
+                          navigation.navigate('Tabs', {
+                            screen: 'Search',
+                            params: {
+                              keyword: '#' + tag,
+                            },
+                          });
+                        } else {
+                          navigation.navigate('Search', {
+                            keyword: '#' + tag,
+                          });
+                        }
                       }}>
                       #{tag}
                     </TagText>
@@ -657,7 +734,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: 12,
   },
   contentText: {
-    fontSize: 13,
+    fontSize: 14,
   },
   container: {
     width: '100%',

@@ -1,4 +1,4 @@
-import {TouchableOpacity, View} from 'react-native';
+import {Pressable, TouchableOpacity, View} from 'react-native';
 import Avatar from '@components/Avatar';
 import {Text} from '@rneui/themed';
 import React from 'react';
@@ -6,7 +6,7 @@ import CommentMenu from '@components/CommentMenu';
 import HeartIcon from '@assets/icon/heart.svg';
 import HeartOutLineIcon from '@assets/icon/heart-outline.svg';
 import {humanizeNumber} from '@utils/Humanize';
-import {NavigationProp} from '@react-navigation/native';
+import {NavigationProp, StackActions} from '@react-navigation/native';
 
 interface CommentProps {
   item: IComment;
@@ -33,10 +33,33 @@ const Comment: React.FC<CommentProps> = ({
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-        <View
+        <Pressable
           style={{
             flexDirection: 'row',
             alignItems: 'center',
+          }}
+          onPress={() => {
+            if (item.author.id) {
+              if (!navigation.getState().routes[0].state) {
+                navigation.navigate('Tabs', {
+                  screen: 'ProfileTab',
+                  params: {
+                    screen: 'Profile',
+                    initial: false,
+                    params: {
+                      id: item.author.id,
+                    },
+                  },
+                });
+              } else {
+                navigation.navigate('ProfileTab');
+                navigation.dispatch(
+                  StackActions.push('Profile', {
+                    id: item.author.id,
+                  }),
+                );
+              }
+            }
           }}>
           <View
             style={{
@@ -50,7 +73,7 @@ const Comment: React.FC<CommentProps> = ({
             <Avatar style={{width: 20, height: 20}} />
           </View>
           <Text style={{fontSize: 13}}>{item.author.nickname} 님</Text>
-        </View>
+        </Pressable>
         <View>
           <CommentMenu
             item={item}
@@ -76,9 +99,9 @@ const Comment: React.FC<CommentProps> = ({
 
           <TouchableOpacity onPress={() => likeCallback(item)}>
             {item.likeStatus ? (
-              <HeartIcon fill={'#99c729'} width={24} height={24} />
+              <HeartIcon fill={'#60B630'} width={24} height={24} />
             ) : (
-              <HeartOutLineIcon fill={'#99c729'} width={24} height={24} />
+              <HeartOutLineIcon fill={'#60B630'} width={24} height={24} />
             )}
           </TouchableOpacity>
           <View

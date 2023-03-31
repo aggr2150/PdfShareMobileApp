@@ -135,13 +135,13 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({navigation}) => {
                     dense={true}
                     style={styles.textInput}
                     contentStyle={styles.textInputContent}
-                    activeUnderlineColor={'#99c729'}
+                    activeUnderlineColor={'#60B630'}
                     keyboardType={'email-address'}
                     spellCheck={false}
                     autoCorrect={false}
                     autoCapitalize={'none'}
                     textColor={'#fff'}
-                    underlineColor={'#99c729'}
+                    underlineColor={'#60B630'}
                     onSubmitEditing={sendVerificationCode}
                   />
                 </View>
@@ -157,13 +157,13 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({navigation}) => {
                 dense={true}
                 style={styles.textInput}
                 contentStyle={styles.textInputContent}
-                activeUnderlineColor={'#99c729'}
+                activeUnderlineColor={'#60B630'}
                 keyboardType={'numeric'}
                 spellCheck={false}
                 autoCorrect={false}
                 multiline={true}
                 textColor={'#fff'}
-                underlineColor={'#99c729'}
+                underlineColor={'#60B630'}
                 onSubmitEditing={submitVerificationCode}
               />
             </View>

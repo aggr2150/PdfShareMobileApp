@@ -12,7 +12,10 @@ import ImagePicker, {Image} from 'react-native-image-crop-picker';
 import BackButton from '@components/BackButton';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import BookCover from '@components/BookCover';
-import CheckButton from '@components/CheckButton';
+// import CheckButton from '@components/CheckButton';
+import Toast from 'react-native-toast-message';
+import CheckButton from '@components/buttons/CheckButton';
+import Book from '@components/Book';
 
 type UploadProps = StackScreenProps<RootStackParamList, 'Upload'>;
 // | BottomTabScreenProps<BottomTabParamList, 'UploadTab'>;
@@ -56,6 +59,22 @@ const Upload: React.FC<UploadProps> = ({navigation}) => {
   const submit = useCallback(() => {
     // if (pdf) {
     // setSubmitDisabled(true);
+    switch (true) {
+      case title.length === 0:
+        Toast.show({
+          type: 'error',
+          text1: '제목을 입력해주세요.',
+          position: 'bottom',
+        });
+        return;
+      case !pdf:
+        Toast.show({
+          type: 'error',
+          text1: 'PDF 파일을 선택해주세요.',
+          position: 'bottom',
+        });
+        return;
+    }
     setProgressModalVisible(true);
     let form = new FormData();
     form.append('title', title);
@@ -92,6 +111,11 @@ const Upload: React.FC<UploadProps> = ({navigation}) => {
       })
       .catch(error => {
         console.log('error', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Unknown Error Occurred!',
+          position: 'bottom',
+        });
         setProgressModalVisible(false);
       });
     // }
@@ -112,7 +136,7 @@ const Upload: React.FC<UploadProps> = ({navigation}) => {
             backgroundColor: 'black',
           }}>
           <View
-            style={{backgroundColor: '#99c729', height: dimensions.height / 3}}
+            style={{backgroundColor: '#60B630', height: 250 + insets.top}}
           />
         </View>
         <View>
@@ -133,11 +157,12 @@ const Upload: React.FC<UploadProps> = ({navigation}) => {
             <View style={{padding: 5}}>
               <BackButton onPress={() => navigation.goBack()} color={'white'} />
             </View>
-            <View style={{padding: 5}}>
+            <View style={{padding: 5, marginRight: insets.right || 5}}>
               <CheckButton
                 onPress={submit}
                 color={'white'}
-                disabled={title.length === 0 && !thumbnail && !pdf}
+                size={28}
+                // disabled={title.length === 0 && !thumbnail && !pdf}
               />
             </View>
           </View>
@@ -146,31 +171,94 @@ const Upload: React.FC<UploadProps> = ({navigation}) => {
               style={{
                 // width: '50%',
                 marginBottom: 20,
-                height: dimensions.height / 3,
+                height: 250,
               }}>
               <Pressable onPress={openImagePicker}>
-                <BookCover source={thumbnail} />
+                {/*<BookCover source={thumbnail} />*/}
+                <View
+                  style={{
+                    // flex: 1,
+                    aspectRatio: 3 / 4,
+                    // backgroundColor: 'white',
+                    height: '100%',
+                  }}>
+                  <View
+                    style={{
+                      shadowColor: '#000',
+                      shadowOffset: {
+                        width: 0,
+                        height: 1,
+                      },
+                      shadowOpacity: 0.22,
+                      shadowRadius: 2.22,
+                      elevation: 3,
+                      position: 'absolute',
+                      top: 12,
+                      // right: 50,
+                      left: 10,
+                      backgroundColor: 'white',
+                      // flex: 1,
+                      height: '80%',
+                      // width: '100%',
+                      aspectRatio: 1 / Math.sqrt(2),
+                    }}>
+                    {/*<Book*/}
+                    {/*  author={item?.author}*/}
+                    {/*  document={item?.document}*/}
+                    {/*  documentThumbnail={item?.documentThumbnail}*/}
+                    {/*  thumbnail={item?.documentThumbnail}*/}
+                    {/*  title={item?.title}*/}
+                    {/*/>*/}
+                    {/*<View*/}
+                    {/*  style={{*/}
+                    {/*    width: '100%',*/}
+                    {/*    height: '100%',*/}
+                    {/*    backgroundColor: 'yellow',*/}
+                    {/*  }}></View>*/}
+                  </View>
+                  <View
+                    style={{
+                      shadowColor: '#000',
+                      shadowOffset: {
+                        width: 0,
+                        height: 1,
+                      },
+                      shadowOpacity: 0.22,
+                      shadowRadius: 2.22,
+                      elevation: 3,
+                      position: 'absolute',
+                      right: 10,
+                      bottom: 12,
+                      // backgroundColor: 'brown',
+                      height: '80%',
+                      aspectRatio: 1 / Math.sqrt(2),
+                    }}>
+                    <BookCover source={thumbnail} />
+                  </View>
+                </View>
               </Pressable>
             </View>
             <Button
               onPress={openPdfPicker}
               buttonStyle={{
-                borderRadius: 24,
                 paddingVertical: 5,
                 paddingHorizontal: 45,
-                marginBottom: 24,
-                backgroundColor: pdf ? '#3a3a3a' : '#99c729',
+                backgroundColor: pdf ? '#3a3a3a' : '#60B630',
               }}
+              containerStyle={{marginBottom: 8, borderRadius: 300}}
               title={
                 <View style={{alignItems: 'center', justifyContent: 'center'}}>
-                  <Text style={{fontSize: 8}}></Text>
-                  <Text style={{fontSize: 13}}>
+                  {/*<Text style={{fontSize: 8}}></Text>*/}
+                  <Text style={{fontSize: 13, paddingVertical: 14}}>
                     {pdf ? 'PDF 선택완료' : '내 PDF 업로드'}
                   </Text>
-                  <Text style={{fontSize: 8}}>(최대 20MB)</Text>
+                  {/*<Text style={{fontSize: 8}}></Text>*/}
                 </View>
               }
             />
+            <Text style={{fontSize: 10, marginBottom: 15, color: '#60B630'}}>
+              (최대 20MB)
+            </Text>
             <View style={styles.inputField}>
               <TextInput
                 onChangeText={setTitle}

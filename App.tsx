@@ -35,7 +35,7 @@ const linking: LinkingOptions<RootStackParamList> = {
     initialRouteName: 'Tabs',
     screens: {
       Viewer: {
-        path: 'post/:_id',
+        path: '/post/:_id',
         // parse: {
         //   _id: value => value,
         // },
@@ -52,7 +52,7 @@ const linking: LinkingOptions<RootStackParamList> = {
             initialRouteName: 'My',
             screens: {
               Profile: {
-                path: 'u/:id',
+                path: '/u/:id',
                 exact: true,
               },
             },
@@ -91,7 +91,7 @@ const App = () => {
             ...DefaultTheme,
             colors: {
               ...DefaultTheme.colors,
-              onSurfaceVariant: '#99c729',
+              onSurfaceVariant: '#60B630',
             },
           }}>
           <SafeAreaProvider>

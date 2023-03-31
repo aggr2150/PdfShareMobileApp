@@ -4,7 +4,7 @@ import {Button, makeStyles, Text} from '@rneui/themed';
 import {StackScreenProps} from '@react-navigation/stack';
 import {HeaderBackButton} from '@react-navigation/elements';
 import Avatar from '@components/Avatar';
-import {TextInput} from 'react-native-paper';
+import {HelperText, TextInput} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import ImagePicker, {Image} from 'react-native-image-crop-picker';
@@ -13,6 +13,9 @@ import {useAppDispatch} from '@redux/store/RootStore';
 import {editAccount} from '@redux/reducer/authReducer';
 import {StackActions} from '@react-navigation/native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import CheckButton from '@components/buttons/CheckButton';
+import BackButton from '@components/BackButton';
+import ProgressModal from '@screens/Upload/ProgressModal';
 
 type EditProfileProps = StackScreenProps<RootStackParamList, 'EditProfile'>;
 
@@ -25,6 +28,7 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
   const [link, setLink] = useState(route.params.link);
   const [avatar, setAvatar] = useState<Image>();
   const [csrfToken, setCsrfToken] = useState<string>();
+  const [progressModalVisible, setProgressModalVisible] = useState(false);
 
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -44,57 +48,66 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
     }).then(setAvatar);
   }, []);
   const submit = useCallback(() => {
-    let form = new FormData();
-    form.append('id', id);
-    form.append('nickname', nickname);
-    form.append('link', link);
-    form.append('description', description);
-    if (avatar) {
-      form.append('avatar', {
-        uri: avatar.path,
-        type: avatar.mime,
-        name:
-          avatar.filename ||
-          avatar.path.substring(
-            avatar.path.lastIndexOf('/') + 1,
-            avatar.path.length,
-          ),
-      });
+    if (!progressModalVisible) {
+      setProgressModalVisible(true);
+      let form = new FormData();
+      form.append('id', id);
+      form.append('nickname', nickname);
+      form.append('link', link);
+      form.append('description', description);
+      if (avatar) {
+        form.append('avatar', {
+          uri: avatar.path,
+          type: avatar.mime,
+          name:
+            avatar.filename ||
+            avatar.path.substring(
+              avatar.path.lastIndexOf('/') + 1,
+              avatar.path.length,
+            ),
+        });
+      }
+      form.append('_csrf', csrfToken);
+      apiInstance
+        .post<response<ISession>>('/api/account/edit', form, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          withCredentials: true,
+          timeout: 180000,
+        })
+        .then(response => {
+          switch (response.data.code) {
+            case 200:
+              dispatch(editAccount(response.data.data));
+              navigation.dispatch(
+                StackActions.replace(
+                  // stale: false,
+                  // stale: false,
+                  'My',
+                ),
+              );
+              navigation.navigate('ProfileTab');
+              break;
+            case 409:
+              Toast.show({
+                type: 'error',
+                text1: '중복된 아이디 입니다.',
+                position: 'bottom',
+              });
+              break;
+          }
+        })
+        .catch(error => {
+          Toast.show({
+            type: 'error',
+            text1: 'Unknown Error Occurred!',
+            position: 'bottom',
+          });
+          setProgressModalVisible(false);
+          console.log('error', error);
+        });
     }
-    form.append('_csrf', csrfToken);
-    apiInstance
-      .post<response<ISession>>('/api/account/edit', form, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        withCredentials: true,
-      })
-      .then(response => {
-        switch (response.data.code) {
-          case 200:
-            dispatch(editAccount(response.data.data));
-            navigation.dispatch(
-              StackActions.replace(
-                // stale: false,
-                // stale: false,
-                'My',
-              ),
-            );
-            navigation.navigate('ProfileTab');
-            break;
-          case 409:
-            Toast.show({
-              type: 'error',
-              text1: '중복된 아이디 입니다.',
-              position: 'bottom',
-            });
-            break;
-        }
-      })
-      .catch(error => {
-        console.log('error', error);
-      });
-    // }
   }, [
     id,
     nickname,
@@ -107,20 +120,35 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
   ]);
   return (
     <View style={styles.container}>
-      <KeyboardAwareScrollView>
+      <View
+        style={[
+          styles.backButton,
+          {
+            justifyContent: 'space-between',
+            paddingTop: insets.top || 11,
+            paddingBottom: 11,
+            alignItems: 'center',
+          },
+        ]}>
+        <View style={{padding: 5, paddingHorizontal: 10}}>
+          <BackButton onPress={() => navigation.goBack()} color={'white'} />
+        </View>
         <View
-          style={[
-            styles.backButton,
-            {
-              paddingTop: insets.top || 11,
-              paddingBottom: 11,
-            },
-          ]}>
-          <HeaderBackButton
-            tintColor={'white'}
-            onPress={() => navigation.goBack()}
+          style={{
+            padding: 5,
+            paddingHorizontal: 10,
+            marginRight: insets.right || 5,
+          }}>
+          <CheckButton
+            onPress={submit}
+            color={'white'}
+            size={28}
+            label={'수정'}
+            // disabled={title.length === 0 && !thumbnail && !pdf}
           />
         </View>
+      </View>
+      <KeyboardAwareScrollView>
         <View style={styles.inputContainer}>
           {/*<View style={styles.backButton}>*/}
           {/*  <HeaderBackButton*/}
@@ -132,9 +160,9 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
             onPress={openImagePicker}
             style={{
               marginBottom: 12,
-              borderWidth: 1,
+              // borderWidth: 1,
               borderRadius: 100,
-              borderColor: '#cbe244',
+              // borderColor: '#cbe244',
             }}>
             <Avatar
               avatar={avatar ? {filepath: avatar.path} : route.params.avatar}
@@ -143,84 +171,145 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
           <View style={{marginBottom: 15}}>
             <Text style={styles.nicknameText}>{nickname}</Text>
           </View>
-          <Button
-            buttonStyle={{
-              borderRadius: 24,
-              paddingVertical: 14,
-              paddingHorizontal: 40,
-              marginBottom: 24,
-            }}
-            onPress={submit}
-            title={'프로필 수정'}
-          />
+          {/*<Button*/}
+          {/*  buttonStyle={{*/}
+          {/*    paddingVertical: 14,*/}
+          {/*    paddingHorizontal: 40,*/}
+          {/*  }}*/}
+          {/*  containerStyle={{borderRadius: 24, marginBottom: 24}}*/}
+          {/*  onPress={submit}*/}
+          {/*  title={'프로필 수정'}*/}
+          {/*/>*/}
           <View style={styles.inputField}>
             <TextInput
+              theme={{
+                colors: {
+                  onSurfaceVariant: '#fff',
+                },
+              }}
               label="아이디"
               dense={true}
               style={styles.textInput}
               contentStyle={styles.textInputContent}
-              activeUnderlineColor={'#99c729'}
+              activeUnderlineColor={'#fff'}
               autoCapitalize={'none'}
               autoCorrect={false}
               returnKeyType={'next'}
-              underlineColor={'#99c729'}
+              underlineColor={'#fff'}
               onChangeText={setId}
               value={id}
+              textColor={'#fff'}
+              selectionColor={'#fff'}
+              cursorColor={'#fff'}
             />
+            <HelperText
+              type={'info'}
+              visible
+              style={{paddingHorizontal: 0}}
+              theme={{
+                colors: {
+                  onSurfaceVariant: '#777',
+                },
+              }}>
+              영소문자 및 _ 최소 4자 최대 24자 가능합니다
+            </HelperText>
             <TextInput
+              theme={{
+                colors: {
+                  onSurfaceVariant: '#fff',
+                },
+              }}
               label="채널명"
               dense={true}
               style={styles.textInput}
               contentStyle={styles.textInputContent}
-              activeUnderlineColor={'#99c729'}
+              activeUnderlineColor={'#fff'}
               keyboardType={'email-address'}
               autoCapitalize={'none'}
               autoCorrect={false}
               returnKeyType={'next'}
-              underlineColor={'#99c729'}
+              underlineColor={'#fff'}
               onChangeText={setNickname}
               value={nickname}
+              textColor={'#fff'}
+              selectionColor={'#fff'}
+              cursorColor={'#fff'}
             />
+            <HelperText
+              type={'info'}
+              visible
+              style={{paddingHorizontal: 0}}
+              theme={{
+                colors: {
+                  onSurfaceVariant: '#777',
+                },
+              }}>
+              최소 2자 최대 24자 가능합니다
+            </HelperText>
             <TextInput
+              theme={{
+                colors: {
+                  onSurfaceVariant: '#fff',
+                },
+              }}
               label="내 소개"
               dense={true}
               style={styles.textInput}
               contentStyle={styles.textInputContent}
-              activeUnderlineColor={'#99c729'}
+              activeUnderlineColor={'#fff'}
+              autoCapitalize={'none'}
+              autoCorrect={false}
               multiline={true}
-              textColor={'#fff'}
-              underlineColor={'#99c729'}
+              underlineColor={'#fff'}
               onChangeText={setDescription}
               value={description}
+              textColor={'#fff'}
+              selectionColor={'#fff'}
+              cursorColor={'#fff'}
+            />
+            <TextInput
+              theme={{
+                colors: {
+                  onSurfaceVariant: '#fff',
+                },
+              }}
+              label="링크"
+              dense={true}
+              style={styles.textInput}
+              contentStyle={styles.textInputContent}
+              activeUnderlineColor={'#fff'}
+              multiline={true}
+              underlineColor={'#fff'}
+              onChangeText={setLink}
+              value={link}
+              textColor={'#fff'}
+              selectionColor={'#fff'}
+              cursorColor={'#fff'}
             />
           </View>
         </View>
-        {/*<Input />*/}
-        {/*<Input />*/}
-        {/*<Input />*/}
-        {/*<Input />*/}
       </KeyboardAwareScrollView>
+      <ProgressModal
+        progressModalVisible={progressModalVisible}
+        setProgressModalVisible={setProgressModalVisible}
+      />
     </View>
   );
 };
 const useStyles = makeStyles(theme => ({
   container: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: 'black',
     flex: 1,
   },
   inputContainer: {
     flex: 1,
-    backgroundColor: theme.colors.primary,
-    paddingHorizontal: 35,
+    // backgroundColor: theme.colors.primary,
+    // paddingHorizontal: 35,
     alignItems: 'center',
   },
   nicknameText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: theme.colors.black,
-  },
-  counterText: {
-    fontSize: 12,
     color: theme.colors.black,
   },
   submitButton: {
@@ -229,7 +318,7 @@ const useStyles = makeStyles(theme => ({
     paddingHorizontal: 40,
   },
   backButton: {
-    alignSelf: 'flex-start',
+    // alignSelf: 'flex-start',
     flexDirection: 'row',
     // paddingVertical: 11,
   },
@@ -239,11 +328,12 @@ const useStyles = makeStyles(theme => ({
     paddingTop: 3,
     paddingBottom: 15,
     paddingHorizontal: 20,
-    backgroundColor: theme.colors.black,
-    borderRadius: 20,
+    // backgroundColor: theme.colors.black,
+    // borderRadius: 20,
   },
   textInput: {
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
+    backgroundColor: 'transparent',
     paddingHorizontal: 0,
     fontSize: 13,
   },
@@ -251,8 +341,8 @@ const useStyles = makeStyles(theme => ({
     // flex: 1,
     // width: '100%',
     // paddingHorizontal: 0,
-    backgroundColor: theme.colors.black,
-    color: theme.colors.secondary,
+    backgroundColor: 'transparent',
+    color: theme.colors.black,
     fontFamily: 'Apple SD Gothic Neo',
     textAlignVertical: 'bottom',
     // alignSelf: 'stretch',

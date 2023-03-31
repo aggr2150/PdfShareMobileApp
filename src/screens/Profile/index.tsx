@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList, useWindowDimensions, View} from 'react-native';
 import ProfileListHeader from '@screens/Profile/ProfileListHeader';
 import BookCard from '@components/BookCard';
 import Spinner from '@components/Spinner';
@@ -25,6 +25,9 @@ import ListEmptyComponent from '@components/ListEmptyComponent';
 import {Button} from '@rneui/themed';
 import {selectById as selectBlockUserById} from '@redux/reducer/blocksReducer';
 import SplashScreen from 'react-native-splash-screen';
+import {batch} from 'react-redux';
+import {getNumColumns} from '@utils/Layout';
+import ColumnCard from '@components/book/ColumnCard';
 
 enum ETabIndex {
   'PDF',
@@ -128,11 +131,11 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   }, [authState, dispatch, route.params?.id]);
 
   const onRefresh = useCallback(() => {
-    setRefreshing(true);
+    // setRefreshing(true);
     apiInstance
       .post<
         response<{
-          user?: IUser;
+          user: IUser;
           feeds: IPost[];
           likes: ILikePost[];
           subscribing: IUser[];
@@ -142,28 +145,28 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
       })
       .then(response => {
         if (response.data.code === 200 && response.data.data.user) {
-          dispatch(setOneUser(response.data.data.user));
-          if (response.data.data.feeds.length !== 0) {
-            setTabData([
-              response.data.data.feeds,
-              response.data.data.likes || [],
-              response.data.data.subscribing || [],
-            ]);
+          batch(() => {
+            dispatch(setOneUser(response.data.data.user));
             dispatch(postSetMany(response.data.data.feeds));
-          }
-          if (
-            response.data.data.likes &&
-            response.data.data.likes.length !== 0
-          ) {
-            dispatch(postSetMany(response.data.data.likes));
-            dispatch(setAllLike(response.data.data.likes));
-          }
-          if (
-            response.data.data.subscribing &&
-            response.data.data.subscribing.length !== 0
-          ) {
-            dispatch(userSetMany(response.data.data.subscribing));
-          }
+            if (
+              response.data.data.likes &&
+              response.data.data.likes.length !== 0
+            ) {
+              dispatch(postSetMany(response.data.data.likes));
+              dispatch(setAllLike(response.data.data.likes));
+            }
+            if (
+              response.data.data.subscribing &&
+              response.data.data.subscribing.length !== 0
+            ) {
+              dispatch(userSetMany(response.data.data.subscribing));
+            }
+          });
+          setTabData([
+            response.data.data.feeds || [],
+            response.data.data.likes || [],
+            response.data.data.subscribing || [],
+          ]);
         }
       })
       .finally(() => {
@@ -411,22 +414,22 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
     SubscribingThrottleEventCallback,
   ]);
 
+  const dimensions = useWindowDimensions();
+  const numColumns = getNumColumns(dimensions.width);
+  console.log(dimensions.width);
   const renderItem = useMemo<
     React.FC<{item: IPost | IUser; index: number}>
   >((): React.FC<{item: IPost | IUser; index: number}> => {
     switch (selectedIndex) {
       case ETabIndex.PDF:
-        return ({item, index}) => (
-          <Animated.View entering={FadeIn}>
-            <BookCard item={item as IPost} index={index} />
-          </Animated.View>
-        );
       case ETabIndex.Likes:
-        return ({item, index}) => (
-          <Animated.View entering={FadeIn}>
-            <BookCard item={item as IPost} index={index} />
-          </Animated.View>
-        );
+        if (numColumns === 3)
+          return ({item, index}) => (
+            <Animated.View entering={FadeIn}>
+              <BookCard item={item as IPost} index={index} />
+            </Animated.View>
+          );
+        return props => <ColumnCard {...props} numColumns={numColumns} />;
       case ETabIndex.Subscribing:
         return ({item, index}) => (
           <Animated.View entering={FadeIn}>
@@ -438,7 +441,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
           </Animated.View>
         );
     }
-  }, [selectedIndex, subscribe]);
+  }, [selectedIndex, subscribe, numColumns]);
   switch (selectedIndex) {
     case 0:
       data = PDFData;
@@ -515,6 +518,8 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
         </ListEmptyComponent>
       ) : (
         <FlatList<IPost | IUser>
+          key={`#${selectedIndex !== 2 && numColumns !== 3 ? numColumns : 1}`}
+          numColumns={selectedIndex !== 2 && numColumns !== 3 ? numColumns : 1}
           data={data}
           // data={[]}
           onRefresh={onRefresh}

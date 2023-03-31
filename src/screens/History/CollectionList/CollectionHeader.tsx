@@ -4,7 +4,7 @@ import {makeStyles, Text} from '@rneui/themed';
 import BackButton from '@components/BackButton';
 import {Menu} from 'react-native-paper';
 
-import DotIcon from '@assets/icon/dot.svg';
+import DotIcon from '@assets/icon/horizontalDots.svg';
 import {useNavigation} from '@react-navigation/native';
 import {useAppDispatch} from '@redux/store/RootStore';
 import {removeCollection} from '@redux/reducer/collectionsReducer';

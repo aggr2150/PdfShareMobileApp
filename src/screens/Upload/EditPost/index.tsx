@@ -8,8 +8,9 @@ import {apiInstance, getCsrfToken} from '@utils/Networking';
 import ImagePicker, {Image} from 'react-native-image-crop-picker';
 import BackButton from '@components/BackButton';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import CheckButton from '@components/CheckButton';
+import CheckButton from '@components/buttons/CheckButton';
 import ThumbnailCover from '@components/ThumbnailCover';
+import BookCover from '@components/BookCover';
 
 type EditPostProps = StackScreenProps<RootStackParamList, 'EditPost'>;
 const EditPost: React.FC<EditPostProps> = ({navigation, route}) => {
@@ -91,7 +92,7 @@ const EditPost: React.FC<EditPostProps> = ({navigation, route}) => {
             backgroundColor: 'black',
           }}>
           <View
-            style={{backgroundColor: '#99c729', height: dimensions.height / 3}}
+            style={{backgroundColor: '#60B630', height: dimensions.height / 3}}
           />
         </View>
         <View>
@@ -112,11 +113,13 @@ const EditPost: React.FC<EditPostProps> = ({navigation, route}) => {
             <View style={{padding: 5}}>
               <BackButton onPress={() => navigation.goBack()} color={'white'} />
             </View>
-            <View style={{padding: 5}}>
+            <View style={{padding: 5, marginRight: insets.right || 5}}>
               <CheckButton
                 onPress={submit}
                 color={'white'}
                 disabled={title.length === 0}
+                size={28}
+                label={'수정'}
               />
             </View>
           </View>
@@ -125,15 +128,71 @@ const EditPost: React.FC<EditPostProps> = ({navigation, route}) => {
               style={{
                 // width: '50%',
                 marginBottom: 20,
-                height: dimensions.height / 3,
+                height: 250,
               }}>
               <Pressable onPress={openImagePicker}>
-                <ThumbnailCover
-                  thumbnail={route.params.thumbnail}
-                  source={thumbnail}
-                  author={route.params.author}
-                  title={title}
-                />
+                {/*<BookCover source={thumbnail} />*/}
+                <View
+                  style={{
+                    // flex: 1,
+                    aspectRatio: 3 / 4,
+                    // backgroundColor: 'white',
+                    height: '100%',
+                  }}>
+                  <View
+                    style={{
+                      shadowColor: '#000',
+                      shadowOffset: {
+                        width: 0,
+                        height: 1,
+                      },
+                      shadowOpacity: 0.22,
+                      shadowRadius: 2.22,
+                      elevation: 3,
+                      position: 'absolute',
+                      top: 12,
+                      // right: 50,
+                      left: 10,
+                      backgroundColor: 'white',
+                      // flex: 1,
+                      height: '80%',
+                      // width: '100%',
+                      aspectRatio: 1 / Math.sqrt(2),
+                    }}>
+                    {/*<Book*/}
+                    {/*  author={item?.author}*/}
+                    {/*  document={item?.document}*/}
+                    {/*  documentThumbnail={item?.documentThumbnail}*/}
+                    {/*  thumbnail={item?.documentThumbnail}*/}
+                    {/*  title={item?.title}*/}
+                    {/*/>*/}
+                    {/*<View*/}
+                    {/*  style={{*/}
+                    {/*    width: '100%',*/}
+                    {/*    height: '100%',*/}
+                    {/*    backgroundColor: 'yellow',*/}
+                    {/*  }}></View>*/}
+                  </View>
+                  <View
+                    style={{
+                      shadowColor: '#000',
+                      shadowOffset: {
+                        width: 0,
+                        height: 1,
+                      },
+                      shadowOpacity: 0.22,
+                      shadowRadius: 2.22,
+                      elevation: 3,
+                      position: 'absolute',
+                      right: 10,
+                      bottom: 12,
+                      // backgroundColor: 'brown',
+                      height: '80%',
+                      aspectRatio: 1 / Math.sqrt(2),
+                    }}>
+                    <BookCover source={thumbnail} />
+                  </View>
+                </View>
               </Pressable>
             </View>
             <View style={styles.inputField}>

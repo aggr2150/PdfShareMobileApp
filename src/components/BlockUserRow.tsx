@@ -38,11 +38,13 @@ const BlockUserRow: React.FC<BlockUserRowProps> = ({item, callback}) => {
         titleStyle={{fontSize: 13}}
         onPress={() => callback(item)}
         buttonStyle={{
-          backgroundColor: user?.subscribeStatus ? '#3a3a3a' : '#99c729',
-          borderRadius: 50,
+          backgroundColor: user?.subscribeStatus ? '#3a3a3a' : '#60B630',
           paddingTop: 8,
           paddingBottom: 8,
           paddingHorizontal: 20,
+        }}
+        containerStyle={{
+          borderRadius: 50,
         }}>
         {'차단해제'}
       </Button>

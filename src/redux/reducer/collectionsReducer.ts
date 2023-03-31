@@ -32,7 +32,7 @@ const collectionsSlice = createSlice({
     collectionSetOne: collectionAdapter.setOne,
     collectionSetMany: collectionAdapter.setMany,
     setAll: collectionAdapter.setAll,
-    updateCollection: collectionAdapter.updateOne,
+    collectionUpdate: collectionAdapter.updateOne,
     removeCollection: collectionAdapter.removeOne,
   },
 });
@@ -44,7 +44,7 @@ export const {
   collectionAddedMany,
   collectionAdded,
   setAll,
-  updateCollection,
+  collectionUpdate,
   removeCollection,
 } = collectionsSlice.actions;
 

@@ -7,14 +7,14 @@ import {apiInstance} from '@utils/Networking';
 import _ from 'lodash';
 import {postSetMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
-import {TestIds, useInterstitialAd} from 'react-native-google-mobile-ads';
+import ColumnCard from '@components/book/ColumnCard';
+import {getNumColumns} from '@utils/Layout';
 
-const adUnitId = TestIds.INTERSTITIAL;
-// const BACKGROUND_COLORS = ['#1750dd', '#108e13', '#fc86b7'];
+// const BACKGROUND_COLORS = ['#1750dd', '#60B630', '#fc86b7'];
 const LIST_ITEM_COLORS = [
-  {background: '#1750dd', book: '#fc86b7'},
-  {background: '#108e13', book: '#1750dd'},
-  {background: '#fc86b7', book: '#108e13'},
+  {background: '#1751D9', book: '#fc86b7'},
+  {background: '#60B630', book: '#1751D9'},
+  {background: '#fc86b7', book: '#60B630'},
 ];
 const FirstScene = () => {
   const styles = useStyles();
@@ -70,8 +70,10 @@ const FirstScene = () => {
   const posts = useAppSelector(state => {
     return data.map(item => state.posts.entities[item._id] || item);
   });
-  return (
+  const numColumns = getNumColumns(dimensions.width);
+  return numColumns === 3 ? (
     <FlatList<IPost>
+      key={'#'}
       data={posts}
       contentContainerStyle={{
         // paddingTop: (insets.top || 24) + 46,
@@ -84,6 +86,32 @@ const FirstScene = () => {
       keyExtractor={item => item._id}
       renderItem={({item, index}) => (
         <BookCard item={item} index={index} colors={LIST_ITEM_COLORS} />
+      )}
+      refreshControl={
+        <RefreshControl
+          progressViewOffset={(insets.top || 24) + 46 + 12}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      }
+    />
+  ) : (
+    <FlatList<IPost>
+      key={`@${numColumns}`}
+      numColumns={numColumns}
+      data={posts}
+      contentContainerStyle={{
+        // paddingTop: (insets.top || 24) + 46,
+        paddingTop: (insets.top || 24) + 46 + 12,
+        minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
+      }}
+      onEndReached={onEndReached}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
+      keyExtractor={item => item._id}
+      renderItem={props => (
+        <ColumnCard {...props} numColumns={numColumns} />
+        // <BookCard item={item} index={index} colors={LIST_ITEM_COLORS} />
       )}
       refreshControl={
         <RefreshControl

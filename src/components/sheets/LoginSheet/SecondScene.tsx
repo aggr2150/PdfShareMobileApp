@@ -1,10 +1,10 @@
-import {TouchableOpacity, View} from 'react-native';
+import {Linking, TouchableOpacity, View} from 'react-native';
 import {Button, makeStyles, Text} from '@rneui/themed';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {TextInput} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import {Input as BaseInput} from '@rneui/base/dist/Input/Input';
 import {signIn} from '@redux/reducer/authReducer';
 import Toast from 'react-native-toast-message';
@@ -22,11 +22,13 @@ const SecondScene = props => {
   const [verificationCode, setVerificationCode] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [csrfToken, setCsrfToken] = useState<string>();
+  const [buttonDisabled, setButtonDisabled] = useState(false);
   const dispatch = useAppDispatch();
   useEffect(() => {
     getCsrfToken.then(token => setCsrfToken(token));
   }, []);
   const sendVerificationCode = useCallback(() => {
+    setButtonDisabled(true);
     if (csrfToken) {
       apiInstance
         .post('/api/auth/signUp/sendVerificationCode', {
@@ -34,9 +36,25 @@ const SecondScene = props => {
           email: email,
         })
         .then(result => {
+          Toast.show({
+            type: 'success',
+            text1: '비밀번호가 변경되었습니다.',
+            position: 'bottom',
+          });
           console.log(result);
+          setTimeout(() => {
+            setButtonDisabled(false);
+          }, 30000);
         })
-        .catch(error => console.log(error, csrfToken, email));
+        .catch(error => {
+          console.log(error, csrfToken, email);
+          Toast.show({
+            type: 'error',
+            text1: 'Unknown Error Occurred!',
+            position: 'bottom',
+          });
+          setButtonDisabled(false);
+        });
     }
   }, [csrfToken, email]);
   const submit = useCallback(() => {
@@ -146,14 +164,14 @@ const SecondScene = props => {
                 // dense={true}
                 theme={{
                   colors: {
-                    onSurfaceVariant: '#99c729',
+                    onSurfaceVariant: '#60B630',
                   },
                 }}
                 style={styles.textInput}
                 contentStyle={styles.textInputContent}
                 // style={{color: 'red'}}
-                activeUnderlineColor={'#99c729'}
-                underlineColor={'#99c729'}
+                activeUnderlineColor={'#60B630'}
+                underlineColor={'#60B630'}
                 autoCorrect={false}
                 autoCapitalize={'none'}
                 textColor={'white'}
@@ -165,8 +183,15 @@ const SecondScene = props => {
             {/*  <Text style={{color: 'red'}}>전송</Text>*/}
             {/*</TouchableOpacity>*/}
             <Button
-              buttonStyle={{borderRadius: 50, paddingHorizontal: 15}}
+              buttonStyle={{paddingHorizontal: 15}}
               titleStyle={styles.buttonLabel}
+              disabled={buttonDisabled}
+              disabledStyle={{
+                opacity: 0.7,
+              }}
+              containerStyle={{
+                borderRadius: 50,
+              }}
               onPress={sendVerificationCode}>
               전송
             </Button>
@@ -177,11 +202,11 @@ const SecondScene = props => {
             dense={true}
             style={styles.textInput}
             contentStyle={styles.textInputContent}
-            activeUnderlineColor={'#99c729'}
+            activeUnderlineColor={'#60B630'}
             keyboardType={'numeric'}
             autoCorrect={false}
             returnKeyType={'next'}
-            underlineColor={'#99c729'}
+            underlineColor={'#60B630'}
           />
           <TextInput
             onChangeText={setPassword}
@@ -189,9 +214,9 @@ const SecondScene = props => {
             dense={true}
             style={styles.textInput}
             contentStyle={styles.textInputContent}
-            activeUnderlineColor={'#99c729'}
+            activeUnderlineColor={'#60B630'}
             textColor={'#fff'}
-            underlineColor={'#99c729'}
+            underlineColor={'#60B630'}
             secureTextEntry={true}
             autoCorrect={false}
           />
@@ -201,10 +226,10 @@ const SecondScene = props => {
             dense={true}
             style={styles.textInput}
             contentStyle={styles.textInputContent}
-            placeholderTextColor={'#99c729'}
-            activeUnderlineColor={'#99c729'}
+            placeholderTextColor={'#60B630'}
+            activeUnderlineColor={'#60B630'}
             textColor={'#fff'}
-            underlineColor={'#99c729'}
+            underlineColor={'#60B630'}
             secureTextEntry={true}
             autoCorrect={false}
           />
@@ -257,10 +282,36 @@ const SecondScene = props => {
           회원가입
         </Button>
       </View>
+      <View
+        style={{
+          margin: 12,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Text style={{fontSize: 12}}>
+          회원가입시{' '}
+          <Text
+            onPress={() => Linking.openURL('https://everypdf.cc/legal/privacy')}
+            style={styles.policyLabel}>
+            개인정보 보호정책
+          </Text>
+          과{' '}
+          <Text
+            onPress={() => Linking.openURL('https://everypdf.cc/legal/use')}
+            style={styles.policyLabel}>
+            서비스 이용약관
+          </Text>
+          에 동의한것으로 간주합니다.
+        </Text>
+      </View>
     </View>
   );
 };
 const useStyles = makeStyles(theme => ({
+  policyLabel: {
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
+  },
   submitButton: {
     borderRadius: 20,
   },
@@ -309,7 +360,7 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: 0,
   },
   inputContainer: {
-    backgroundColor: theme.colors.primary,
+    // backgroundColor: theme.colors.primary,
     alignItems: 'center',
     marginBottom: 7,
   },

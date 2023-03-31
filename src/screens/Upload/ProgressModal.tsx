@@ -32,8 +32,8 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
   return (
     <Modal
       visible={progressModalVisible}
-      contentContainerStyle={containerStyle}
-      onDismiss={() => setProgressModalVisible(false)}>
+      dismissable={false}
+      contentContainerStyle={containerStyle}>
       <View
         style={{
           marginHorizontal: 32,
@@ -50,7 +50,8 @@ const ProgressModal: React.FC<ProgressModalProps> = ({
             minWidth: 230,
             height: 7,
             borderRadius: 3,
-            backgroundColor: '#99c729',
+            backgroundColor: '#60B630',
+            // backgroundColor: '#60B630',
           }}
           progress={0.5}
           color={'#fcfc22'}

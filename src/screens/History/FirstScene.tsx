@@ -25,6 +25,9 @@ import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import Book from '@components/Book';
 import Separator from '@components/Seperator';
+import {useNavigation} from '@react-navigation/native';
+import {getHistoryNumColumns} from '@utils/Layout';
+import VerticalSeparator from '@components/VerticalSeparator';
 
 const FirstScene = () => {
   const styles = useStyles();
@@ -34,7 +37,7 @@ const FirstScene = () => {
   const [fetching, setFetching] = useState(true);
   const dimensions = useWindowDimensions();
   const dispatch = useAppDispatch();
-  // const pagingKey =
+  const navigation = useNavigation();
   useEffect(() => {
     apiInstance
       .post<response<IHistoryPost[]>>('/api/feeds/history')
@@ -86,10 +89,13 @@ const FirstScene = () => {
   const posts = useAppSelector(state => {
     return data.map(item => state.posts.entities[item._id] || item);
   });
+  const numColumns = getHistoryNumColumns(dimensions.width);
   return (
     // <SafeAreaView>
     <FlatList<IPost>
       data={posts}
+      key={`#${numColumns}`}
+      numColumns={numColumns}
       contentContainerStyle={{
         width: '100%',
         paddingTop: (insets.top || 24) + 46 + 12,
@@ -102,6 +108,7 @@ const FirstScene = () => {
       onEndReached={onEndReached}
       refreshing={refreshing}
       onRefresh={onRefresh}
+      // ItemSeparatorComponent={VerticalSeparator}
       ItemSeparatorComponent={Separator}
       renderItem={({item, index}) => (
         <Pressable
@@ -109,13 +116,13 @@ const FirstScene = () => {
             navigation.navigate('Viewer', item);
           }}
           style={{
-            backgroundColor: '#ef5518',
+            backgroundColor: '#000',
             paddingHorizontal: 21,
             paddingVertical: 21,
             aspectRatio: 32 / 12,
             flexDirection: 'row',
             justifyContent: 'space-between',
-            flex: 1,
+            flex: 1 / numColumns,
           }}>
           <View style={{flex: 0, paddingRight: 21}}>
             <Book
@@ -132,11 +139,11 @@ const FirstScene = () => {
                 fontSize: 22,
                 textAlign: 'right',
                 marginBottom: 37,
-                color: '#603502',
+                color: '#fff',
               }}>
               {item.title}
             </Text>
-            <Text style={{fontSize: 16, textAlign: 'right', color: '#603502'}}>
+            <Text style={{fontSize: 16, textAlign: 'right', color: '#9b9b9b'}}>
               {item.author.nickname}
             </Text>
           </View>
@@ -147,6 +154,7 @@ const FirstScene = () => {
           progressViewOffset={(insets.top || 24) + 46 + 12}
           refreshing={refreshing}
           onRefresh={onRefresh}
+          tintColor={'#fff'}
         />
       }
     />

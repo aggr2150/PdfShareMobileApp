@@ -20,7 +20,14 @@ const History = () => {
   );
   const insets = useSafeAreaInsets();
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingLeft: insets.left,
+          paddingRight: insets.right,
+        },
+      ]}>
       <View style={{position: 'absolute', top: insets.top || 24, zIndex: 1}}>
         <ToggleBtn
           labelText={['히스토리', '콜렉션']}

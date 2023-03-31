@@ -1,6 +1,8 @@
 declare type BottomTabParamList = {
   HomeTab: undefined;
-  Search: undefined | {keyword: string};
+  // Search: undefined | {keyword: string};
+  Search: ?{keyword: string};
+
   UploadTab: undefined;
   HistoryTab: import('@react-navigation/native').NavigatorScreenParams<HistoryStackScreenParams>;
   ProfileTab: import('@react-navigation/native').NavigatorScreenParams<ProfileStackScreenParams>;
@@ -9,7 +11,7 @@ declare type ProfileStackScreenParams = {
   My: undefined;
   Revenue: undefined;
   Profile: IUser | {id: string};
-  Information: IUser;
+  ProfileInformation: IUser;
 };
 declare type HistoryStackScreenParams = {
   History: undefined;
@@ -54,7 +56,7 @@ declare type RootStackParamList = {
   Replies: IComment;
   HistoryTab: undefined;
   History: undefined;
-  SearchTab: undefined;
+  Search: ?{keyword: string};
   Revenue: undefined;
   SearchResult: {keyword: string};
   EditProfile: {
@@ -67,6 +69,7 @@ declare type RootStackParamList = {
   My: undefined;
   // Profile: IUser | {id: string};
   Settings: undefined;
+  Information: undefined;
   BlockList: undefined;
   // CollectionList: undefined;
   Upload: undefined;

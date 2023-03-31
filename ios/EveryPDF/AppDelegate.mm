@@ -6,6 +6,7 @@
 
 #import <CodePush/CodePush.h>
 #import <React/RCTLinkingManager.h>
+#import "Orientation.h"
 
 @implementation AppDelegate
 
@@ -26,14 +27,17 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  self.moduleName = @"RnDiffApp";
+  self.moduleName = @"EveryPDF";
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
 
-  [RNSplashScreen show];
+//   [RNSplashScreen show];
+  bool didFinish=[super application:application didFinishLaunchingWithOptions:launchOptions];
 
-  return [super application:application didFinishLaunchingWithOptions:launchOptions];
+  [RNSplashScreen show];  // here
+  return didFinish;
+//   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
@@ -43,6 +47,10 @@
 #else
   return [CodePush bundleURL];
 #endif
+}
+
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+  return [Orientation getOrientation];
 }
 //  return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 

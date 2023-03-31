@@ -17,11 +17,11 @@ export default createTheme({
   },
   fontFamily: 'Apple SD Gothic Neo',
   lightColors: {
-    sheetsBackground: '#99c729',
+    sheetsBackground: '#60B630',
     black: '#fff',
     white: '#262626',
     separator: '#393939',
-    primary: '#99c729',
+    primary: '#60B630',
     background: '#000',
     secondary: '#1ba639',
     tertiary: '#60b630',

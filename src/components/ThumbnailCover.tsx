@@ -43,7 +43,7 @@ const ThumbnailCover: React.FC<ThumbnailCoverProps> = ({
         style={{
           fontSize: dimension?.width / 9,
           textAlign: 'center',
-          color: '#99c729',
+          color: '#60B630',
         }}
         numberOfLines={2}>
         표지 이미지를 선택해 주세요

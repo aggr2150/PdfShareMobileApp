@@ -20,10 +20,17 @@ import {Button, makeStyles, Text} from '@rneui/themed';
 import ScrollHeader from '@screens/Profile/Information/ScrollHeader';
 import reactStringReplace from 'react-string-replace';
 import TagText from '@components/TagText';
-import {CommonActions, useLinkTo} from '@react-navigation/native';
+import {
+  CommonActions,
+  useLinkTo,
+  useLinkBuilder,
+} from '@react-navigation/native';
 import UrlPattern from 'url-pattern';
 
-type ProfileProps = StackScreenProps<ProfileStackScreenParams, 'Information'>;
+type ProfileProps = StackScreenProps<
+  ProfileStackScreenParams,
+  'ProfileInformation'
+>;
 const Information: React.FC<ProfileProps> = ({navigation, route}) => {
   // const navigation = useNavigation();
   // const route = useRoute();
@@ -220,6 +227,7 @@ const Information: React.FC<ProfileProps> = ({navigation, route}) => {
     },
     [session, dispatch, sessionUser, csrfToken],
   );
+  const builder = useLinkBuilder();
   return (
     <View
       style={{
@@ -264,24 +272,25 @@ const Information: React.FC<ProfileProps> = ({navigation, route}) => {
                   link => (
                     <TagText
                       style={{
-                        color: '#99c729',
+                        color: '#60a4e6',
                         fontSize: 13,
                       }}
                       onPress={async () => {
                         if (await Linking.canOpenURL(link)) {
-                          // const url = new URL(link);
-
-                          // new URL('https://naver.com');
-                          // let url = new URL(
-                          //   'https://developer.mozilla.org/ko/docs/Web/API/URL/host',
-                          // );
-                          // const url = new URL(link);
-                          // new UrlPattern('/post/:_id');
-                          // console.log(url.host, url.pathname);
-
-                          // linkTo(link);
-                          // linkTo('https://www.naver.com');
-                          await Linking.openURL(link);
+                          try {
+                            const url = link.replace(
+                              /^(https:\/\/everypdf.cc)/,
+                              '',
+                            );
+                            if (url.startsWith('/')) {
+                              linkTo(url);
+                            } else {
+                              await Linking.openURL(url);
+                            }
+                          } catch (e) {
+                            console.log('link', link);
+                            await Linking.openURL(link);
+                          }
                         }
                       }}>
                       {link}
@@ -293,7 +302,7 @@ const Information: React.FC<ProfileProps> = ({navigation, route}) => {
                 tag => (
                   <TagText
                     style={{
-                      color: '#99c729',
+                      color: '#60a4e6',
                       fontSize: 13,
                     }}
                     onPress={() => {
@@ -305,6 +314,31 @@ const Information: React.FC<ProfileProps> = ({navigation, route}) => {
                   </TagText>
                 ),
               )}
+            </Text>
+            <Text style={styles.contentText}>
+              링크 :{' '}
+              <Text
+                style={{color: '#60a4e6'}}
+                onPress={async () => {
+                  if (user?.link && (await Linking.canOpenURL(user.link))) {
+                    try {
+                      const url = user.link.replace(
+                        /^(https:\/\/everypdf.cc)/,
+                        '',
+                      );
+                      if (url.startsWith('/')) {
+                        linkTo(url);
+                      } else {
+                        await Linking.openURL(url);
+                      }
+                    } catch (e) {
+                      console.log('link', user.link);
+                      await Linking.openURL(user.link);
+                    }
+                  }
+                }}>
+                {user?.link}
+              </Text>
             </Text>
           </View>
         </ScrollView>

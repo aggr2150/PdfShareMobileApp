@@ -71,6 +71,7 @@ const ToggleBtn: React.FC<ToggleBtnProps> = ({
         style={[
           animatedStyles,
           {
+            display: width === 0 ? 'none' : 'flex',
             backgroundColor: '#1ba639',
             width:
               width / 2 +

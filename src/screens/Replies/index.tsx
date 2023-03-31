@@ -319,7 +319,7 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
               alignItems: 'center',
               paddingHorizontal: 10,
             }}>
-            <SendIcon width={36} height={36} fill={'#99c729'} />
+            <SendIcon width={36} height={36} fill={'#60B630'} />
           </TouchableOpacity>
         </Pressable>
       </KeyboardAvoidingView>

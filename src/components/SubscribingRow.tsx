@@ -55,11 +55,13 @@ const SubscribingRow: React.FC<SubscribingRowProps> = ({
         titleStyle={{fontSize: 13}}
         onPress={() => subscribe(user)}
         buttonStyle={{
-          backgroundColor: user?.subscribeStatus ? '#3a3a3a' : '#99c729',
-          borderRadius: 50,
+          backgroundColor: user?.subscribeStatus ? '#3a3a3a' : '#60B630',
           paddingTop: 8,
           paddingBottom: 8,
           paddingHorizontal: 20,
+        }}
+        containerStyle={{
+          borderRadius: 50,
         }}>
         {user?.subscribeStatus ? '취소' : '구독'}
       </Button>

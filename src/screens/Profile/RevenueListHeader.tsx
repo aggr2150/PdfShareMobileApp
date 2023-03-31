@@ -66,17 +66,17 @@ const RevenueListHeader: React.FC<RevenueListHeaderProps> = ({
             paddingVertical: 16,
             paddingHorizontal: 32,
           }}>
-          <Text style={{fontSize: 14, color: '#99c729'}}>
+          <Text style={{fontSize: 20, color: '#60B630'}}>
             ₩{' '}
-            {(
+            {Math.floor(
               (settlement.postViewCounter - settlement.settledViewCounter) *
-              0.24
-            ).toFixed(2)}
+                0.24,
+            )}
           </Text>
         </View>
         <Text style={{fontSize: 14, paddingVertical: 10}}>
           정산 수익 :{' '}
-          <Text style={{fontSize: 14, color: '#99c729'}}>
+          <Text style={{fontSize: 14, color: '#60B630'}}>
             ₩ {settlement.settledAmount}
           </Text>
         </Text>

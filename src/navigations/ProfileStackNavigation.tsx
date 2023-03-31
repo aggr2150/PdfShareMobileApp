@@ -45,7 +45,7 @@ const ProfileStackNavigation = () => {
           // options={{headerShown: false}}
         />
         <ProfileStack.Screen
-          name="Information"
+          name="ProfileInformation"
           component={Information}
           options={{
             cardStyleInterpolator: CardStyleInterpolators.forFadeFromCenter,

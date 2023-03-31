@@ -7,6 +7,8 @@ import _ from 'lodash';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {postSetMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
+import {getNumColumns} from '@utils/Layout';
+import ColumnCard from '@components/book/ColumnCard';
 
 const SecondScene: React.FC = () => {
   const styles = useStyles();
@@ -66,8 +68,10 @@ const SecondScene: React.FC = () => {
     throttleEventCallback.cancel();
     throttleEventCallback(undefined, true);
   }, [throttleEventCallback]);
-  return (
+  const numColumns = getNumColumns(dimensions.width);
+  return numColumns === 3 ? (
     <FlatList<IPost>
+      key={'#'}
       data={posts}
       contentContainerStyle={{
         paddingTop: (insets.top || 24) + 46 + 12,
@@ -78,6 +82,31 @@ const SecondScene: React.FC = () => {
       onRefresh={onRefresh}
       refreshing={refreshing}
       renderItem={({item, index}) => <BookCard item={item} index={index} />}
+      refreshControl={
+        <RefreshControl
+          progressViewOffset={(insets.top || 24) + 46 + 12}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      }
+    />
+  ) : (
+    <FlatList<IPost>
+      key={`@${numColumns}`}
+      numColumns={numColumns}
+      data={posts}
+      contentContainerStyle={{
+        // paddingTop: (insets.top || 24) + 46,
+        paddingTop: (insets.top || 24) + 46 + 12,
+        minHeight: dimensions.height + (insets.top || 24) + 46 + 12,
+      }}
+      onEndReached={onEndReached}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
+      renderItem={props => (
+        <ColumnCard {...props} numColumns={numColumns} />
+        // <BookCard item={item} index={index} colors={LIST_ITEM_COLORS} />
+      )}
       refreshControl={
         <RefreshControl
           progressViewOffset={(insets.top || 24) + 46 + 12}

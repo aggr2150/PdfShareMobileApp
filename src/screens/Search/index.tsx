@@ -20,7 +20,9 @@ import queryString from 'query-string';
 import Book from '@components/Book';
 import {StackScreenProps} from '@react-navigation/stack';
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
-const LIST_ITEM_COLORS = ['#108e13', '#fc86b7', '#1750dd'];
+import ColumnCard from '@components/book/ColumnCard';
+import {getNumColumns} from '@utils/Layout';
+const LIST_ITEM_COLORS = ['#5DB522', '#fc86b7', '#1751D9'];
 type SearchProps = BottomTabScreenProps<BottomTabParamList, 'Search'>;
 const Search: React.FC<SearchProps> = ({navigation, route}) => {
   const styles = useStyles();
@@ -152,6 +154,7 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
   const posts = useAppSelector(state => {
     return data.map(item => state.posts.entities[item._id] || item);
   });
+  const numColumns = getNumColumns(dimensions.width);
   return (
     <View
       style={{
@@ -159,6 +162,8 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#000',
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
       }}>
       <StatusBar backgroundColor={'black'} barStyle={'light-content'} />
       {/*<TouchableOpacity*/}
@@ -200,60 +205,71 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
       {/*  </Pressable>*/}
       {/*</TouchableOpacity>*/}
       <View
+        pointerEvents={'box-none'}
         style={{
           position: 'absolute',
           top: insets.top || 24,
           zIndex: 1,
+          // width: '100%',
           left: 0,
           right: 0,
           marginHorizontal: 60,
+          justifyContent: 'center',
+          flexDirection: 'row',
         }}>
-        <SearchBar
-          showLoading={loading}
-          value={keyword}
-          onChangeText={onChangeText}
-          // inputContainerStyle={{}}
-          // style={{borderRadius: 20, overflow: 'hidden'}}
-          inputContainerStyle={{
-            // height: 36,
-            alignItems: 'center',
-            justifyContent: 'center',
-            // backgroundColor: 'red',
-            // height: 46,
-          }}
-          inputStyle={{
-            fontSize: 12,
-            minHeight: 35,
-            marginLeft: 0,
-            // textAlignVertical: 'top',
-            height: 46,
-          }}
-          rightIconContainerStyle={{
-            height: 46,
-          }}
-          leftIconContainerStyle={{
-            paddingHorizontal: 10,
-            height: 46,
-          }}
+        <View
           style={{
-            height: 46,
-          }}
-          containerStyle={{
-            // alignItems: 'center',
-            justifyContent: 'center',
-            height: 46,
+            flex: 1,
+            maxWidth: 500,
+          }}>
+          <SearchBar
+            showLoading={loading}
+            value={keyword}
+            onChangeText={onChangeText}
+            // inputContainerStyle={{}}
+            // style={{borderRadius: 20, overflow: 'hidden'}}
+            inputContainerStyle={{
+              // height: 36,
+              alignItems: 'center',
+              justifyContent: 'center',
+              // backgroundColor: 'red',
+              // height: 46,
+            }}
+            inputStyle={{
+              fontSize: 12,
+              minHeight: 35,
+              marginLeft: 0,
+              // textAlignVertical: 'top',
+              height: 46,
+            }}
+            rightIconContainerStyle={{
+              height: 46,
+            }}
+            leftIconContainerStyle={{
+              paddingHorizontal: 10,
+              height: 46,
+            }}
+            style={{
+              // width: '100%',
+              height: 46,
+            }}
+            containerStyle={{
+              // alignItems: 'center',
+              justifyContent: 'center',
+              height: 46,
 
-            maxHeight: 46,
-            maxWidth: 700,
-            // width: '100%',
-            borderRadius: 300,
-            overflow: 'hidden',
-            padding: 0,
-            borderTopWidth: 0,
-            borderBottomWidth: 0,
-          }}
-          platform={'default'}
-        />
+              maxHeight: 46,
+              maxWidth: 700,
+              // width: '100%',
+              borderRadius: 300,
+              overflow: 'hidden',
+              padding: 0,
+              borderTopWidth: 0,
+              borderBottomWidth: 0,
+            }}
+            platform={'default'}
+          />
+        </View>
       </View>
       <View
         style={{
@@ -265,7 +281,8 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
           <Spinner />
         ) : (
           <FlatList<IPost>
-            numColumns={3}
+            key={`#${numColumns}`}
+            numColumns={numColumns}
             data={keyword.length === 0 ? sample : posts}
             contentContainerStyle={{
               // width: '100%',
@@ -280,55 +297,9 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
             onEndReached={onEndReached}
             onRefresh={onRefresh}
             refreshing={refreshing}
-            renderItem={({item, index}) => {
-              return (
-                // <TouchableOpacity>
-                // <BookCard item={item} index={index} />
-                <Pressable
-                  onPress={() =>
-                    navigation.dispatch(CommonActions.navigate('Viewer', item))
-                  }
-                  style={{
-                    flex: 1 / 3,
-                  }}>
-                  <View
-                    style={{
-                      // backgroundColor: 'red',
-                      // height: 300,
-                      // width: 100,
-                      flex: 1,
-                      margin: 4,
-                      // padding: 10,
-                    }}>
-                    <View
-                      style={{
-                        marginVertical: 5,
-                        // aspectRatio: 1 / Math.sqrt(2),
-                      }}>
-                      <View
-                        style={{
-                          // marginVertical: 5,
-                          aspectRatio: 1 / Math.sqrt(2),
-                        }}>
-                        <Book
-                          title={item.title}
-                          author={item.author}
-                          thumbnail={item.thumbnail}
-                          color={LIST_ITEM_COLORS[(index / 3).toFixed(0) % 3]}
-                        />
-                      </View>
-                    </View>
-                    <Text style={styles.titleLabel} numberOfLines={3}>
-                      {item.title}
-                    </Text>
-                    <Text style={styles.authorLabel} numberOfLines={2}>
-                      {item.author.nickname}
-                    </Text>
-                  </View>
-                </Pressable>
-                // </TouchableOpacity>
-              );
-            }}
+            renderItem={props => (
+              <ColumnCard {...props} numColumns={numColumns} />
+            )}
             refreshControl={
               <RefreshControl
                 progressViewOffset={(insets.top || 24) + 46 + 12}

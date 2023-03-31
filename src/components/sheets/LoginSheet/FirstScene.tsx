@@ -102,6 +102,7 @@ const FirstScene = props => {
           inputStyle={{margin: 0}}
           secureTextEntry={true}
           autoCorrect={false}
+          autoCapitalize={'none'}
           returnKeyType={'done'}
           onSubmitEditing={submit}
         />

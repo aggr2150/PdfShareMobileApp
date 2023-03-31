@@ -24,6 +24,8 @@ const Home = () => {
     <View
       style={{
         flex: 1,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#000',

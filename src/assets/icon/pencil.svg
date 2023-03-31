@@ -5,7 +5,7 @@
 <style type="text/css">
 	.st0{fill:#FFFFFF;}
 	.st1{fill:#FFFFFF;stroke:#9E9E9E;stroke-width:0.0788;stroke-miterlimit:10;}
-	.st2{fill:#99C729;}
+	.st2{fill:#60B630;}
 	.st3{display:none;}
 	.st4{display:inline;fill:#60B630;}
 	.st5{fill:none;}
@@ -23,7 +23,7 @@
 		<path class="st2" d="M4.3,24.58c-0.38,0.38-0.6,0.9-0.61,1.44l-0.06,5.82c-0.01,1.16,0.93,2.1,2.09,2.09l5.82-0.06
 			c0.54-0.01,1.06-0.22,1.44-0.61L28.25,18l-8.77-8.6L4.3,24.58z"/>
 	</g>
-	
+
 		<rect x="19.61" y="10.8" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 35.5976 38.3916)" class="st2" width="12.28" height="2.05"/>
 	<path class="st2" d="M31.93,14.33c2.4-2.4,2.4-6.29,0-8.69s-6.29-2.4-8.69,0L31.93,14.33z"/>
 </g>

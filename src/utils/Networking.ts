@@ -19,7 +19,8 @@ export const getCsrfToken = apiInstance
   .then(response => {
     return response.data.data._csrf;
   });
-
+export const reportCallback = ({csrfToken, targetType, targetId}) =>
+  apiInstance.post('/api/report/' + targetType, {_csrf: csrfToken, targetId});
 // export const confirmIdToken = async (user: FirebaseAuthTypes.User) => {
 //   return apiInstance
 //     .post(
