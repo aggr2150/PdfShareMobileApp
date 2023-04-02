@@ -1,5 +1,5 @@
 import React, {Dispatch, useCallback, useEffect, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {Platform, TouchableOpacity, View} from 'react-native';
 import {Button, ButtonGroup, makeStyles, Text} from '@rneui/themed';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import Avatar from '@components/Avatar';
@@ -9,6 +9,7 @@ import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import {getSession} from '@redux/reducer/authReducer';
 import {selectById, updateManyUser} from '@redux/reducer/usersReducer';
 import {SheetManager} from 'react-native-actions-sheet';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface ProfileListHeaderProps {
   selectedIndex?: number;
@@ -203,20 +204,52 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
       </View>
       {user?.description && (
         <TouchableOpacity
-          style={{flex: 1}}
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            // alignSelf: 'center',
+            // height: 40,
+          }}
           activeOpacity={0.7}
           onPress={() => navigation.navigate('ProfileInformation', user)}>
+          {/*<View*/}
+          {/*  style={{*/}
+          {/*    width: 30,*/}
+          {/*  }}></View>*/}
           <Text
             style={{
-              width: '100%',
+              marginLeft: 30,
+              flex: 1,
+              // width: '100%',
               paddingHorizontal: 15,
-              marginBottom: 15,
+              // marginBottom: 15,
               textAlign: 'center',
+              // alignSelf: 'center',
+              // alignItems: 'center',
+              // height: 40,
+              lineHeight: 40,
             }}
             numberOfLines={1}
             ellipsizeMode={'tail'}>
             {user?.description}
           </Text>
+          <View
+            style={{
+              // position: 'absolute',
+              // top: 0,
+              // bottom: 0,
+              // right: '15%',
+              width: 30,
+              opacity: 0.3,
+            }}>
+            <Ionicons
+              color={'white'}
+              name={'chevron-forward-outline'}
+              size={30}
+            />
+          </View>
         </TouchableOpacity>
       )}
       {isMine && setSelectedIndex && (

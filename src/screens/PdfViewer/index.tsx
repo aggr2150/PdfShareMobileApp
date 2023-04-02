@@ -412,10 +412,12 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                     }
                   }}>
                   <Avatar
-                    style={{width: 20, height: 20, marginRight: 5}}
+                    style={{width: 24, height: 24, marginRight: 5}}
                     avatar={post.author?.avatar}
                   />
-                  <Text>{post.author.nickname} 님의 </Text>
+                  <Text style={{lineHeight: 20}}>
+                    {post.author.nickname} 님의{' '}
+                  </Text>
                 </Pressable>
                 <Pressable
                   onPress={() => detailsActionSheetRef.current?.show()}
@@ -429,14 +431,13 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                   <View style={{flex: 1, justifyContent: 'center'}}>
                     <Text
                       numberOfLines={1}
-                      style={
-                        {
-                          // flex: 1,
-                          // justifyContent: 'center',
-                          // alignSelf: 'center',
-                          // textAlignVertical: 'center',
-                        }
-                      }>
+                      style={{
+                        // flex: 1,
+                        // justifyContent: 'center',
+                        lineHeight: 20,
+                        // alignSelf: 'center',
+                        // textAlignVertical: 'center',
+                      }}>
                       {post.title}
                     </Text>
                   </View>
