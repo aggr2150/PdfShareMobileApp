@@ -70,7 +70,10 @@ const Comment: React.FC<CommentProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <Avatar style={{width: 20, height: 20}} />
+            <Avatar
+              style={{width: 20, height: 20}}
+              avatar={item.author.avatar}
+            />
           </View>
           <Text style={{fontSize: 13}}>{item.author.nickname} 님</Text>
         </Pressable>
