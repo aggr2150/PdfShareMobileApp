@@ -23,7 +23,7 @@ import _ from 'lodash';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
 import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
-import Book from '@components/Book';
+import Book from '@components/book/Book';
 import Separator from '@components/Seperator';
 import {useNavigation} from '@react-navigation/native';
 import {getHistoryNumColumns} from '@utils/Layout';

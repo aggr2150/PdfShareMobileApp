@@ -1,8 +1,9 @@
-import {Pressable, View} from 'react-native';
-import {CommonActions, useNavigation} from '@react-navigation/native';
-import Book from '@components/Book';
+import {View} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import Book from '@components/book/Book';
 import {makeStyles, Text} from '@rneui/themed';
 import React from 'react';
+
 const LIST_ITEM_COLORS = ['#5DB522', '#fc86b7', '#1751D9'];
 interface ColumnCardProps {
   item: IPost;
@@ -17,10 +18,10 @@ const ColumnCard: React.FC<ColumnCardProps> = ({
   const navigation = useNavigation();
   const styles = useStyles();
   return (
-    <Pressable
-      onPress={() =>
-        navigation.dispatch(CommonActions.navigate('Viewer', item))
-      }
+    <View
+      // onPress={() =>
+      //   navigation.dispatch(CommonActions.navigate('Viewer', item))
+      // }
       style={{
         flex: 1 / numColumns,
       }}>
@@ -55,7 +56,7 @@ const ColumnCard: React.FC<ColumnCardProps> = ({
           {item.author.nickname}
         </Text>
       </View>
-    </Pressable>
+    </View>
     // </TouchableOpacity>
   );
 };

@@ -5,7 +5,7 @@ import {useNavigation} from '@react-navigation/native';
 import PagerView from 'react-native-pager-view';
 import ThrottleFlatList from '@components/ThrottleFlatlist';
 import {SheetManager} from 'react-native-actions-sheet';
-import Book from '@components/Book';
+import Book from '@components/book/Book';
 
 interface PagesProps {
   selectedIndex: number;

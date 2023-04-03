@@ -3,7 +3,7 @@ import {makeStyles, Text} from '@rneui/themed';
 import ThrottleFlatList from '@components/ThrottleFlatlist';
 import BookCard from '@components/BookCard';
 import {FlatList, Pressable, useWindowDimensions, View} from 'react-native';
-import Book from '@components/Book';
+import Book from '@components/book/Book';
 import {useNavigation} from '@react-navigation/native';
 
 const FirstSceneBk = () => {

@@ -14,7 +14,7 @@ import ActionSheet, {
   SheetManager,
 } from 'react-native-actions-sheet';
 import ThrottleFlatList from '@components/ThrottleFlatlist';
-import Book from '@components/Book';
+import Book from '@components/book/Book';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import {StackScreenProps} from '@react-navigation/stack';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';

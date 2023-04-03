@@ -12,7 +12,7 @@ import {selectAll, setAllLike} from '@redux/reducer/likesReducer';
 import {getSession} from '@redux/reducer/authReducer';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import RevenueListHeader from '@screens/Profile/RevenueListHeader';
-import Book from '@components/Book';
+import Book from '@components/book/Book';
 import {Text} from '@rneui/themed';
 import Separator from '@components/Seperator';
 import _ from 'lodash';

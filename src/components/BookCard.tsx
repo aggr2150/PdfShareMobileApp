@@ -2,7 +2,7 @@ import React from 'react';
 import {ColorValue, Pressable, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
-import Book from '@src/components/Book';
+import Book from '@components/book/Book';
 import {humanizeNumber} from '@utils/Humanize';
 import InterstitialAdsController from '@components/InterstitialAdsController';
 

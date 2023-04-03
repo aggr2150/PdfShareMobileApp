@@ -15,7 +15,7 @@ import BookCover from '@components/BookCover';
 // import CheckButton from '@components/CheckButton';
 import Toast from 'react-native-toast-message';
 import CheckButton from '@components/buttons/CheckButton';
-import Book from '@components/Book';
+import Book from '@components/book/Book';
 
 type UploadProps = StackScreenProps<RootStackParamList, 'Upload'>;
 // | BottomTabScreenProps<BottomTabParamList, 'UploadTab'>;

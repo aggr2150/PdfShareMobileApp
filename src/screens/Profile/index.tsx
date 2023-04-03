@@ -416,19 +416,19 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
 
   const dimensions = useWindowDimensions();
   const numColumns = getNumColumns(dimensions.width);
-  console.log(dimensions.width);
   const renderItem = useMemo<
     React.FC<{item: IPost | IUser; index: number}>
   >((): React.FC<{item: IPost | IUser; index: number}> => {
     switch (selectedIndex) {
       case ETabIndex.PDF:
       case ETabIndex.Likes:
-        if (numColumns === 3)
+        if (numColumns === 3) {
           return ({item, index}) => (
             <Animated.View entering={FadeIn}>
               <BookCard item={item as IPost} index={index} />
             </Animated.View>
           );
+        }
         return props => <ColumnCard {...props} numColumns={numColumns} />;
       case ETabIndex.Subscribing:
         return ({item, index}) => (

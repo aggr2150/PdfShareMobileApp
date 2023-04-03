@@ -17,7 +17,7 @@ import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
 import _ from 'lodash';
 import Spinner from '@components/Spinner';
 import queryString from 'query-string';
-import Book from '@components/Book';
+import Book from '@components/book/Book';
 import {StackScreenProps} from '@react-navigation/stack';
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import ColumnCard from '@components/book/ColumnCard';

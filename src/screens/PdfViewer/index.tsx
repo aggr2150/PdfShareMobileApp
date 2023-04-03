@@ -11,6 +11,7 @@ import {
   useColorScheme,
   useWindowDimensions,
   View,
+  Text as RText,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Pdf, {Source} from 'react-native-pdf';
@@ -20,7 +21,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 // import {setUIVisible} from '@redux/reducer/viewerReducer';
 import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {makeStyles, Text} from '@rneui/themed';
+import {Button, makeStyles, Text} from '@rneui/themed';
 import Avatar from '@components/Avatar';
 import {
   StackActions,
@@ -60,6 +61,7 @@ import {
   blockUserRemoveOne,
   selectById as selectBlockUserById,
 } from '@redux/reducer/blocksReducer';
+import ListEmptyComponent from '@components/ListEmptyComponent';
 
 type ViewerProps = StackScreenProps<RootStackParamList, 'Viewer'>;
 const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
@@ -73,6 +75,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
     // flex: 1,
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+  const [fetching, setFetching] = useState(true);
 
   const [csrfToken, setCsrfToken] = useState<string>('');
 
@@ -103,28 +106,25 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
     useCallback(() => {
       if (authState !== EAuthState.INIT) {
         getCsrfToken.then(token => setCsrfToken(token));
-        // if (route.params?._id) {
-        // }
         apiInstance
           .post<response<IPost>>(
             '/api/post/' + (route.params?.id || route.params._id),
           )
           .then(response => {
-            console.log(response.data);
             if (response.data.data) {
-              console.log('response.data.data', response.data.data);
               dispatch(postSetOne(response.data.data));
+            } else {
+              dispatch(postRemoveOne(route.params?.id || route.params._id));
             }
+            setFetching(false);
           });
       }
     }, [authState, dispatch, route.params._id, route.params?.id]),
   );
   const likeCallback = useCallback(() => {
     if (!session) {
-      console.log('session', session);
       SheetManager.show('loginSheet', {payload: {closable: true}}).then();
     } else if (post) {
-      console.log(post.likeStatus);
       dispatch(
         updatePost({
           id: post._id,
@@ -149,12 +149,32 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
           } else {
             dispatch(likeRemoved(post._id));
           }
-          console.log('response', response.data);
         });
     }
   }, [csrfToken, dispatch, post, session]);
-  return !post ? (
+  return post === undefined && fetching ? (
     <Spinner />
+  ) : !post ? (
+    <View style={{flex: 1}}>
+      <ListEmptyComponent
+        ExtraComponent={
+          <Button
+            buttonStyle={{
+              paddingHorizontal: 32,
+              paddingVertical: 12,
+            }}
+            containerStyle={{
+              marginTop: 24,
+              borderRadius: 500,
+            }}
+            titleStyle={{fontSize: 12, lineHeight: 20}}
+            title={'돌아가기'}
+            onPress={() => navigation.goBack()}
+          />
+        }>
+        Pdf 를 찾을 수 없습니다.
+      </ListEmptyComponent>
+    </View>
   ) : (
     <View
       style={[
@@ -175,6 +195,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
         <Pdf
           fitPolicy={2}
           trustAllCerts={false}
+          spacing={2}
           source={source}
           onPageSingleTap={() => setUIVisible(prevState => !prevState)}
           onLoadComplete={numberOfPages => {
@@ -477,6 +498,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
               <Pressable
                 style={{paddingVertical: 10}}
                 onPress={() => {
+                  actionSheetRef.current?.hide();
                   Alert.alert('삭제하시겠습니까?', undefined, [
                     {
                       text: '취소',
@@ -503,7 +525,6 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                             }
                           },
                           errorHandle: error => {
-                            actionSheetRef.current?.hide();
                             console.log(error);
                             Toast.show({
                               type: 'error',
@@ -649,8 +670,9 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                   reactStringReplace(
                     post.content,
                     /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi,
-                    link => (
+                    (link, index) => (
                       <TagText
+                        key={`link${index}:${link}`}
                         style={{
                           color: '#60a4e6',
                         }}
@@ -678,8 +700,9 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                   ),
                   /#([\p{L}|\p{N}]{1,20})(?=\s|#|$)/giu,
 
-                  tag => (
+                  (tag, index) => (
                     <TagText
+                      key={`tag${index}:${tag}`}
                       style={{
                         color: '#60a4e6',
                       }}
