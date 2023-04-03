@@ -4,6 +4,7 @@ import {
   ListRenderItem,
   Platform,
   Pressable,
+  StatusBar,
   TextInput,
   TouchableOpacity,
   useWindowDimensions,
@@ -225,6 +226,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
         const {x, y, width, height} = event.nativeEvent.layout;
         setViewHeight(height);
       }}>
+      <StatusBar backgroundColor={'black'} barStyle={'light-content'} />
       <View style={{flex: 1}}>
         <FlatList<IComment>
           contentContainerStyle={{flexGrow: 1}}
@@ -336,6 +338,7 @@ const useStyles = makeStyles(theme => ({
     borderColor: '#fff',
   },
   textInput: {
+    color: 'black',
     backgroundColor: 'white',
     paddingTop: 10,
     paddingBottom: 10,

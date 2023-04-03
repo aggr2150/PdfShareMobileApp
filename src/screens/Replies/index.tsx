@@ -4,6 +4,7 @@ import {
   ListRenderItem,
   Platform,
   Pressable,
+  StatusBar,
   TextInput,
   TouchableOpacity,
   useWindowDimensions,
@@ -230,6 +231,7 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
         const {x, y, width, height} = event.nativeEvent.layout;
         setViewHeight(height);
       }}>
+      <StatusBar backgroundColor={'black'} barStyle={'light-content'} />
       <View style={{flex: 1}}>
         <FlatList<IComment>
           data={comments}
@@ -294,6 +296,7 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
                 paddingTop: 10,
                 paddingBottom: 10,
                 paddingHorizontal: 20,
+                color: 'black',
               }}
               // style={styles.textInput}
               placeholder={'댓글 입력'}
