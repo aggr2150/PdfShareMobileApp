@@ -255,6 +255,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                     ios: 30,
                     default: 30,
                   })}
+                  color={'black'}
                 />
               </Pressable>
             </TouchableOpacity>

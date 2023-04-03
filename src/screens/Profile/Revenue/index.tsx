@@ -172,8 +172,6 @@ const Revenue: React.FC<RevenueProps> = ({navigation, route}) => {
   return (
     <View
       style={{
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom,
         paddingRight: insets.right,
         paddingLeft: insets.left,
         overflow: 'visible',

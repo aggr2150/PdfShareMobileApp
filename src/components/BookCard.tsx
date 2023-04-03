@@ -133,7 +133,6 @@ const BookCard: React.FC<BookCardProps> = ({
               position: 'absolute',
               right: 10,
               bottom: 12,
-              // backgroundColor: 'brown',
               height: '70%',
               aspectRatio: 1 / Math.sqrt(2),
             }}>

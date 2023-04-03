@@ -1,5 +1,5 @@
-import {View} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {View, Pressable} from 'react-native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import Book from '@components/book/Book';
 import {makeStyles, Text} from '@rneui/themed';
 import React from 'react';
@@ -18,10 +18,10 @@ const ColumnCard: React.FC<ColumnCardProps> = ({
   const navigation = useNavigation();
   const styles = useStyles();
   return (
-    <View
-      // onPress={() =>
-      //   navigation.dispatch(CommonActions.navigate('Viewer', item))
-      // }
+    <Pressable
+      onPress={() =>
+        navigation.dispatch(CommonActions.navigate('Viewer', item))
+      }
       style={{
         flex: 1 / numColumns,
       }}>
@@ -56,7 +56,7 @@ const ColumnCard: React.FC<ColumnCardProps> = ({
           {item.author.nickname}
         </Text>
       </View>
-    </View>
+    </Pressable>
     // </TouchableOpacity>
   );
 };

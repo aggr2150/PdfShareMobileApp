@@ -76,7 +76,7 @@ const Upload: React.FC<UploadProps> = ({navigation}) => {
         return;
     }
     setProgressModalVisible(true);
-    let form = new FormData();
+    const form = new FormData();
     form.append('title', title);
     form.append('content', content);
     if (thumbnail) {
@@ -229,7 +229,7 @@ const Upload: React.FC<UploadProps> = ({navigation}) => {
                       position: 'absolute',
                       right: 10,
                       bottom: 12,
-                      // backgroundColor: 'brown',
+                      backgroundColor: 'white',
                       height: '80%',
                       aspectRatio: 1 / Math.sqrt(2),
                     }}>

@@ -209,39 +209,33 @@ const ProfileListHeader: React.FC<ProfileListHeaderProps> = ({
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            // alignSelf: 'center',
-            // height: 40,
+            marginBottom: 15,
           }}
           activeOpacity={0.7}
           onPress={() => navigation.navigate('ProfileInformation', user)}>
-          {/*<View*/}
-          {/*  style={{*/}
-          {/*    width: 30,*/}
-          {/*  }}></View>*/}
-          <Text
-            style={{
-              marginLeft: 30,
-              flex: 1,
-              // width: '100%',
-              paddingHorizontal: 15,
-              // marginBottom: 15,
-              textAlign: 'center',
-              // alignSelf: 'center',
-              // alignItems: 'center',
-              // height: 40,
-              lineHeight: 40,
-            }}
-            numberOfLines={1}
-            ellipsizeMode={'tail'}>
-            {user?.description}
-          </Text>
           <View
             style={{
-              // position: 'absolute',
-              // top: 0,
-              // bottom: 0,
-              // right: '15%',
-              width: 30,
+              marginLeft: 32,
+              flexShrink: 1,
+              overflow: 'hidden',
+              paddingHorizontal: 15,
+              paddingVertical: 8,
+            }}>
+            <Text
+              style={{
+                textAlign: 'center',
+                lineHeight: 24,
+              }}
+              numberOfLines={1}
+              ellipsizeMode={'tail'}>
+              {user?.description}
+            </Text>
+          </View>
+          <View
+            style={{
+              flexGrow: 0,
+              flexBasis: 32,
+              width: 32,
               opacity: 0.3,
             }}>
             <Ionicons
