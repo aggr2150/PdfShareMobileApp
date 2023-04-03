@@ -39,6 +39,7 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
   useEffect(() => {
     if (route.params?.keyword) {
       setKeyword(route.params.keyword);
+      throttleKeywordEventCallback(route.params?.keyword, undefined, true);
     }
   }, [route.params?.keyword]);
   useEffect(() => {
@@ -53,10 +54,10 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
   }, [dispatch]);
   const throttleKeywordEventCallback = useMemo(
     () =>
-      _.throttle((query: string, pagingKey?, initial = false) => {
+      _.throttle((q: string, pagingKey?, initial = false) => {
         apiInstance
           .post<response<IPost[]>>(
-            '/api/search?' + queryString.stringify({query}),
+            '/api/search?' + queryString.stringify({q}),
             {pagingKey},
           )
           .then(response => {
@@ -107,11 +108,10 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
   );
   const onChangeText = useCallback(
     (value: string) => {
-      console.log(value);
       setKeyword(value);
-      if (value.length === 0) {
+      if (value.length === 0 || value === '#') {
         throttleKeywordEventCallback.cancel();
-        throttleEventCallback();
+        // throttleEventCallback();
       } else {
         setLoading(true);
         throttleEventCallback.cancel();
@@ -283,7 +283,7 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
           <FlatList<IPost>
             key={`#${numColumns}`}
             numColumns={numColumns}
-            data={keyword.length === 0 ? sample : posts}
+            data={keyword.length === 0 || keyword === '#' ? sample : posts}
             contentContainerStyle={{
               // width: '100%',
               // paddingTop: (insets.top || 24) + 46,

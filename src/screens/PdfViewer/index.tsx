@@ -411,7 +411,10 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                   }}
                   onPress={() => {
                     if (post.author.id) {
-                      if (!navigation.getState().routes[0].state) {
+                      if (
+                        !navigation.getState().routes[0].state?.routes[4].state
+                          ?.routes[0]
+                      ) {
                         navigation.navigate('Tabs', {
                           screen: 'ProfileTab',
                           params: {
@@ -707,6 +710,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                         color: '#60a4e6',
                       }}
                       onPress={() => {
+                        detailsActionSheetRef.current?.hide();
                         if (!navigation.getState().routes[0].state) {
                           navigation.navigate('Tabs', {
                             screen: 'Search',
