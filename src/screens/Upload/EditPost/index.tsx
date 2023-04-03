@@ -186,7 +186,7 @@ const EditPost: React.FC<EditPostProps> = ({navigation, route}) => {
                       position: 'absolute',
                       right: 10,
                       bottom: 12,
-                      // backgroundColor: 'brown',
+                      backgroundColor: 'white',
                       height: '80%',
                       aspectRatio: 1 / Math.sqrt(2),
                     }}>
