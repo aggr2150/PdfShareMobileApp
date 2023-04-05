@@ -35,6 +35,7 @@ const blocksSlice = createSlice({
     blockUserUpdate: blockUserAdapter.updateOne,
     blockUserUpdateMany: blockUserAdapter.updateMany,
     blockUserRemoveOne: blockUserAdapter.removeOne,
+    blockUserRemoveAll: blockUserAdapter.removeAll,
   },
 });
 
@@ -48,6 +49,7 @@ export const {
   blockUserUpdate,
   blockUserUpdateMany,
   blockUserRemoveOne,
+  blockUserRemoveAll,
 } = blocksSlice.actions;
 
 export const blockUserSelectors = blockUserAdapter.getSelectors<RootState>(

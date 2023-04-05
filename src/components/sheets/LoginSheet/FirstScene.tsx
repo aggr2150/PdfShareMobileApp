@@ -47,11 +47,11 @@ const FirstScene = props => {
               }
             });
             SheetManager.hide('loginSheet').then(() => {
-              navigation.dispatch(
-                CommonActions.reset({
-                  routes: [{name: 'Tabs'}],
-                }),
-              );
+              // navigation.dispatch(
+              //   CommonActions.reset({
+              //     routes: [{name: 'Tabs'}],
+              //   }),
+              // );
             });
             break;
           case 422:

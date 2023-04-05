@@ -315,31 +315,33 @@ const Information: React.FC<ProfileProps> = ({navigation, route}) => {
                 ),
               )}
             </Text>
-            <Text style={styles.contentText}>
-              링크 :{' '}
-              <Text
-                style={{color: '#60a4e6'}}
-                onPress={async () => {
-                  if (user?.link && (await Linking.canOpenURL(user.link))) {
-                    try {
-                      const url = user.link.replace(
-                        /^(https:\/\/everypdf.cc)/,
-                        '',
-                      );
-                      if (url.startsWith('/')) {
-                        linkTo(url);
-                      } else {
-                        await Linking.openURL(url);
+            {user?.link && (
+              <Text style={styles.contentText}>
+                링크 :{' '}
+                <Text
+                  style={{color: '#60a4e6'}}
+                  onPress={async () => {
+                    if (await Linking.canOpenURL(user.link)) {
+                      try {
+                        const url = user.link.replace(
+                          /^(https:\/\/everypdf.cc)/,
+                          '',
+                        );
+                        if (url.startsWith('/')) {
+                          linkTo(url);
+                        } else {
+                          await Linking.openURL(url);
+                        }
+                      } catch (e) {
+                        console.log('link', user.link);
+                        await Linking.openURL(user.link);
                       }
-                    } catch (e) {
-                      console.log('link', user.link);
-                      await Linking.openURL(user.link);
                     }
-                  }
-                }}>
-                {user?.link}
+                  }}>
+                  {user?.link}
+                </Text>
               </Text>
-            </Text>
+            )}
           </View>
         </ScrollView>
       )}

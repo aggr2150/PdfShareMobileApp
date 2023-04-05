@@ -41,7 +41,7 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
       setKeyword(route.params.keyword);
       throttleKeywordEventCallback(route.params?.keyword, undefined, true);
     }
-  }, [route.params?.keyword]);
+  }, [route.params]);
   useEffect(() => {
     apiInstance.post<response<IPost[]>>('/api/feeds/sample').then(response => {
       if (response.data.data.length !== 0) {
