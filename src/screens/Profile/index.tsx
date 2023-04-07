@@ -10,6 +10,7 @@ import {
   selectById as selectUserById,
   setOneUser,
   updateManyUser,
+  userRemoveOne,
   userSetMany,
 } from '@redux/reducer/usersReducer';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
@@ -130,6 +131,8 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
               response.data.data.likes || [],
               response.data.data.subscribing || [],
             ]);
+          } else if (route.params?.id) {
+            dispatch(userRemoveOne(route.params.id));
           }
         })
         .finally(() => {
@@ -177,6 +180,8 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
             response.data.data.likes || [],
             response.data.data.subscribing || [],
           ]);
+        } else if (route.params?.id) {
+          dispatch(userRemoveOne(route.params.id));
         }
       })
       .finally(() => {
@@ -483,13 +488,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
         overflow: 'visible',
         flex: 1,
       }}>
-      {!user && !fetching ? (
-        <ListEmptyComponent>
-          {user
-            ? emptyText(selectedIndex)
-            : '삭제된 아이디 또는 존재하지 않는 사용자입니다.'}
-        </ListEmptyComponent>
-      ) : !user && fetching ? (
+      {!user && fetching ? (
         <Spinner />
       ) : !user && !route.params?.id ? (
         <ListEmptyComponent
@@ -512,6 +511,12 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
             />
           }>
           아직 프로필이 없습니다. 로그인을 해 주세요!
+        </ListEmptyComponent>
+      ) : !user && !fetching ? (
+        <ListEmptyComponent>
+          {user
+            ? emptyText(selectedIndex)
+            : '삭제된 아이디 또는 존재하지 않는 사용자입니다.'}
         </ListEmptyComponent>
       ) : block && !showBlockUser ? (
         <ListEmptyComponent

@@ -33,6 +33,7 @@ const usersSlice = createSlice({
     //   userAdapter.setOne(state, action.payload.user);
     // },
     userSetMany: userAdapter.setMany,
+    userRemoveOne: userAdapter.removeOne,
     setOneUser: userAdapter.setOne,
     setAll: userAdapter.setAll,
     updateUser: userAdapter.updateOne,
@@ -49,6 +50,7 @@ export const {
   setAll,
   updateUser,
   updateManyUser,
+  userRemoveOne,
 } = usersSlice.actions;
 
 export const userSelectors = userAdapter.getSelectors<RootState>(
