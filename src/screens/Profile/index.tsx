@@ -94,6 +94,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
   const dispatch = useAppDispatch();
   useEffect(() => {
     if (authState !== EAuthState.INIT) {
+      console.log(route.params?.id);
       apiInstance
         .post<
           response<{
@@ -107,15 +108,23 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
         })
         .then(response => {
           if (response.data.code === 200 && response.data.data.user) {
-            dispatch(setOneUser(response.data.data.user));
-            dispatch(postSetMany(response.data.data.feeds));
-            if (response.data.data.likes) {
-              dispatch(postSetMany(response.data.data.likes));
-              dispatch(setAllLike(response.data.data.likes));
-            }
-            if (response.data.data.subscribing) {
-              dispatch(userSetMany(response.data.data.subscribing));
-            }
+            batch(() => {
+              dispatch(setOneUser(response.data.data.user));
+              dispatch(postSetMany(response.data.data.feeds));
+              if (
+                response.data.data.likes &&
+                response.data.data.likes.length !== 0
+              ) {
+                dispatch(postSetMany(response.data.data.likes));
+                dispatch(setAllLike(response.data.data.likes));
+              }
+              if (
+                response.data.data.subscribing &&
+                response.data.data.subscribing.length !== 0
+              ) {
+                dispatch(userSetMany(response.data.data.subscribing));
+              }
+            });
             setTabData([
               response.data.data.feeds,
               response.data.data.likes || [],
@@ -145,6 +154,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
       })
       .then(response => {
         if (response.data.code === 200 && response.data.data.user) {
+          console.log(response.data.data.user);
           batch(() => {
             dispatch(setOneUser(response.data.data.user));
             dispatch(postSetMany(response.data.data.feeds));
@@ -463,6 +473,7 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
         return '구독중인 유저가 없습니다.';
     }
   }
+  console.log(user);
   return (
     <View
       style={{
@@ -472,7 +483,13 @@ const Profile: React.FC<ProfileProps> = ({navigation, route}) => {
         overflow: 'visible',
         flex: 1,
       }}>
-      {!user && fetching ? (
+      {!user && !fetching ? (
+        <ListEmptyComponent>
+          {user
+            ? emptyText(selectedIndex)
+            : '삭제된 아이디 또는 존재하지 않는 사용자입니다.'}
+        </ListEmptyComponent>
+      ) : !user && fetching ? (
         <Spinner />
       ) : !user && !route.params?.id ? (
         <ListEmptyComponent

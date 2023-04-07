@@ -28,6 +28,7 @@ import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import SplashScreen from 'react-native-splash-screen';
 import Information from '@screens/Settings/Information';
 import InterstitialAdsController from '@components/InterstitialAdsController';
+import CustomerService from '@screens/Settings/CustomerService';
 const RootStack = createStackNavigator<RootStackParamList>();
 
 InterstitialAdsController.initialize();
@@ -177,6 +178,13 @@ const RootStackNavigator = () => {
           component={Settings}
           options={{
             title: '설정',
+          }}
+        />
+        <RootStack.Screen
+          name="CustomerService"
+          component={CustomerService}
+          options={{
+            title: '1:1 문의',
           }}
         />
         <RootStack.Screen

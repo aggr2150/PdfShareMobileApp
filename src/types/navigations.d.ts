@@ -69,6 +69,7 @@ declare type RootStackParamList = {
   My: undefined;
   // Profile: IUser | {id: string};
   Settings: undefined;
+  CustomerService: undefined;
   Information: undefined;
   BlockList: undefined;
   // CollectionList: undefined;

@@ -40,7 +40,6 @@ const Settings = ({navigation}) => {
                 labelText: '비밀번호 변경',
                 onPress: () => navigation.navigate('ChangePassword'),
               },
-              // {labelText: '1:1 문의'},
               {
                 labelText: '차단 관리',
                 onPress: () => navigation.navigate('BlockList'),
@@ -48,6 +47,10 @@ const Settings = ({navigation}) => {
               {
                 labelText: '정보',
                 onPress: () => navigation.navigate('Information'),
+              },
+              {
+                labelText: '1:1 문의',
+                onPress: () => navigation.navigate('CustomerService'),
               },
               {
                 labelText: '회원탈퇴',

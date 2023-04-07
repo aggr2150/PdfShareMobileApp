@@ -33,6 +33,7 @@ const useStyles = makeStyles(theme => ({
     marginHorizontal: '10%',
   },
   text: {
+    textAlign: 'center',
     fontSize: 13,
     color: theme.colors.black,
   },
