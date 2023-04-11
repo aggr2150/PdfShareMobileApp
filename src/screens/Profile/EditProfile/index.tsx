@@ -50,7 +50,7 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
   const submit = useCallback(() => {
     if (!progressModalVisible) {
       setProgressModalVisible(true);
-      let form = new FormData();
+      const form = new FormData();
       form.append('id', id);
       form.append('nickname', nickname);
       form.append('link', link);
@@ -211,7 +211,7 @@ const EditProfile: React.FC<EditProfileProps> = ({navigation, route}) => {
                   onSurfaceVariant: '#777',
                 },
               }}>
-              영소문자 및 _ 최소 4자 최대 24자 가능합니다
+              숫자, 영소문자 및 _ 최소 4자 최대 24자 가능합니다
             </HelperText>
             <TextInput
               theme={{

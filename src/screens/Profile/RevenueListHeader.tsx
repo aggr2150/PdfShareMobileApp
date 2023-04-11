@@ -10,10 +10,12 @@ import {useAppDispatch} from '@redux/store/RootStore';
 interface RevenueListHeaderProps {
   user?: IUser;
   settlement: TSettlement;
+  settlementMultiplier: number;
 }
 const RevenueListHeader: React.FC<RevenueListHeaderProps> = ({
   user,
   settlement,
+  settlementMultiplier,
 }) => {
   const styles = useStyles();
   const navigation =
@@ -68,10 +70,10 @@ const RevenueListHeader: React.FC<RevenueListHeaderProps> = ({
           }}>
           <Text style={{fontSize: 20, fontWeight: 'bold', color: '#60B630'}}>
             ₩{' '}
-            {Math.floor(
+            {(
               (settlement.postViewCounter - settlement.settledViewCounter) *
-                0.24,
-            )}
+              settlementMultiplier
+            ).toFixed(2)}
           </Text>
         </View>
         <Text style={{fontSize: 14, paddingVertical: 10}}>

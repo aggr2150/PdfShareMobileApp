@@ -18,6 +18,7 @@ import Separator from '@components/Seperator';
 import _ from 'lodash';
 import Orientation from 'react-native-orientation-locker';
 
+const settlementMultiplier = 0.12;
 type RevenueProps = StackScreenProps<ProfileStackScreenParams, 'Revenue'>;
 // type TSettlement = {
 //   postViewCounter: number;
@@ -147,7 +148,7 @@ const Revenue: React.FC<RevenueProps> = ({navigation, route}) => {
               <View style={{flex: 1}}>
                 <Text
                   style={{fontSize: 20, textAlign: 'right', color: '#60B630'}}>
-                  ₩ {Math.floor(item.viewCounter * 0.24)}
+                  ₩ {Math.floor(item.viewCounter * settlementMultiplier)}
                 </Text>
               </View>
             </View>
@@ -194,7 +195,11 @@ const Revenue: React.FC<RevenueProps> = ({navigation, route}) => {
           // contentContainerStyle={{width: '100%'}}
           ItemSeparatorComponent={Separator}
           ListHeaderComponent={() => (
-            <RevenueListHeader settlement={settlement} user={user} />
+            <RevenueListHeader
+              settlement={settlement}
+              user={user}
+              settlementMultiplier={settlementMultiplier}
+            />
           )}
           renderItem={renderItem}
           // keyExtractor={item => `${selectedIndex}${item._id}`}
