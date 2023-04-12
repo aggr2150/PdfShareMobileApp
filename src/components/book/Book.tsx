@@ -24,7 +24,6 @@ const Book: React.FC<BookProps> = ({title, author, thumbnail, color}) => {
         uri: thumbnail.filepath,
         cache: FastImage.cacheControl.web,
       }}
-      // source={require('../assets/icon/noun-pin-1151141 (2).png')}
       // source={{
       //   uri: 'https://www.gstatic.com/webp/gallery/1.sm.webp',
       //   cache: FastImage.cacheControl.web,

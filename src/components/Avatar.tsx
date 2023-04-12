@@ -34,6 +34,7 @@ const Avatar: React.FC<AvatarProps> = ({style, avatar}) => {
       <FastImage
         source={{
           uri: avatar?.filepath || 'https://cdn.everypdf.cc/static/every2.png',
+          cache: FastImage.cacheControl.web,
         }}
         style={{
           width: '100%',
