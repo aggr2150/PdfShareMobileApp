@@ -46,11 +46,6 @@ const RootStackNavigator = () => {
       .then(credentials => {
         if (credentials) {
           getCsrfToken.then(token => {
-            console.log({
-              _csrf: token,
-              id: credentials.username,
-              password: credentials.password,
-            });
             apiInstance
               .post<response<ISession>>('/api/auth/signIn', {
                 _csrf: token,

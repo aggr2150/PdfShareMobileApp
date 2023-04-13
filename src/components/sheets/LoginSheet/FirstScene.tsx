@@ -35,9 +35,7 @@ const FirstScene = props => {
         switch (response.data.code) {
           case 200:
             dispatch(signIn(response.data.data));
-            Keychain.setGenericPassword(email, password).then(r =>
-              console.log(r),
-            );
+            Keychain.setGenericPassword(email, password).then();
             props.setClosable(true);
             apiInstance.post('/api/account/block/list').then(result => {
               if (result.data.code === 200) {
