@@ -71,7 +71,7 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Access to your album to create a photo post.</string>
+	<string>Allow access to photos to upload photos from your library.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Your data will be used to deliver personalized ads to you.</string>
 	<key>UIAppFonts</key>
