@@ -71,7 +71,7 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Allow access to photos to upload photos from your library.</string>
+	<string>Allow access to photos to change thumbnail image from your library.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Your data will be used to deliver personalized ads to you.</string>
 	<key>UIAppFonts</key>
