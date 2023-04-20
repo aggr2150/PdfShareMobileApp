@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>235619709353-q4kf5c3rsokcpue3o59tijk9vqe0oee7.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.235619709353-q4kf5c3rsokcpue3o59tijk9vqe0oee7</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>235619709353-ad0pv5bh14vcuh21ah2o0jhplu9ffgke.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBFOQIPvgv9_dCDXxKJ5Y2vFye8Bg3215o</string>
+	<key>GCM_SENDER_ID</key>
+	<string>235619709353</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.everypdf</string>
+	<key>PROJECT_ID</key>
+	<string>everypdf-76172</string>
+	<key>STORAGE_BUCKET</key>
+	<string>everypdf-76172.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:235619709353:ios:0bc1221cdcd15c6b4d94b8</string>
+</dict>
+</plist>

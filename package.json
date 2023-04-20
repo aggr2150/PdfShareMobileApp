@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "ios": "react-native run-ios --udid=\"A2EA9CEC-0A77-4105-9527-7D2200C14BEF\"",
+    "ios": "react-native run-ios",
+    "ios-simulator": "react-native run-ios --udid=\"A2EA9CEC-0A77-4105-9527-7D2200C14BEF\"",
     "ios-device": "react-native run-ios --device=Scip",
     "ios-pad": "react-native run-ios --udid=\"9186E28C-561F-4479-BCEF-BC21C70FCB04\"",
     "start": "react-native start",
@@ -14,6 +15,7 @@
   "dependencies": {
     "@react-native-clipboard/clipboard": "^1.11.2",
     "@react-native-firebase/app": "^17.4.2",
+    "@react-native-firebase/messaging": "^17.4.2",
     "@react-native-masked-view/masked-view": "^0.2.8",
     "@react-navigation/bottom-tabs": "^6.5.7",
     "@react-navigation/native": "^6.1.6",
