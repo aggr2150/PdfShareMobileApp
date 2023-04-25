@@ -12,6 +12,7 @@ declare type ProfileStackScreenParams = {
   Revenue: undefined;
   Profile: IUser | {id: string};
   ProfileInformation: IUser;
+  Notifications: undefined;
 };
 declare type HistoryStackScreenParams = {
   History: undefined;
@@ -76,7 +77,6 @@ declare type RootStackParamList = {
   Upload: undefined;
   // UploadTab: undefined;
   EditPost: IPost;
-
   ResetPassword: undefined;
   ResetPasswordConfirm: {
     email: string;

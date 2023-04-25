@@ -10,6 +10,7 @@ import {makeStyles} from '@rneui/themed';
 import {useAppSelector} from '@redux/store/RootStore';
 import {getSession} from '@redux/reducer/authReducer';
 import Information from '@screens/Profile/Information';
+import Notifications from '@screens/Notifications';
 
 const ProfileStack = createStackNavigator<ProfileStackScreenParams>();
 
@@ -52,6 +53,11 @@ const ProfileStackNavigation = () => {
           }}
         />
       </ProfileStack.Group>
+      <ProfileStack.Screen
+        name="Notifications"
+        component={Notifications}
+        options={{headerTitle: '앱 알림'}}
+      />
       <ProfileStack.Screen
         name="Revenue"
         component={Revenue}

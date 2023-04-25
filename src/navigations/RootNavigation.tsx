@@ -52,9 +52,15 @@ const RootStackNavigator = () => {
               authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
               authStatus === messaging.AuthorizationStatus.PROVISIONAL
             ) {
-              apiInstance.post('/api/account/confirmFCMToken', {
-                registrationToken: messaging().getToken(),
-              });
+              messaging()
+                .getToken()
+                .then(value => {
+                  apiInstance
+                    .post('/api/account/confirmFCMToken', {
+                      registrationToken: value,
+                    })
+                    .then();
+                });
             }
           });
       }
@@ -67,12 +73,17 @@ const RootStackNavigator = () => {
         PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
         ).then(permissionStatus => {
-          if (permissionStatus === 'granted')
-            apiInstance
-              .post('/api/account/confirmFCMToken', {
-                registrationToken: messaging().getToken(),
-              })
-              .then();
+          if (permissionStatus === 'granted') {
+            messaging()
+              .getToken()
+              .then(value => {
+                apiInstance
+                  .post('/api/account/confirmFCMToken', {
+                    registrationToken: value,
+                  })
+                  .then();
+              });
+          }
         });
       } else {
         messaging()
@@ -82,11 +93,15 @@ const RootStackNavigator = () => {
               authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
               authStatus === messaging.AuthorizationStatus.PROVISIONAL
             ) {
-              apiInstance
-                .post('/api/account/confirmFCMToken', {
-                  registrationToken: messaging().getToken(),
-                })
-                .then();
+              messaging()
+                .getToken()
+                .then(value => {
+                  apiInstance
+                    .post('/api/account/confirmFCMToken', {
+                      registrationToken: value,
+                    })
+                    .then();
+                });
             }
           });
         const unsubscribe = messaging().onTokenRefresh(token => {});
