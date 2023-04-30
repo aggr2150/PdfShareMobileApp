@@ -44,32 +44,6 @@ const RootStackNavigator = () => {
     if (authState !== EAuthState.INIT) {
       SplashScreen.hide();
       if (Platform.OS === 'android') {
-      } else {
-        messaging()
-          .requestPermission()
-          .then(authStatus => {
-            if (
-              authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-              authStatus === messaging.AuthorizationStatus.PROVISIONAL
-            ) {
-              messaging()
-                .getToken()
-                .then(value => {
-                  apiInstance
-                    .post('/api/account/confirmFCMToken', {
-                      registrationToken: value,
-                    })
-                    .then();
-                });
-            }
-          });
-      }
-    }
-  }, [authState]);
-  useEffect(() => {
-    if (authState !== EAuthState.INIT) {
-      SplashScreen.hide();
-      if (Platform.OS === 'android') {
         PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
         ).then(permissionStatus => {
@@ -104,7 +78,6 @@ const RootStackNavigator = () => {
                 });
             }
           });
-        const unsubscribe = messaging().onTokenRefresh(token => {});
       }
     }
   }, [authState]);
