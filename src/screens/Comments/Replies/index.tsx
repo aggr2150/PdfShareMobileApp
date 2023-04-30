@@ -58,29 +58,6 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
     }, []);
   });
   const session = useAppSelector(state => getSession(state));
-  useEffect(() => {
-    getCsrfToken.then(token => setCsrfToken(token));
-    apiInstance
-      .post<response<IComment[]>>('/api/comment/list', {
-        postId: route.params.postId,
-        parentCommentId: route.params._id,
-      })
-      .then(response => {
-        if (response.data.data) {
-          dispatch(commentAddedMany(response.data.data));
-          setData(response.data.data);
-        }
-      })
-      .finally(() => {
-        setFetching(false);
-      });
-  }, [
-    dispatch,
-    route.params._id,
-    route.params.postId,
-    route.params.parentCommentId,
-    route.params.commentId,
-  ]);
   const flatListRef = useRef<FlatList<IComment>>(null);
   const throttleEventCallback = useMemo(
     () =>
@@ -120,6 +97,17 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
       route.params.postId,
     ],
   );
+  useEffect(() => {
+    getCsrfToken.then(token => setCsrfToken(token));
+    throttleEventCallback(route.params.commentId, -1, true);
+  }, [
+    dispatch,
+    route.params._id,
+    route.params.postId,
+    route.params.parentCommentId,
+    route.params.commentId,
+    throttleEventCallback,
+  ]);
   const onEndReached = useCallback(() => {
     if (!fetching) {
       throttleEventCallback(data[data.length - 1]?._id);
@@ -256,10 +244,20 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
       <StatusBar backgroundColor={'black'} barStyle={'light-content'} />
       <View style={{flex: 1}}>
         <FlatList<IComment>
-          data={comments}
+          ref={flatListRef}
           contentContainerStyle={{flexGrow: 1}}
           maintainVisibleContentPosition={{
             minIndexForVisible: 0,
+          }}
+          data={comments}
+          onScrollToIndexFailed={info => {
+            const wait = new Promise(resolve => setTimeout(resolve, 100));
+            wait.then(() => {
+              flatListRef.current?.scrollToIndex({
+                index: info.index,
+                animated: true,
+              });
+            });
           }}
           ListHeaderComponent={() => (
             <>

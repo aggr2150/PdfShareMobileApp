@@ -140,6 +140,13 @@ const SecondScene = props => {
               position: 'bottom',
             });
             break;
+          case 400:
+            Toast.show({
+              type: 'error',
+              text1: '인증번호가 일치하지 않습니다.',
+              position: 'bottom',
+            });
+            break;
           case 500:
             Toast.show({
               type: 'error',
@@ -149,7 +156,14 @@ const SecondScene = props => {
             break;
         }
       })
-      .catch(error => console.log(error));
+      .catch(error => {
+        console.log(error);
+        Toast.show({
+          type: 'error',
+          text1: 'Unknown Error Occurred!',
+          position: 'bottom',
+        });
+      });
   }, [csrfToken, email, password, passwordConfirm, verificationCode]);
   return (
     <View>
