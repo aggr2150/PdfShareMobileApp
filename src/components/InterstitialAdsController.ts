@@ -36,7 +36,7 @@ export default class InterstitialAdsController {
     console.log('initialized');
   };
 
-  static requestAds = async () => {
+  static requestAds = () => {
     if (this.interstitial.loaded) {
       this.interstitial.show().then();
     } else {
