@@ -236,9 +236,9 @@ const Collection: React.FC<CollectionProps> = ({navigation, route}) => {
         renderItem={({item}) => {
           return (
             <Pressable
-              onPress={() => {
-                navigation.navigate('Viewer', item);
-              }}
+              onPress={() =>
+                navigation.navigate('Pdf', {screen: 'Viewer', params: item})
+              }
               style={{
                 backgroundColor: '#282828',
                 paddingHorizontal: 21,

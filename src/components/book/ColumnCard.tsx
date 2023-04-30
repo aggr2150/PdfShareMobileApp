@@ -19,8 +19,9 @@ const ColumnCard: React.FC<ColumnCardProps> = ({
   const styles = useStyles();
   return (
     <Pressable
-      onPress={() =>
-        navigation.dispatch(CommonActions.navigate('Viewer', item))
+      onPress={
+        () => navigation.dispatch(CommonActions.navigate('Viewer', item))
+        // navigation.navigate('Pdf', {screen: 'Viewer', params: item})
       }
       style={{
         flex: 1 / numColumns,

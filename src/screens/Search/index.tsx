@@ -37,20 +37,19 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
   const dimensions = useWindowDimensions();
   const dispatch = useAppDispatch();
   useEffect(() => {
-    if (route.params?.keyword) {
-      setKeyword(route.params.keyword);
-      throttleKeywordEventCallback(route.params?.keyword, undefined, true);
-    }
-  }, [route.params]);
-  useEffect(() => {
-    apiInstance.post<response<IPost[]>>('/api/feeds/sample').then(response => {
-      if (response.data.data.length !== 0) {
-        setSample(response.data.data);
-        dispatch(postSetMany(response.data.data));
-        // setFetching(false);
+    apiInstance
+      .post<response<IPost[]>>('/api/feeds/sample')
+      .then(response => {
+        if (response.data.data.length !== 0) {
+          setSample(response.data.data);
+          dispatch(postSetMany(response.data.data));
+          // setFetching(false);
+          // setInitialized(true);
+        }
+      })
+      .finally(() => {
         setInitialized(true);
-      }
-    });
+      });
   }, [dispatch]);
   const throttleKeywordEventCallback = useMemo(
     () =>
@@ -82,6 +81,12 @@ const Search: React.FC<SearchProps> = ({navigation, route}) => {
     [dispatch],
   );
 
+  useEffect(() => {
+    if (route.params?.keyword) {
+      setKeyword(route.params.keyword);
+      throttleKeywordEventCallback(route.params?.keyword, undefined, true);
+    }
+  }, [route.params, throttleKeywordEventCallback]);
   const throttleEventCallback = useMemo(
     () =>
       _.throttle(() => {

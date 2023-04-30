@@ -59,6 +59,34 @@ declare interface IBlockUser {
   nickname: string;
 }
 
+declare enum ENotificationType {
+  'notice' = 'notice',
+  'social' = 'social',
+}
+
+declare enum EActionType {
+  'none' = 'none',
+  'upload' = 'upload',
+  'comment' = 'comment',
+  'mention' = 'mention',
+  'likePost' = 'likePost',
+  'likeComment' = 'likeComment',
+  'subscribe' = 'subscribe',
+}
+declare interface INotification<T> {
+  _id: string;
+  toUser?: IAuthor;
+  fromUser: IAuthor | undefined;
+  notificationType: ENotificationType;
+  actionType: EActionType;
+  post?: IPost;
+  title: string;
+  body: string;
+  route: string;
+  data: T;
+  createdAt: Date;
+}
+
 declare interface IUser extends ISession {
   _id: string;
   id: string;

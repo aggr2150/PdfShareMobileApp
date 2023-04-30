@@ -1,5 +1,5 @@
 import {
-  FlatList,
+  Keyboard,
   KeyboardAvoidingView,
   ListRenderItem,
   Platform,
@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import {makeStyles} from '@rneui/themed';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Comment from '@components/Comment';
 import SendIcon from '@assets/icon/send.svg';
@@ -30,6 +30,7 @@ import {getSession} from '@redux/reducer/authReducer';
 import {SheetManager} from 'react-native-actions-sheet';
 import Spinner from '@components/Spinner';
 import ListEmptyComponent from '@components/ListEmptyComponent';
+import {FlatList} from '@stream-io/flat-list-mvcp';
 
 type CommentsProps = StackScreenProps<RootStackParamList, 'Comments'>;
 const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
@@ -54,42 +55,29 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
       return previousValue;
     }, []);
   });
-  useEffect(() => {
-    getCsrfToken.then(token => setCsrfToken(token));
-    console.log('ccc', route.params);
-    apiInstance
-      .post<response<IComment[]>>('/api/comment/list', {
-        postId: route.params.postId,
-      })
-      .then(response => {
-        if (response.data.data) {
-          dispatch(commentSetMany(response.data.data));
-          setData(response.data.data);
-        }
-      })
-      .finally(() => {
-        setFetching(false);
-        setRefreshing(false);
-      });
-  }, [dispatch, route.params.postId]);
   const session = useAppSelector(state => getSession(state));
+  const flatListRef = useRef<FlatList<IComment>>(null);
   const throttleEventCallback = useMemo(
     () =>
-      _.throttle((pagingKey, initial?) => {
+      _.throttle((pagingKey, sort = -1, initial?) => {
         apiInstance
           .post<response<IComment[]>>('/api/comment/list', {
             postId: route.params.postId,
-            pagingKey,
+            sort,
+            ...(initial ? {commentId: route.params.commentId} : {pagingKey}),
           })
           .then(response => {
-            console.log(response.data);
             if (response.data.data.length !== 0) {
+              dispatch(commentSetMany(response.data.data));
               if (initial) {
                 setData(response.data.data);
+                const target = response.data.data.find(
+                  value => value._id === route.params.commentId,
+                );
+                target && flatListRef.current?.scrollToItem({item: target});
               } else {
                 setData(prevState => [...prevState, ...response.data.data]);
               }
-              dispatch(commentSetMany(response.data.data));
             }
           })
           .catch(error => console.log(error))
@@ -98,18 +86,45 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
             setRefreshing(false);
           });
       }, 1000),
-    [dispatch, route.params.postId],
+    [dispatch, route.params.postId, route.params.commentId],
   );
+  useEffect(() => {
+    getCsrfToken.then(token => setCsrfToken(token));
+    // apiInstance
+    //   .post<response<IComment[]>>('/api/comment/list', {
+    //     postId: route.params.postId,
+    //   })
+    //   .then(response => {
+    //     if (response.data.data) {
+    //       dispatch(commentSetMany(response.data.data));
+    //       setData(response.data.data);
+    //     }
+    //   })
+    //   .finally(() => {
+    //     setFetching(false);
+    //     setRefreshing(false);
+    //   });
+    throttleEventCallback(route.params.commentId, -1, true);
+  }, [
+    dispatch,
+    route.params.commentId,
+    route.params.postId,
+    throttleEventCallback,
+  ]);
   const onEndReached = useCallback(() => {
     if (!fetching) {
       throttleEventCallback(data[data.length - 1]?._id);
     }
   }, [data, fetching, throttleEventCallback]);
   const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    throttleEventCallback.cancel();
-    throttleEventCallback(undefined, true);
-  }, [throttleEventCallback]);
+    if (!fetching) {
+      setRefreshing(true);
+      throttleEventCallback(data[0]?._id, 1);
+    }
+    // throttleEventCallback.cancel();
+    // throttleEventCallback(undefined, true);
+  }, [data, fetching, throttleEventCallback]);
+  const textInputRef = useRef<TextInput>(null);
   const submit = useCallback(() => {
     apiInstance
       .post<response<IComment>>('/api/comment/write', {
@@ -123,6 +138,8 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
           setData(prev => [response.data.data, ...prev]);
           setContent('');
         }
+        Keyboard.dismiss();
+        textInputRef.current?.blur();
       });
   }, [content, csrfToken, dispatch, route.params.postId]);
   const deleteCallback = useCallback(
@@ -229,8 +246,21 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
       <StatusBar backgroundColor={'black'} barStyle={'light-content'} />
       <View style={{flex: 1}}>
         <FlatList<IComment>
+          ref={flatListRef}
           contentContainerStyle={{flexGrow: 1}}
+          maintainVisibleContentPosition={{
+            minIndexForVisible: 0,
+          }}
           data={comments}
+          onScrollToIndexFailed={info => {
+            const wait = new Promise(resolve => setTimeout(resolve, 100));
+            wait.then(() => {
+              flatListRef.current?.scrollToIndex({
+                index: info.index,
+                animated: true,
+              });
+            });
+          }}
           // renderItem={props => <Comment item={props.item} />}
           renderItem={renderItem}
           // inverted={true}
@@ -295,6 +325,7 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
                 }
               }}>
               <TextInput
+                ref={textInputRef}
                 editable={!!session}
                 style={styles.textInput}
                 placeholder={'댓글 입력'}

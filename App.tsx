@@ -11,6 +11,7 @@
 import React from 'react';
 
 import {
+  getPathFromState,
   getStateFromPath,
   LinkingOptions,
   NavigationContainer,
@@ -29,23 +30,11 @@ import {
   Provider as PaperProvider,
   MD3LightTheme as DefaultTheme,
 } from 'react-native-paper';
-const linking: LinkingOptions<RootStackParamList> = {
+const linking = {
   prefixes: ['everyPdf://', 'https://everypdf.cc'],
   config: {
     initialRouteName: 'Tabs',
     screens: {
-      Viewer: {
-        path: '/post/:_id',
-        // parse: {
-        //   _id: value => value,
-        // },
-        // params: {id: 'jane'},
-        // screens: {
-        //   Comments: {
-        //     path: ':postId/comment',
-        //   },
-        // },
-      },
       Tabs: {
         screens: {
           ProfileTab: {
@@ -59,28 +48,71 @@ const linking: LinkingOptions<RootStackParamList> = {
           },
         },
       },
+      Pdf: {
+        screens: {
+          Viewer: {
+            path: 'post/:_id',
+            // params: {_id: 'jane'},
+            // initialRouteName: 'index',
+          },
+          Comments: {
+            path: 'post/:postId/:commentId',
+          },
+          Replies: {
+            path: 'post/:postId/:parentCommentId/commentId',
+
+            // exact: true,
+          },
+        },
+      },
       // Profile: 'user',
     },
     /* configuration for matching screens with paths */
   },
-  // getStateFromPath: (path, options) => {
-  //   const state = getStateFromPath(path, options);
-  //   const newState = {
-  //     ...state,
-  //     routes: state.routes.map(route => {
-  //       if (route.name === 'Chat') {
-  //         // modify your params however you like here!
-  //         return {
-  //           ...route,
-  //           params: {userObject: route.params},
-  //         };
-  //       } else {
-  //         return route;
-  //       }
-  //     }),
-  //   };
-  //   return newState;
-  // },
+  getStateFromPath: (path, config) => {
+    // config.
+    const result: any = getStateFromPath(path, config);
+    console.log(result, path);
+    if (
+      result.routes[1].state?.routes[0] &&
+      (result?.routes[1].state?.routes[0].name === 'Comments' ||
+        result?.routes[1].state?.routes[0].name === 'Replies') &&
+      result.routes[1].state?.routes[0].params
+    ) {
+      const routes = [result?.routes[0]];
+      routes.push(
+        {
+          name: 'Viewer',
+          params: {
+            _id: result.routes[1].state?.routes[0].params.postId,
+          },
+        },
+        {
+          name: 'Comments',
+          params: {
+            postId: result.routes[1].state?.routes[0].params.postId,
+            commentId:
+              result.routes[1].state?.routes[0].params.parentCommentId ??
+              result.routes[1].state?.routes[0].params.commentId,
+          },
+        },
+      );
+      if (result?.routes[1].state?.routes[0]?.name === 'Replies') {
+        routes.push({
+          name: 'Replies',
+          params: {
+            postId: result.routes[1].state?.routes[0].params.postId,
+            parentCommentId:
+              result.routes[1].state?.routes[0].params.parentCommentId,
+            commentId: result.routes[1].state?.routes[0].params.commentId,
+          },
+        });
+      }
+      result.routes[1].state.routes = routes;
+      return result;
+    }
+    return result;
+  },
 };
 const App = () => {
   return (

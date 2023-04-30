@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {
   Alert,
   Dimensions,
@@ -11,7 +11,6 @@ import {
   useColorScheme,
   useWindowDimensions,
   View,
-  Text as RText,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Pdf, {Source} from 'react-native-pdf';
@@ -63,11 +62,12 @@ import {
 } from '@redux/reducer/blocksReducer';
 import ListEmptyComponent from '@components/ListEmptyComponent';
 
-type ViewerProps = StackScreenProps<RootStackParamList, 'Viewer'>;
+type ViewerProps = StackScreenProps<PdfViewerStackParams, 'Viewer'>;
 const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   const isDarkMode = useColorScheme() === 'dark';
+  console.log('PdfViewer', route.params, navigation.getState());
   const post = useAppSelector(state =>
-    selectById(state.posts, route.params._id || route.params?.id),
+    selectById(state.posts, route.params?._id || route.params?.id || ''),
   );
   const authState = useAppSelector(state => getAuthState(state));
   const session = useAppSelector(state => getSession(state));
@@ -104,7 +104,11 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
   );
   useFocusEffect(
     useCallback(() => {
-      if (authState !== EAuthState.INIT) {
+      console.log('aaa', route.params);
+      if (
+        authState !== EAuthState.INIT &&
+        (route.params?.id ?? route.params?._id)
+      ) {
         getCsrfToken.then(token => setCsrfToken(token));
         apiInstance
           .post<response<IPost>>(
@@ -117,9 +121,12 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
               dispatch(postRemoveOne(route.params?.id || route.params._id));
             }
             setFetching(false);
+          })
+          .catch(() => {
+            console.log('error');
           });
       }
-    }, [authState, dispatch, route.params._id, route.params?.id]),
+    }, [authState, dispatch, route.params._id, route.params.id]),
   );
   const likeCallback = useCallback(() => {
     if (!session) {
@@ -193,7 +200,7 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
           },
         ]}>
         <Pdf
-          fitPolicy={2}
+          fitPolicy={0}
           trustAllCerts={false}
           spacing={2}
           source={source}

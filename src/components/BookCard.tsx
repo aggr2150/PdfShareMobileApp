@@ -1,7 +1,7 @@
 import React from 'react';
 import {ColorValue, Pressable, View} from 'react-native';
 import {makeStyles, Text} from '@rneui/themed';
-import {useNavigation} from '@react-navigation/native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import Book from '@components/book/Book';
 import {humanizeNumber} from '@utils/Humanize';
 import InterstitialAdsController from '@components/InterstitialAdsController';
@@ -37,12 +37,18 @@ const BookCard: React.FC<BookCardProps> = ({
   ],
 }) => {
   const styles = useStyles();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
   return (
     <Pressable
       onPress={() => {
         InterstitialAdsController.requestAds();
-        navigation.navigate('Viewer', item);
+        // linkTo(`/post/${item._id}`);
+
+        // navigation.dispatch(
+        //   CommonActions.navigate({name: 'Viewer', params: item}),
+        // );
+        navigation.navigate('Pdf', {screen: 'Viewer', params: item});
       }}
       style={{
         aspectRatio: 16 / 9,

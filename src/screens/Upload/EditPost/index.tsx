@@ -11,6 +11,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import CheckButton from '@components/buttons/CheckButton';
 import ThumbnailCover from '@components/ThumbnailCover';
 import BookCover from '@components/BookCover';
+import {useLinkTo} from '@react-navigation/native';
 
 type EditPostProps = StackScreenProps<RootStackParamList, 'EditPost'>;
 const EditPost: React.FC<EditPostProps> = ({navigation, route}) => {
@@ -39,7 +40,7 @@ const EditPost: React.FC<EditPostProps> = ({navigation, route}) => {
 
   const submit = useCallback(() => {
     setProgressModalVisible(true);
-    let form = new FormData();
+    const form = new FormData();
     form.append('postId', route.params._id);
     form.append('title', title);
     form.append('content', content);
@@ -68,7 +69,7 @@ const EditPost: React.FC<EditPostProps> = ({navigation, route}) => {
         console.log(response.data);
         setProgressModalVisible(false);
         setSubmitDisabled(false);
-        navigation.navigate('Viewer', route.params);
+        navigation.navigate('Pdf', {screen: 'Viewer', params: route.params});
       })
       .catch(error => {
         console.log('error', error);

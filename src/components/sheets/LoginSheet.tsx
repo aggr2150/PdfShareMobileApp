@@ -66,6 +66,7 @@ const LoginSheet: React.FC<SheetProps<loginSheetPayload>> = props => {
         // flexs: 1,
       }}>
       <ScrollView
+        keyboardShouldPersistTaps={'handled'}
         showsVerticalScrollIndicator={false}
         style={{
           paddingHorizontal: 35,

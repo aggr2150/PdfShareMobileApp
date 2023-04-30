@@ -38,7 +38,7 @@ const SecondScene = props => {
         .then(result => {
           Toast.show({
             type: 'success',
-            text1: '비밀번호가 변경되었습니다.',
+            text1: '인증번호가 전송되었습니다.',
             position: 'bottom',
           });
           console.log(result);

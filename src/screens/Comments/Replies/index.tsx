@@ -1,5 +1,4 @@
 import {
-  FlatList,
   KeyboardAvoidingView,
   ListRenderItem,
   Platform,
@@ -11,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import {makeStyles} from '@rneui/themed';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import Comment from '@components/Comment';
 import SendIcon from '@assets/icon/send.svg';
 import {StackScreenProps} from '@react-navigation/stack';
@@ -31,6 +30,7 @@ import ListEmptyComponent from '@components/ListEmptyComponent';
 import Spinner from '@components/Spinner';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Separator from '@components/Seperator';
+import {FlatList} from '@stream-io/flat-list-mvcp';
 
 type ReplyProps = StackScreenProps<RootStackParamList, 'Replies'>;
 const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
@@ -74,24 +74,36 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
       .finally(() => {
         setFetching(false);
       });
-  }, [dispatch, route.params._id, route.params.postId]);
+  }, [
+    dispatch,
+    route.params._id,
+    route.params.postId,
+    route.params.parentCommentId,
+    route.params.commentId,
+  ]);
+  const flatListRef = useRef<FlatList<IComment>>(null);
   const throttleEventCallback = useMemo(
     () =>
-      _.throttle((pagingKey, initial?) => {
+      _.throttle((pagingKey, sort = -1, initial?) => {
         apiInstance
           .post<response<IComment[]>>('/api/comment/list', {
             postId: route.params.postId,
-            parentCommentId: route.params._id,
-            pagingKey,
+            parentCommentId: route.params.parentCommentId ?? route.params._id,
+            sort,
+            ...(initial ? {commentId: route.params.commentId} : {pagingKey}),
           })
           .then(response => {
             if (response.data.data.length !== 0) {
+              dispatch(commentAddedMany(response.data.data));
               if (initial) {
                 setData(response.data.data);
+                const target = response.data.data.find(
+                  value => value._id === route.params.commentId,
+                );
+                target && flatListRef.current?.scrollToItem({item: target});
               } else {
                 setData(prevState => [...prevState, ...response.data.data]);
               }
-              dispatch(commentAddedMany(response.data.data));
             }
           })
           .catch(error => console.log(error))
@@ -100,7 +112,13 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
             setRefreshing(false);
           });
       }, 1000),
-    [dispatch, route.params._id, route.params.postId],
+    [
+      dispatch,
+      route.params._id,
+      route.params.commentId,
+      route.params.parentCommentId,
+      route.params.postId,
+    ],
   );
   const onEndReached = useCallback(() => {
     if (!fetching) {
@@ -108,10 +126,14 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
     }
   }, [data, fetching, throttleEventCallback]);
   const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    throttleEventCallback.cancel();
-    throttleEventCallback(undefined, true);
-  }, [throttleEventCallback]);
+    if (!fetching) {
+      setRefreshing(true);
+      throttleEventCallback(data[0]?._id, 1);
+    }
+    // setRefreshing(true);
+    // throttleEventCallback.cancel();
+    // throttleEventCallback(undefined, true);
+  }, [data, fetching, throttleEventCallback]);
   // const headerHeight = useHeaderHeight();
   const submit = useCallback(() => {
     apiInstance
@@ -236,6 +258,9 @@ const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
         <FlatList<IComment>
           data={comments}
           contentContainerStyle={{flexGrow: 1}}
+          maintainVisibleContentPosition={{
+            minIndexForVisible: 0,
+          }}
           ListHeaderComponent={() => (
             <>
               <Comment

@@ -5,6 +5,7 @@ import {
   CommonActions,
   NavigationProp,
   RouteProp,
+  useLinkTo,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
@@ -147,10 +148,14 @@ const ProfileHeaderRight = () => {
       SheetManager.show('loginSheet', {payload: {closable: true}}).then();
     }
   }, [session, csrfToken, dispatch, sessionUser, user]);
+  const linkTo = useLinkTo();
   return (
     user && (
       <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
+          // onPress={() =>
+          //   linkTo('/post/644b7ff9e4ef40ea6cf9b44a/644c0703eb2a545bf55d309d')
+          // }
           onPress={() => navigation.navigate('Notifications')}
           style={{
             // marginRight: 11,

@@ -1,21 +1,20 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import Spinner from '@components/Spinner';
-import Animated, {FadeIn} from 'react-native-reanimated';
-import {useAppSelector} from '@redux/store/RootStore';
 import {StackScreenProps} from '@react-navigation/stack';
-import {selectById} from '@redux/reducer/usersReducer';
 import {apiInstance} from '@utils/Networking';
-import {getSession} from '@redux/reducer/authReducer';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import RevenueListHeader from '@screens/Profile/RevenueListHeader';
 import Book from '@components/book/Book';
 import {Text} from '@rneui/themed';
 import Separator from '@components/Seperator';
 import _ from 'lodash';
 import Orientation from 'react-native-orientation-locker';
+// import {FlatList} from 'react-native-bidirectional-infinite-scroll';
+import {FlatList} from '@stream-io/flat-list-mvcp';
+import {useLinkTo} from '@react-navigation/native';
+import Avatar from '@components/Avatar';
+import ListEmptyComponent from '@components/ListEmptyComponent';
 
-const settlementMultiplier = 0.12;
 type NotificationsProps = StackScreenProps<
   ProfileStackScreenParams,
   'Notifications'
@@ -25,40 +24,22 @@ type NotificationsProps = StackScreenProps<
 //   settledAmount: number;
 //   settledViewCounter: number;
 // };
-const Notifications: React.FC<NotificationsProps> = ({navigation}) => {
+const Notifications: React.FC<NotificationsProps> = () => {
   const insets = useSafeAreaInsets();
-  const session = useAppSelector(state => getSession(state));
   const [refreshing, setRefreshing] = useState(false);
-  const [settlement, setSettlement] = useState<TSettlement>();
-  const [feeds, setFeeds] = useState<IPost[]>([]);
+  const [data, setData] = useState<INotification<any>[]>([]);
   const [fetching, setFetching] = useState(true);
   useEffect(() => {
     Orientation.lockToPortrait();
   }, []);
-
-  // const LikesData = useAppSelector(state => {
-  //   // state.likes
-  //   return tabData[selectedIndex].map(
-  //     item => state.posts.entities[item._id] || item,
-  //   );
-  // });
-  const user = useAppSelector(state =>
-    selectById(state.users, session?.id || ''),
-  );
   useEffect(() => {
     apiInstance
-      .post<
-        response<{
-          feeds: IPost[];
-          settlement: TSettlement;
-        }>
-      >('/api/account/revenue', {})
+      .post<response<INotification<any>[]>>('/api/account/notifications', {})
       .then(response => {
-        if (response.data.code === 200 && response.data.data.settlement) {
-          if (response.data.data.feeds.length !== 0) {
-            setFeeds(response.data.data.feeds);
+        if (response.data.code === 200 && response.data.data) {
+          if (response.data.data.length !== 0) {
+            setData(response.data.data);
           }
-          setSettlement(response.data.data.settlement);
         }
       })
       .finally(() => {
@@ -69,12 +50,18 @@ const Notifications: React.FC<NotificationsProps> = ({navigation}) => {
 
   const throttleEventCallback = useMemo(
     () =>
-      _.throttle(pagingKey => {
+      _.throttle((pagingKey, initial?) => {
         apiInstance
-          .post<response<IPost[]>>('/api/account/revenue/feeds', {pagingKey})
+          .post<response<INotification<any>[]>>('/api/account/notifications', {
+            pagingKey,
+          })
           .then(response => {
             if (response.data.data.length !== 0) {
-              setFeeds(prevState => [...prevState, ...response.data.data]);
+              if (initial) {
+                setData(response.data.data);
+              } else {
+                setData(prevState => [...prevState, ...response.data.data]);
+              }
             }
           })
           .catch(error => console.log(error))
@@ -88,88 +75,77 @@ const Notifications: React.FC<NotificationsProps> = ({navigation}) => {
 
   const onEndReached = useCallback(() => {
     if (!fetching) {
-      throttleEventCallback(feeds[feeds.length - 1]?._id);
+      throttleEventCallback(data[data.length - 1]?._id);
     }
-  }, [feeds, fetching, throttleEventCallback]);
+  }, [data, fetching, throttleEventCallback]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    apiInstance
-      .post<
-        response<{
-          feeds: IPost[];
-          settlement: TSettlement;
-        }>
-      >('/api/account/revenue', {})
-      .then(response => {
-        if (response.data.code === 200 && response.data.data.settlement) {
-          if (response.data.data.feeds.length !== 0) {
-            setFeeds(response.data.data.feeds);
-          }
-          setSettlement(response.data.data.settlement);
-        }
-      })
-      .finally(() => {
-        setFetching(false);
-        setRefreshing(false);
-      });
-  }, []);
+    throttleEventCallback.cancel();
+    throttleEventCallback(undefined, true);
+  }, [throttleEventCallback]);
 
+  const linkTo = useLinkTo();
   const renderItem = useMemo<
-    React.FC<{item: IPost; index: number}>
-  >((): React.FC<{item: IPost; index: number}> => {
-    return ({item, index}) => (
-      <Animated.View entering={FadeIn}>
+    React.FC<{item: INotification<any>; index: number}>
+  >((): React.FC<{item: INotification<any>; index: number}> => {
+    return ({item}) => (
+      <TouchableOpacity onPress={() => item.route && linkTo(item.route)}>
         {/*<BookCard item={item} index={index} />*/}
-        <View style={{flexDirection: 'row', aspectRatio: 32 / 12, padding: 24}}>
-          <View style={{marginRight: 24}}>
-            <View style={{aspectRatio: 3 / 4}}>
-              <Book
-                title={item.title}
-                author={item.author}
-                thumbnail={item.thumbnail}
+        {/*<Text style={{marginVertical: 20}}>테스트{item}</Text>*/}
+        <View
+          style={{
+            flexDirection: 'row',
+            minHeight: 120,
+            paddingHorizontal: 4,
+            paddingRight: 24,
+          }}>
+          {item.fromUser && (
+            <TouchableOpacity
+              style={{backgroundColor: 'red'}}
+              onPress={() => item.fromUser && linkTo(`/u/${item.fromUser.id}`)}>
+              <Avatar
+                style={{margin: 8, width: 24, height: 24}}
+                avatar={item.fromUser.avatar}
               />
-            </View>
-          </View>
+            </TouchableOpacity>
+          )}
           <View
             style={{
-              justifyContent: 'space-between',
-              alignItems: 'flex-end',
+              marginLeft: item.fromUser ? 0 : 32,
+              marginVertical: 8,
+              // justifyContent: 'space-between',
+              // alignItems: 'flex-end',
               flex: 1,
             }}>
-            <Text style={{fontSize: 20}}>{item.title}</Text>
-            <View
-              style={{
-                // justifyContent: 'space-between',
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <Text style={{fontSize: 16}}>예상 수익</Text>
-              <View style={{flex: 1}}>
-                <Text
-                  style={{fontSize: 20, textAlign: 'right', color: '#60B630'}}>
-                  ₩ {(item.viewCounter * settlementMultiplier).toFixed(2)}
-                </Text>
-              </View>
-            </View>
+            {item.title && (
+              <Text
+                style={{
+                  fontSize: 16,
+                  lineHeight: 24,
+                }}>
+                {item.title}
+              </Text>
+            )}
+            <Text style={{fontSize: 14}}>{item.body}</Text>
           </View>
+          {item.post && (
+            <TouchableOpacity
+              style={{marginLeft: 16, marginVertical: 15}}
+              onPress={() => linkTo(`/post/${item._id}`)}>
+              <View style={{aspectRatio: 3 / 4, flex: 1}}>
+                <Book
+                  title={item.post.title}
+                  author={item.post.author}
+                  thumbnail={item.post.thumbnail}
+                />
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
-        {/*<Book />*/}
-        {/*    <Pressable*/}
-        {/*      onPress={() => {*/}
-        {/*        navigation.navigate('CollectionList');*/}
-        {/*      }}*/}
-        {/*      style={{*/}
-        {/*        backgroundColor: '#282828',*/}
-        {/*        paddingHorizontal: 42,*/}
-        {/*        paddingVertical: 54,*/}
-        {/*        justifyContent: 'center',*/}
-        {/*      }}>*/}
-        {/*      <Text style={{fontSize: 14}}>크리스마스어쩌고 저쩌고</Text>*/}
-        {/*    </Pressable>*/}
-      </Animated.View>
+      </TouchableOpacity>
     );
-  }, []);
+  }, [linkTo]);
   return (
     <View
       style={{
@@ -178,14 +154,57 @@ const Notifications: React.FC<NotificationsProps> = ({navigation}) => {
         overflow: 'visible',
         flex: 1,
       }}>
-      {!settlement ? (
-        <Spinner />
-      ) : (
-        <FlatList<IPost>
-          data={feeds}
+      {
+        <FlatList<INotification<any>>
+          contentContainerStyle={{flexGrow: 1}}
+          data={data}
+          keyExtractor={item => item.toString()}
+          // onStartReached={async () => {
+          //   // flatListRef.current?.scrollToIndex({animated: false, index: 10});
+          //   setData(prevState => [
+          //     ...[
+          //       'aaa' + prevState.length,
+          //       'bbb' + prevState.length,
+          //       'ccc' + prevState.length,
+          //       'ddd' + prevState.length,
+          //     ],
+          //     ...prevState,
+          //   ]);
+          //   // flatListRef.current?.;
+          // }}
           onRefresh={onRefresh}
+          // onEndReachedThreshold={10}
+          // onRefresh={onRefresh}
+          // updateCellsBatchingPeriod={}
+          // onContentSizeChange={() => {
+          //   flatListRef.current.scrollToIndex({animated: true, index: 10});
+          // }}
+          // directionalLockEnabled={}
+          // onViewableItemsChanged={({viewableItems, changed}) => {
+          //   // console.log(viewableItems, changed);
+          // }}
+          // refreshControl={
+          //   <RefreshControl
+          //     refreshing={refreshing}
+          //     onRefresh={() => {
+          //       setData(prevState => [
+          //         ...[
+          //           'aaa' + prevState.length,
+          //           'bbb' + prevState.length,
+          //           'ccc' + prevState.length,
+          //           'ddd' + prevState.length,
+          //         ],
+          //         ...prevState,
+          //       ]);
+          //     }}
+          //   />
+          // }
           refreshing={refreshing}
           onEndReached={onEndReached}
+          maintainVisibleContentPosition={{
+            minIndexForVisible: 0,
+          }}
+          // onViewableItemsChanged={}
           // extraData={data}
           // showsVerticalScrollIndicator={false}
           scrollIndicatorInsets={{right: 0}}
@@ -194,10 +213,17 @@ const Notifications: React.FC<NotificationsProps> = ({navigation}) => {
           // style={{overflow: 'visible'}}
           // contentContainerStyle={{width: '100%'}}
           ItemSeparatorComponent={Separator}
+          ListEmptyComponent={() =>
+            fetching ? (
+              <Spinner />
+            ) : (
+              <ListEmptyComponent>알림이 없습니다.</ListEmptyComponent>
+            )
+          }
           renderItem={renderItem}
           // keyExtractor={item => `${selectedIndex}${item._id}`}
         />
-      )}
+      }
     </View>
   );
 };

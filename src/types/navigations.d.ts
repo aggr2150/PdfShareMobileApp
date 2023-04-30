@@ -29,10 +29,7 @@ interface IID {
 }
 type Viewer = IID | IPost;
 
-declare type RootStackParamList = {
-  Tabs: import('@react-navigation/native').NavigatorScreenParams<BottomTabParamList>;
-  ProfileTab: undefined;
-  Collection: {_id: string};
+declare type PdfViewerStackParams = {
   Viewer:
     | {
         _id: string;
@@ -52,9 +49,42 @@ declare type RootStackParamList = {
         likeStatus: boolean;
       }
     | {id: string};
+  Comments: {postId: string; commentId?: string};
+  Replies: IComment | {postId: string; commentId: string; replyId?: string};
+};
+
+declare type RootStackParamList = {
+  Tabs: import('@react-navigation/native').NavigatorScreenParams<BottomTabParamList>;
+  ProfileTab: undefined;
+  Collection: {_id: string};
+  Pdf: import('@react-navigation/native').NavigatorScreenParams<PdfViewerStackParams>;
+  // Viewer:
+  //   | {
+  //       _id: string;
+  //       author: IAuthor;
+  //       title: string;
+  //       content: string;
+  //       tag: string[];
+  //       thumbnail?: IFile;
+  //       documentThumbnail: IFile;
+  //       document: IFile;
+  //       viewCounter: number;
+  //       likeCounter: number;
+  //       commentCounter: number;
+  //       isDeleted: boolean;
+  //       createdAt: Date;
+  //       updatedAt?: Date;
+  //       likeStatus: boolean;
+  //     }
+  //   | {id: string};
   SignIn: undefined;
-  Comments: {postId: string};
-  Replies: IComment;
+  index: undefined;
+  Comments: {postId: string; commentId?: string};
+  Replies: IComment & {
+    postId: string;
+    commentId?: string;
+    parentCommentId?: string;
+  };
   HistoryTab: undefined;
   History: undefined;
   Search: ?{keyword: string};

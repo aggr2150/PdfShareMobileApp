@@ -105,8 +105,6 @@ const Upload: React.FC<UploadProps> = ({navigation}) => {
       })
       .then(response => {
         console.log(response.data);
-        setProgressModalVisible(false);
-        setSubmitDisabled(false);
         navigation.navigate('Home');
       })
       .catch(error => {
@@ -116,6 +114,9 @@ const Upload: React.FC<UploadProps> = ({navigation}) => {
           text1: 'Unknown Error Occurred!',
           position: 'bottom',
         });
+      })
+      .finally(() => {
+        setSubmitDisabled(false);
         setProgressModalVisible(false);
       });
     // }

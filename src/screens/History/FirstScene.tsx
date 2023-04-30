@@ -1,33 +1,21 @@
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {makeStyles, Text} from '@rneui/themed';
-import ThrottleFlatList from '@components/ThrottleFlatlist';
-import BookCard from '@components/BookCard';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
   FlatList,
   Pressable,
   RefreshControl,
-  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
 import {apiInstance} from '@utils/Networking';
 import _ from 'lodash';
-import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
-import {postAddedMany, postSetMany} from '@redux/reducer/postsReducer';
+import {postSetMany} from '@redux/reducer/postsReducer';
 import {useAppDispatch, useAppSelector} from '@redux/store/RootStore';
 import Book from '@components/book/Book';
 import Separator from '@components/Seperator';
 import {useNavigation} from '@react-navigation/native';
 import {getHistoryNumColumns} from '@utils/Layout';
-import VerticalSeparator from '@components/VerticalSeparator';
 
 const FirstScene = () => {
   const styles = useStyles();
@@ -110,11 +98,11 @@ const FirstScene = () => {
       onRefresh={onRefresh}
       // ItemSeparatorComponent={VerticalSeparator}
       ItemSeparatorComponent={Separator}
-      renderItem={({item, index}) => (
+      renderItem={({item}) => (
         <Pressable
-          onPress={() => {
-            navigation.navigate('Viewer', item);
-          }}
+          onPress={() =>
+            navigation.navigate('Pdf', {screen: 'Viewer', params: item})
+          }
           style={{
             backgroundColor: '#000',
             paddingHorizontal: 21,
