@@ -1,10 +1,10 @@
-import {Linking, TouchableOpacity, View} from 'react-native';
+import {Linking, View} from 'react-native';
 import {Button, makeStyles, Text} from '@rneui/themed';
 import {apiInstance, getCsrfToken} from '@utils/Networking';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {TextInput} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {CommonActions, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {Input as BaseInput} from '@rneui/base/dist/Input/Input';
 import {signIn} from '@redux/reducer/authReducer';
 import Toast from 'react-native-toast-message';
@@ -164,7 +164,16 @@ const SecondScene = props => {
           position: 'bottom',
         });
       });
-  }, [csrfToken, email, password, passwordConfirm, verificationCode]);
+  }, [
+    csrfToken,
+    dispatch,
+    email,
+    navigation,
+    password,
+    passwordConfirm,
+    props,
+    verificationCode,
+  ]);
   return (
     <View>
       <View style={styles.inputContainer}>
