@@ -114,9 +114,14 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
         getCsrfToken.then(token => setCsrfToken(token));
         apiInstance
           .post<response<IPost>>(
-            '/api/post/' + (route.params?.id || route.params._id),
+            '/api/post/' + (route.params?.id ?? route.params._id),
           )
           .then(response => {
+            console.log(
+              'focus',
+              response.data,
+              '/api/post/' + (route.params?.id ?? route.params._id),
+            );
             if (response.data.data) {
               dispatch(postSetOne(response.data.data));
             } else {

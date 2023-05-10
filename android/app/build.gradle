@@ -101,8 +101,8 @@ android {
         applicationId "com.everypdf"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 12
-        versionName "0.1"
+        versionCode 14
+        versionName "0.2"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -116,21 +116,21 @@ android {
     }
     signingConfigs {
         debug {
-//             if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
-//                 storeFile file(MYAPP_UPLOAD_STORE_FILE)
-//                 storePassword MYAPP_UPLOAD_STORE_PASSWORD
-//                 keyAlias MYAPP_UPLOAD_KEY_ALIAS
-//                 keyPassword MYAPP_UPLOAD_KEY_PASSWORD
-//             } else {
-//                 storeFile file('debug.keystore')
-//                 storePassword 'android'
-//                 keyAlias 'androiddebugkey'
-//                 keyPassword 'android'
-//             }
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+                storeFile file(MYAPP_UPLOAD_STORE_FILE)
+                storePassword MYAPP_UPLOAD_STORE_PASSWORD
+                keyAlias MYAPP_UPLOAD_KEY_ALIAS
+                keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+            } else {
+                storeFile file('debug.keystore')
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            }
+//             storeFile file('debug.keystore')
+//             storePassword 'android'
+//             keyAlias 'androiddebugkey'
+//             keyPassword 'android'
         }
         release {
             if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {

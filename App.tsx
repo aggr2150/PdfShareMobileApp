@@ -74,10 +74,10 @@ const linking = {
     const result: any = getStateFromPath(path, config);
     console.log(result, path);
     if (
-      result.routes[1].state?.routes[0] &&
-      (result?.routes[1].state?.routes[0].name === 'Comments' ||
-        result?.routes[1].state?.routes[0].name === 'Replies') &&
-      result.routes[1].state?.routes[0].params
+      result.routes[1]?.state?.routes[0] &&
+      (result?.routes[1]?.state?.routes[0].name === 'Comments' ||
+        result?.routes[1]?.state?.routes[0].name === 'Replies') &&
+      result.routes[1]?.state?.routes[0].params
     ) {
       const routes = [result?.routes[0]];
       routes.push(

@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {Pressable, TouchableOpacity, View} from 'react-native';
 import Spinner from '@components/Spinner';
 import {StackScreenProps} from '@react-navigation/stack';
 import {apiInstance} from '@utils/Networking';
@@ -14,6 +14,7 @@ import {FlatList} from '@stream-io/flat-list-mvcp';
 import {useLinkTo} from '@react-navigation/native';
 import Avatar from '@components/Avatar';
 import ListEmptyComponent from '@components/ListEmptyComponent';
+import {INotification} from '@src/types/models';
 
 type NotificationsProps = StackScreenProps<
   ProfileStackScreenParams,
@@ -97,18 +98,18 @@ const Notifications: React.FC<NotificationsProps> = () => {
           style={{
             flexDirection: 'row',
             minHeight: 120,
+            maxHeight: 200,
             paddingHorizontal: 4,
             paddingRight: 24,
           }}>
           {item.fromUser && (
-            <TouchableOpacity
-              style={{backgroundColor: 'red'}}
+            <Pressable
               onPress={() => item.fromUser && linkTo(`/u/${item.fromUser.id}`)}>
               <Avatar
                 style={{margin: 8, width: 24, height: 24}}
                 avatar={item.fromUser.avatar}
               />
-            </TouchableOpacity>
+            </Pressable>
           )}
           <View
             style={{
@@ -129,10 +130,10 @@ const Notifications: React.FC<NotificationsProps> = () => {
             )}
             <Text style={{fontSize: 14}}>{item.body}</Text>
           </View>
-          {item.post && (
+          {item.post?._id && (
             <TouchableOpacity
-              style={{marginLeft: 16, marginVertical: 15}}
-              onPress={() => linkTo(`/post/${item._id}`)}>
+              style={{marginLeft: 16, marginVertical: 15, flex: 0}}
+              onPress={() => linkTo(`/post/${item.post?._id}`)}>
               <View style={{aspectRatio: 3 / 4, flex: 1}}>
                 <Book
                   title={item.post.title}
@@ -158,7 +159,7 @@ const Notifications: React.FC<NotificationsProps> = () => {
         <FlatList<INotification<any>>
           contentContainerStyle={{flexGrow: 1}}
           data={data}
-          keyExtractor={item => item.toString()}
+          keyExtractor={item => item._id}
           // onStartReached={async () => {
           //   // flatListRef.current?.scrollToIndex({animated: false, index: 10});
           //   setData(prevState => [
@@ -221,7 +222,7 @@ const Notifications: React.FC<NotificationsProps> = () => {
             )
           }
           renderItem={renderItem}
-          // keyExtractor={item => `${selectedIndex}${item._id}`}
+          // keyExtractor={item => `${item._id}`}
         />
       }
     </View>
