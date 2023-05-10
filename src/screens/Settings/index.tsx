@@ -41,6 +41,10 @@ const Settings = ({navigation}) => {
                 onPress: () => navigation.navigate('ChangePassword'),
               },
               {
+                labelText: '알림 설정',
+                onPress: () => navigation.navigate('Notification'),
+              },
+              {
                 labelText: '차단 관리',
                 onPress: () => navigation.navigate('BlockList'),
               },

@@ -64,7 +64,7 @@ declare enum ENotificationType {
   'social' = 'social',
 }
 
-declare enum EActionType {
+export enum EActionType {
   'none' = 'none',
   'upload' = 'upload',
   'comment' = 'comment',

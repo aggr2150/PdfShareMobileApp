@@ -32,6 +32,7 @@ import CustomerService from '@screens/Settings/CustomerService';
 import messaging from '@react-native-firebase/messaging';
 import Replies from '../screens/Comments/Replies';
 import PdfViewerStackNavigation from '@navigations/PdfViewerStackNavigation';
+import SettingStackNavigation from '@src/navigations/stack/SettingStackNavigation';
 
 const RootStack = createStackNavigator<RootStackParamList>();
 
@@ -202,49 +203,14 @@ const RootStackNavigator = () => {
           }}
         />
       </RootStack.Group>
-      <RootStack.Group
-        screenOptions={{
-          headerTintColor: 'white',
-          headerStyle: {
-            backgroundColor: '#000',
-            borderBottomWidth: 0,
-            // borderBottomColor: '#333',
-            shadowOpacity: 0,
-          },
-          headerTitleStyle: {
-            color: '#fff',
-          },
-          headerLeftLabelVisible: false,
-        }}>
-        <RootStack.Screen
-          name="Settings"
-          component={Settings}
-          options={{
-            title: '설정',
-          }}
-        />
-        <RootStack.Screen
-          name="CustomerService"
-          component={CustomerService}
-          options={{
-            title: '1:1 문의',
-          }}
-        />
-        <RootStack.Screen
-          name="Information"
-          component={Information}
-          options={{
-            title: '정보',
-          }}
-        />
-        <RootStack.Screen
-          name="BlockList"
-          component={BlockList}
-          options={{
-            title: '차단관리',
-          }}
-        />
-      </RootStack.Group>
+
+      <RootStack.Screen
+        name="Settings"
+        component={SettingStackNavigation}
+        options={{
+          headerShown: false,
+        }}
+      />
 
       <RootStack.Group
         screenOptions={{headerShown: false, cardStyle: styles.primaryCard}}>

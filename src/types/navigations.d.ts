@@ -53,6 +53,14 @@ declare type PdfViewerStackParams = {
   Replies: IComment | {postId: string; commentId: string; replyId?: string};
 };
 
+declare type SettingStackParams = {
+  index: undefined;
+  Notification: undefined;
+  CustomerService: undefined;
+  Information: undefined;
+  BlockList: undefined;
+};
+
 declare type RootStackParamList = {
   Tabs: import('@react-navigation/native').NavigatorScreenParams<BottomTabParamList>;
   ProfileTab: undefined;
@@ -99,7 +107,7 @@ declare type RootStackParamList = {
   };
   My: undefined;
   // Profile: IUser | {id: string};
-  Settings: undefined;
+  Settings: import('@react-navigation/native').NavigatorScreenParams<SettingStackParams>;
   CustomerService: undefined;
   Information: undefined;
   BlockList: undefined;

@@ -1,4 +1,4 @@
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {
   Alert,
   Dimensions,
@@ -8,6 +8,7 @@ import {
   ScrollView,
   StatusBar,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   useColorScheme,
   useWindowDimensions,
   View,
@@ -18,7 +19,7 @@ import Pdf, {Source} from 'react-native-pdf';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // import {setUIVisible} from '@redux/reducer/viewerReducer';
-import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
+import Animated, {FadeIn, FadeOut, runOnJS} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Button, makeStyles, Text} from '@rneui/themed';
 import Avatar from '@components/Avatar';
@@ -61,6 +62,7 @@ import {
   selectById as selectBlockUserById,
 } from '@redux/reducer/blocksReducer';
 import ListEmptyComponent from '@components/ListEmptyComponent';
+import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 
 type ViewerProps = StackScreenProps<PdfViewerStackParams, 'Viewer'>;
 const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
@@ -159,6 +161,17 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
         });
     }
   }, [csrfToken, dispatch, post, session]);
+  const setUIVisibleCallback = () => setUIVisible(prevState => !prevState);
+  const tap = useMemo(
+    () =>
+      Gesture.Tap()
+        .numberOfTaps(1)
+        .maxDuration(200)
+        .maxDelay(100)
+        .maxDistance(40)
+        .onStart(() => runOnJS(setUIVisibleCallback)()),
+    [setUIVisibleCallback],
+  );
   return post === undefined && fetching ? (
     <Spinner />
   ) : !post ? (
@@ -193,35 +206,52 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
       ]}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'#eee'} />
       <View
+        // onPress={() => setUIVisible(prevState => !prevState)}
         style={[
           styles.container,
           {
             overflow: 'visible',
           },
         ]}>
-        <Pdf
-          fitPolicy={0}
-          trustAllCerts={false}
-          spacing={2}
-          source={source}
-          onPageSingleTap={() => setUIVisible(prevState => !prevState)}
-          onLoadComplete={numberOfPages => {
-            console.log(`Number of pages: ${numberOfPages}`);
-          }}
-          onPageChanged={(page, numberOfPages) => {
-            console.log(`Current page: ${page}`);
-          }}
-          onError={error => {
-            console.log(error);
-          }}
-          onPressLink={uri => {
-            console.log(uri);
-            Linking.canOpenURL(uri).then(value => {
-              value && Linking.openURL(uri);
-            });
-          }}
-          style={[styles.pdf, {width, height}]}
-        />
+        <GestureDetector
+          gesture={tap}
+          // style={[
+          //   styles.container,
+          //   {
+          //     overflow: 'visible',
+          //   },
+          // ]}
+          // delayLongPress={500}
+          // pointerEvents={UIVisible ? 'none' : undefined}
+          // onPress={() => setUIVisible(prevState => !prevState)}
+        >
+          <Pdf
+            fitPolicy={0}
+            trustAllCerts={false}
+            spacing={2}
+            source={source}
+            // onPageSingleTap={() => {
+            //   setUIVisible(prevState => !prevState);
+            //   console.log('onPageSingleTap');
+            // }}
+            onLoadComplete={numberOfPages => {
+              console.log(`Number of pages: ${numberOfPages}`);
+            }}
+            onPageChanged={(page, numberOfPages) => {
+              console.log(`Current page: ${page}`);
+            }}
+            onError={error => {
+              console.log(error);
+            }}
+            onPressLink={uri => {
+              console.log(uri);
+              Linking.canOpenURL(uri).then(value => {
+                value && Linking.openURL(uri);
+              });
+            }}
+            style={[styles.pdf, {width, height}]}
+          />
+        </GestureDetector>
         {UIVisible && (
           <Animated.View
             entering={FadeIn.duration(100)}
@@ -327,7 +357,11 @@ const PdfViewer: React.FC<ViewerProps> = ({navigation, route}) => {
                   <BoxIcon fill={'#60B630'} width={24} height={24} />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={likeCallback}
+                  onPress={e => {
+                    // e.preventDefault();
+                    e.stopPropagation();
+                    likeCallback();
+                  }}
                   style={{
                     width: 34,
                     height: 34,

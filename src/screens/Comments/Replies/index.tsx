@@ -32,7 +32,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Separator from '@components/Seperator';
 import {FlatList} from '@stream-io/flat-list-mvcp';
 
-type ReplyProps = StackScreenProps<RootStackParamList, 'Replies'>;
+type ReplyProps = StackScreenProps<PdfViewerStackParams, 'Replies'>;
 const Reply: React.FC<ReplyProps> = ({navigation, route}) => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
