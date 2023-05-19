@@ -20,7 +20,10 @@ const ColumnCard: React.FC<ColumnCardProps> = ({
   return (
     <Pressable
       onPress={
-        () => navigation.dispatch(CommonActions.navigate('Viewer', item))
+        () =>
+          navigation.dispatch(
+            CommonActions.navigate('Pdf', {screen: 'Viewer', params: item}),
+          )
         // navigation.navigate('Pdf', {screen: 'Viewer', params: item})
       }
       style={{
