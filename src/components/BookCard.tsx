@@ -42,7 +42,7 @@ const BookCard: React.FC<BookCardProps> = ({
   return (
     <Pressable
       onPress={() => {
-        InterstitialAdsController.requestAds();
+        // InterstitialAdsController.requestAds();
         // linkTo(`/post/${item._id}`);
 
         // navigation.dispatch(

@@ -76,7 +76,11 @@ const Comments: React.FC<CommentsProps> = ({navigation, route}) => {
                 );
                 target && flatListRef.current?.scrollToItem({item: target});
               } else {
-                setData(prevState => [...prevState, ...response.data.data]);
+                if (sort === -1) {
+                  setData(prevState => [...prevState, ...response.data.data]);
+                } else {
+                  setData(prevState => [...response.data.data, ...prevState]);
+                }
               }
             }
           })
